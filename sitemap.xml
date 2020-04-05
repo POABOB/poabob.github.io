@@ -2,21 +2,28 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>http://yoursite.com/2020/04/04/hello-workd/</loc>
+    <loc>https://poabob.github.io/lib/canvas-nest/README.html</loc>
     
-    <lastmod>2020-04-04T17:27:32.529Z</lastmod>
+    <lastmod>2020-04-05T12:49:07.252Z</lastmod>
     
   </url>
   
   <url>
-    <loc>http://yoursite.com/categories/index.html</loc>
+    <loc>https://poabob.github.io/2020/04/04/hello-workd/</loc>
+    
+    <lastmod>2020-04-05T12:08:53.442Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://poabob.github.io/categories/index.html</loc>
     
     <lastmod>2020-04-04T17:18:41.820Z</lastmod>
     
   </url>
   
   <url>
-    <loc>http://yoursite.com/tags/index.html</loc>
+    <loc>https://poabob.github.io/tags/index.html</loc>
     
     <lastmod>2020-04-04T17:18:17.030Z</lastmod>
     
