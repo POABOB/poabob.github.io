@@ -249,6 +249,8 @@
           </div>
           
 
+  <div id="gitalk-container"></div>
+
 <script>
   window.addEventListener('tabs:register', () => {
     let { activeClass } = CONFIG.comments;
@@ -270,6 +272,7 @@
     });
   }
 </script>
+
 
         </div>
           
@@ -483,21 +486,13 @@ window.addEventListener('pjax:success', () => {
 
 
 
+
+
     <div id="pjax">
   
 
   
 
-<script>
-  function loadCount() {
-    var d = document, s = d.createElement('script');
-    s.src = 'https://poabob.disqus.com/count.js';
-    s.id = 'dsq-count-scr';
-    (d.head || d.body).appendChild(s);
-  }
-  // defer loading until the whole page loading is completed
-  window.addEventListener('load', loadCount, false);
-</script>
 
     </div>
 </body>
