@@ -1,28 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>Hello World</title>
+    <title>Hexo部屬Node14錯誤</title>
     <url>/2020/04/05/hello-workd/</url>
-    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="noopener">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="noopener">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="noopener">GitHub</a>.</p>
+    <content><![CDATA[<h3 id="一、Hexo-deploy報錯"><a href="#一、Hexo-deploy報錯" class="headerlink" title="一、Hexo deploy報錯"></a>一、Hexo deploy報錯</h3><p>最近當我開始把以前使用過的Hexo拿來重新架設Blog，突然發現再deploy的情況產生了Error…</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ C:\Users\poabob\Desktop\my-blog&gt; npm run deploy</span><br><span class="line"></span><br><span class="line">&gt; hexo-site@0.0.0 deploy C:\Users\poabob\Desktop\my-blog</span><br><span class="line">&gt; hexo deploy</span><br><span class="line"></span><br><span class="line">(node:10324) Warning: Accessing non-existent property <span class="string">'lineno'</span> of module exports inside circular dependency</span><br><span class="line">(Use `node --trace-warnings ...` to show <span class="built_in">where</span> the warning was created)</span><br><span class="line">(node:10324) Warning: Accessing non-existent property <span class="string">'column'</span> of module exports inside circular dependency</span><br><span class="line">(node:10324) Warning: Accessing non-existent property <span class="string">'filename'</span> of module exports inside circular dependency</span><br><span class="line">(node:10324) Warning: Accessing non-existent property <span class="string">'lineno'</span> of module exports inside circular dependency</span><br><span class="line">(node:10324) Warning: Accessing non-existent property <span class="string">'column'</span> of module exports inside circular dependency</span><br><span class="line">(node:10324) Warning: Accessing non-existent property <span class="string">'filename'</span> of module exports inside circular dependency</span><br><span class="line">INFO  Deploying: git</span><br><span class="line">INFO  Clearing .deploy_git folder...</span><br><span class="line">INFO  Copying files from public folder...</span><br><span class="line">FATAL Something<span class="string">'s wrong. Maybe you can find the solution here: https://hexo.io/docs/troubleshooting.html</span></span><br><span class="line"><span class="string">TypeError [ERR_INVALID_ARG_TYPE]: The "mode" argument must be integer. Received an instance of Object</span></span><br><span class="line"><span class="string">    at copyFile (fs.js:2042:10)</span></span><br><span class="line"><span class="string">    at tryCatcher (C:\Users\poabob\Desktop\my-blog\node_modules\bluebird\js\release\util.js:16:23)</span></span><br><span class="line"><span class="string">    at ret (eval at makeNodePromisifiedEval (C:\Users\poabob\Desktop\my-blog\node_modules\bluebird\js\release\promisify.js:184:12), &lt;anonymous&gt;:13:39)</span></span><br><span class="line"><span class="string">    at C:\Users\poabob\Desktop\my-blog\node_modules\hexo-fs\lib\fs.js:144:39</span></span><br></pre></td></tr></table></figure>
 <a id="more"></a> 
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></table></figure>
 
-<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="noopener">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
+<ul>
+<li>機器Nodejs版本是14</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">C:\Users\poabob\Desktop\my-blog&gt; node -v</span><br><span class="line">v14.19.1</span><br><span class="line">C:\Users\poabob\Desktop\my-blog&gt; npm -v</span><br><span class="line">6.14.16</span><br></pre></td></tr></table></figure>
 
-<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="noopener">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
+<p>使用 <code>hexo build</code> 、 <code>hexo clean</code> 、 <code>hexo server</code> 也都沒有相關的錯誤提示，查看<a href="https://github.com/hexojs/hexo/issues/4695" target="_blank" rel="noopener">Github Issue</a>上後才發現原來node版本太高。</p>
+<h3 id="二、解決辦法：安裝NVM-Node-Version-Manager"><a href="#二、解決辦法：安裝NVM-Node-Version-Manager" class="headerlink" title="二、解決辦法：安裝NVM(Node Version Manager)"></a>二、解決辦法：安裝NVM(Node Version Manager)</h3><ul>
+<li>方法<ol>
+<li><del>使用 Docker</del></li>
+<li><del>降版本到12或13</del></li>
+<li>安裝NVM管理Nodejs版本</li>
+</ol>
+</li>
+</ul>
+<p>後來想想如果要寫個Blog用Docker跑Container要等有點久，降版本也不是一個治本的方式(如果一個專案發現版本過低，那又要升回去)，於是我就想起以前曾經網路上有人提到的<a href="https://github.com/coreybutler/nvm-windows/releases" target="_blank" rel="noopener">NVM-Windows</a>可以使用(早期<a href="https://github.com/nvm-sh/nvm" target="_blank" rel="noopener">NVM</a>只有支援Linux、MacOS)，立馬點擊下載。</p>
+<p><img src="/images/hello-world_a.jpg" alt="(下載列表)"></p>
+<p>如果是Linux則直接照著NVM官方Github上的<a href="https://github.com/nvm-sh/nvm#install--update-script" target="_blank" rel="noopener">README</a>來安裝、MacOS請參考<a href="https://tecadmin.net/install-nvm-macos-with-homebrew/" target="_blank" rel="noopener">這篇文章</a>。</p>
+<p><img src="/images/hello-world_b.jpg" alt="(下載指令)"></p>
+<blockquote>
+<p>注意：Winddows環境下安裝的話，請事先確認安裝的路徑<strong>是否有無空格</strong>，如果有的話，在使用的時候會產生<a href="https://github.com/coreybutler/nvm-windows/issues/168" target="_blank" rel="noopener">exit status 145</a>，導致無法正確使用nvm指令。</p>
+</blockquote>
+<p><img src="/images/hello-world_c.jpg" alt="(安裝提醒)"></p>
+<p>安裝完後，將terminal全部關掉重開，就可以執行 <code>nvm</code>。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">C:\Users\poabob&gt; nvm</span><br><span class="line"></span><br><span class="line">Running version 1.1.9.</span><br><span class="line"></span><br><span class="line">Usage:</span><br><span class="line"></span><br><span class="line">  nvm arch                     : Show <span class="keyword">if</span> node is running <span class="keyword">in</span> 32 or 64 bit mode.</span><br><span class="line">  nvm current                  : Display active version.</span><br><span class="line">  nvm install &lt;version&gt; [arch] : The version can be a specific version, <span class="string">"latest"</span> <span class="keyword">for</span> the latest current version, or <span class="string">"lts"</span> <span class="keyword">for</span> the</span><br><span class="line">                                 most recent LTS version. Optionally specify whether to install the 32 or 64 bit version (defaults</span><br><span class="line">                                 to system arch). Set [arch] to <span class="string">"all"</span> to install 32 AND 64 bit versions.</span><br><span class="line">                                 Add --insecure to the end of this <span class="built_in">command</span> to bypass SSL validation of the remote download server.</span><br><span class="line">  nvm list [available]         : List the node.js installations. Type <span class="string">"available"</span> at the end to see what can be installed. Aliased as ls.</span><br><span class="line">  nvm on                       : Enable node.js version management.</span><br><span class="line">  nvm off                      : Disable node.js version management.</span><br><span class="line">  nvm proxy [url]              : Set a proxy to use <span class="keyword">for</span> downloads. Leave [url] blank to see the current proxy.</span><br><span class="line">                                 Set [url] to <span class="string">"none"</span> to remove the proxy.</span><br><span class="line">  nvm node_mirror [url]        : Set the node mirror. Defaults to https://nodejs.org/dist/. Leave [url] blank to use default url.</span><br><span class="line">  nvm npm_mirror [url]         : Set the npm mirror. Defaults to https://github.com/npm/cli/archive/. Leave [url] blank to default url.</span><br><span class="line">  nvm uninstall &lt;version&gt;      : The version must be a specific version.</span><br><span class="line">  nvm use [version] [arch]     : Switch to use the specified version. Optionally use <span class="string">"latest"</span>, <span class="string">"lts"</span>, or <span class="string">"newest"</span>.</span><br><span class="line">                                 <span class="string">"newest"</span> is the latest installed version. Optionally specify 32/64bit architecture.</span><br><span class="line">                                 nvm use &lt;arch&gt; will <span class="built_in">continue</span> using the selected version, but switch to 32/64 bit mode.</span><br><span class="line">  nvm root [path]              : Set the directory <span class="built_in">where</span> nvm should store different versions of node.js.</span><br><span class="line">                                 If &lt;path&gt; is not <span class="built_in">set</span>, the current root will be displayed.</span><br><span class="line">  nvm version                  : Displays the current running version of nvm <span class="keyword">for</span> Windows. Aliased as v.</span><br></pre></td></tr></table></figure>
 
-<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="noopener">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
+<h3 id="三、NVM如何使用"><a href="#三、NVM如何使用" class="headerlink" title="三、NVM如何使用"></a>三、NVM如何使用</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">//安裝指定版本的 Nodejs</span><br><span class="line">//nvm install 12</span><br><span class="line">nvm install &lt;version&gt;</span><br><span class="line"></span><br><span class="line">//刪除指定版本</span><br><span class="line">//nvm uninstall 12.22.11 (要確定詳細版本)</span><br><span class="line">nvm uninstall &lt;version&gt;    </span><br><span class="line"></span><br><span class="line">//使用指定版本的 node</span><br><span class="line">//nvm uninstall 12.22.11 (要確定詳細版本)</span><br><span class="line">nvm use [version]           </span><br><span class="line"></span><br><span class="line">//列出本機已安裝的版本</span><br><span class="line">nvm list</span><br></pre></td></tr></table></figure>
 
-<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html" target="_blank" rel="noopener">Deployment</a></p>
-]]></content>
+<blockquote>
+<p>注意：如果在terminal下執行 <code>nvm use &lt;version&gt;</code> 或 <code>nvm on</code> 產生<a href="https://github.com/coreybutler/nvm-windows/issues/717" target="_blank" rel="noopener">exit status 1</a>，並且是亂碼，請在開啟的terminal的時候，選擇以管理員身分執行，這樣才能夠自由的切換。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">C:\Users\poabob&gt; nvm use 12.22.11</span><br><span class="line"><span class="built_in">exit</span> status 1: �z�S���������v���i���榹�ާ@�C</span><br><span class="line"></span><br><span class="line">C:\Users\poabob&gt; nvm on</span><br><span class="line">nvm enabled</span><br><span class="line"><span class="built_in">exit</span> status 1: �z�S���������v���i���榹�ާ@�C</span><br></pre></td></tr></table></figure>
+
+<h3 id="四、重新deploy-Hexo"><a href="#四、重新deploy-Hexo" class="headerlink" title="四、重新deploy Hexo"></a>四、重新deploy Hexo</h3><ol>
+<li>切換版本至12.22.11</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">C:\Users\poabob&gt; nvm list</span><br><span class="line"></span><br><span class="line">  * 14.19.1 (Currently using 64-bit executable)</span><br><span class="line">    13.14.0</span><br><span class="line">    12.22.11</span><br><span class="line">PS C:\Users\poabob&gt; nvm use 12.22.11</span><br><span class="line">Now using node v12.22.11 (64-bit)</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>depoly</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">C:\Users\poabob&gt; nvm list</span><br><span class="line"></span><br><span class="line">  * 14.19.1 (Currently using 64-bit executable)</span><br><span class="line">    13.14.0</span><br><span class="line">    12.22.11</span><br><span class="line">PS C:\Users\poabob&gt; nvm use 12.22.11</span><br><span class="line">Now using node v12.22.11 (64-bit)</span><br></pre></td></tr></table></figure>]]></content>
       <categories>
-        <category>Hello</category>
+        <category>Hexo</category>
       </categories>
       <tags>
-        <tag>Hello</tag>
+        <tag>Hexo</tag>
       </tags>
   </entry>
 </search>

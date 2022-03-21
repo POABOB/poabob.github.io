@@ -218,7 +218,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2020/04/05/hello-workd/" class="post-title-link" itemprop="url">Hello World</a>
+            <a href="/2020/04/05/hello-workd/" class="post-title-link" itemprop="url">Hexo部屬Node14錯誤</a>
         </h2>
 
         <div class="post-meta">
@@ -235,7 +235,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新於</span>
-                <time title="修改時間：2022-03-21 18:16:01" itemprop="dateModified" datetime="2022-03-21T18:16:01+08:00">2022-03-21</time>
+                <time title="修改時間：2022-03-21 20:59:53" itemprop="dateModified" datetime="2022-03-21T20:59:53+08:00">2022-03-21</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -243,7 +243,7 @@
               </span>
               <span class="post-meta-item-text">分類於</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Hello/" itemprop="url" rel="index"><span itemprop="name">Hello</span></a>
+                  <a href="/categories/Hexo/" itemprop="url" rel="index"><span itemprop="name">Hexo</span></a>
                 </span>
             </span>
 
@@ -258,7 +258,8 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p>Welcome to <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="noopener">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="noopener">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="noopener">GitHub</a>.</p>
+          <h3 id="一、Hexo-deploy報錯"><a href="#一、Hexo-deploy報錯" class="headerlink" title="一、Hexo deploy報錯"></a>一、Hexo deploy報錯</h3><p>最近當我開始把以前使用過的Hexo拿來重新架設Blog，突然發現再deploy的情況產生了Error…</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">$ C:\Users\poabob\Desktop\my-blog&gt; npm run deploy</span><br><span class="line"></span><br><span class="line">&gt; hexo-site@0.0.0 deploy C:\Users\poabob\Desktop\my-blog</span><br><span class="line">&gt; hexo deploy</span><br><span class="line"></span><br><span class="line">(node:10324) Warning: Accessing non-existent property <span class="string">'lineno'</span> of module exports inside circular dependency</span><br><span class="line">(Use `node --trace-warnings ...` to show <span class="built_in">where</span> the warning was created)</span><br><span class="line">(node:10324) Warning: Accessing non-existent property <span class="string">'column'</span> of module exports inside circular dependency</span><br><span class="line">(node:10324) Warning: Accessing non-existent property <span class="string">'filename'</span> of module exports inside circular dependency</span><br><span class="line">(node:10324) Warning: Accessing non-existent property <span class="string">'lineno'</span> of module exports inside circular dependency</span><br><span class="line">(node:10324) Warning: Accessing non-existent property <span class="string">'column'</span> of module exports inside circular dependency</span><br><span class="line">(node:10324) Warning: Accessing non-existent property <span class="string">'filename'</span> of module exports inside circular dependency</span><br><span class="line">INFO  Deploying: git</span><br><span class="line">INFO  Clearing .deploy_git folder...</span><br><span class="line">INFO  Copying files from public folder...</span><br><span class="line">FATAL Something<span class="string">'s wrong. Maybe you can find the solution here: https://hexo.io/docs/troubleshooting.html</span></span><br><span class="line"><span class="string">TypeError [ERR_INVALID_ARG_TYPE]: The "mode" argument must be integer. Received an instance of Object</span></span><br><span class="line"><span class="string">    at copyFile (fs.js:2042:10)</span></span><br><span class="line"><span class="string">    at tryCatcher (C:\Users\poabob\Desktop\my-blog\node_modules\bluebird\js\release\util.js:16:23)</span></span><br><span class="line"><span class="string">    at ret (eval at makeNodePromisifiedEval (C:\Users\poabob\Desktop\my-blog\node_modules\bluebird\js\release\promisify.js:184:12), &lt;anonymous&gt;:13:39)</span></span><br><span class="line"><span class="string">    at C:\Users\poabob\Desktop\my-blog\node_modules\hexo-fs\lib\fs.js:144:39</span></span><br></pre></td></tr></table></figure>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2020/04/05/hello-workd/#more" rel="contents">
