@@ -24,23 +24,23 @@
   <meta name="description" content="一、Hexo deploy報錯最近當我開始把以前使用過的Hexo拿來重新架設Blog，突然發現再deploy的情況產生了Error… 123456789101112131415161718192021$ C:\Users\poabob\Desktop\my-blog&gt; npm run deploy&gt; hexo-site@0.0.0 deploy C:\Users\poabob\Desk">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Hexo部屬Nodejs version 14錯誤">
-<meta property="og:url" content="https://poabob.github.io/2020/04/05/hello-workd/index.html">
+<meta property="og:url" content="https://poabob.github.io/2020-04-05/hello-workd/index.html">
 <meta property="og:site_name" content="POABOB">
 <meta property="og:description" content="一、Hexo deploy報錯最近當我開始把以前使用過的Hexo拿來重新架設Blog，突然發現再deploy的情況產生了Error… 123456789101112131415161718192021$ C:\Users\poabob\Desktop\my-blog&gt; npm run deploy&gt; hexo-site@0.0.0 deploy C:\Users\poabob\Desk">
 <meta property="og:locale" content="zh_TW">
-<meta property="og:image" content="https://poabob.github.io/images/hello-world_a.jpg">
-<meta property="og:image" content="https://poabob.github.io/images/hello-world_b.jpg">
-<meta property="og:image" content="https://poabob.github.io/images/hello-world_c.jpg">
+<meta property="og:image" content="https://poabob.github.io/images/a.jpg">
+<meta property="og:image" content="https://poabob.github.io/images/b.jpg">
+<meta property="og:image" content="https://poabob.github.io/hello-world/c.jpg">
 <meta property="article:published_time" content="2020-04-05T12:08:54.000Z">
-<meta property="article:modified_time" content="2022-03-22T20:23:52.618Z">
+<meta property="article:modified_time" content="2022-03-25T13:56:14.197Z">
 <meta property="article:author" content="POABOB">
-<meta property="article:tag" content="NVM">
 <meta property="article:tag" content="Hexo部屬錯誤">
 <meta property="article:tag" content="Node14">
+<meta property="article:tag" content="NVM">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://poabob.github.io/images/hello-world_a.jpg">
+<meta name="twitter:image" content="https://poabob.github.io/images/a.jpg">
 
-<link rel="canonical" href="https://poabob.github.io/2020/04/05/hello-workd/">
+<link rel="canonical" href="https://poabob.github.io/2020-04-05/hello-workd/">
 
 
 <script id="page-configurations">
@@ -205,7 +205,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-TW">
-    <link itemprop="mainEntityOfPage" href="https://poabob.github.io/2020/04/05/hello-workd/">
+    <link itemprop="mainEntityOfPage" href="https://poabob.github.io/2020-04-05/hello-workd/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.png">
@@ -235,7 +235,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新於</span>
-                <time title="修改時間：2022-03-23 04:23:52" itemprop="dateModified" datetime="2022-03-23T04:23:52+08:00">2022-03-23</time>
+                <time title="修改時間：2022-03-25 21:56:14" itemprop="dateModified" datetime="2022-03-25T21:56:14+08:00">2022-03-25</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -277,13 +277,13 @@
 </li>
 </ul>
 <p>後來想想如果要寫個Blog用Docker跑Container要等有點久，降版本也不是一個治本的方式(如果一個專案發現版本過低，那又要升回去)，於是我就想起以前曾經網路上有人提到的<a href="https://github.com/coreybutler/nvm-windows/releases" target="_blank" rel="noopener">NVM-Windows</a>可以使用(早期<a href="https://github.com/nvm-sh/nvm" target="_blank" rel="noopener">NVM</a>只有支援Linux、MacOS)，立馬點擊下載。</p>
-<p><img src="/images/hello-world_a.jpg" alt="(下載列表)"></p>
+<p><img src="/images/a.jpg" alt="(下載列表)"></p>
 <p>如果是Linux則直接照著NVM官方Github上的<a href="https://github.com/nvm-sh/nvm#install--update-script" target="_blank" rel="noopener">README</a>來安裝、MacOS請參考<a href="https://tecadmin.net/install-nvm-macos-with-homebrew/" target="_blank" rel="noopener">這篇文章</a>。</p>
-<p><img src="/images/hello-world_b.jpg" alt="(下載指令)"></p>
+<p><img src="/images/b.jpg" alt="(下載指令)"></p>
 <blockquote>
 <p>注意：Winddows環境下安裝的話，請事先確認安裝的路徑<strong>是否有無空格</strong>，如果有的話，在使用的時候會產生<a href="https://github.com/coreybutler/nvm-windows/issues/168" target="_blank" rel="noopener">exit status 145</a>，導致無法正確使用nvm指令。</p>
 </blockquote>
-<p><img src="/images/hello-world_c.jpg" alt="(安裝提醒)"></p>
+<p><img src="/hello-world/c.jpg" alt="(安裝提醒)"></p>
 <p>安裝完後，將terminal全部關掉重開，就可以執行 <code>nvm</code>。</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">C:\Users\poabob&gt; nvm</span><br><span class="line"></span><br><span class="line">Running version 1.1.9.</span><br><span class="line"></span><br><span class="line">Usage:</span><br><span class="line"></span><br><span class="line">  nvm arch                     : Show <span class="keyword">if</span> node is running <span class="keyword">in</span> 32 or 64 bit mode.</span><br><span class="line">  nvm current                  : Display active version.</span><br><span class="line">  nvm install &lt;version&gt; [arch] : The version can be a specific version, <span class="string">"latest"</span> <span class="keyword">for</span> the latest current version, or <span class="string">"lts"</span> <span class="keyword">for</span> the</span><br><span class="line">                                 most recent LTS version. Optionally specify whether to install the 32 or 64 bit version (defaults</span><br><span class="line">                                 to system arch). Set [arch] to <span class="string">"all"</span> to install 32 AND 64 bit versions.</span><br><span class="line">                                 Add --insecure to the end of this <span class="built_in">command</span> to bypass SSL validation of the remote download server.</span><br><span class="line">  nvm list [available]         : List the node.js installations. Type <span class="string">"available"</span> at the end to see what can be installed. Aliased as ls.</span><br><span class="line">  nvm on                       : Enable node.js version management.</span><br><span class="line">  nvm off                      : Disable node.js version management.</span><br><span class="line">  nvm proxy [url]              : Set a proxy to use <span class="keyword">for</span> downloads. Leave [url] blank to see the current proxy.</span><br><span class="line">                                 Set [url] to <span class="string">"none"</span> to remove the proxy.</span><br><span class="line">  nvm node_mirror [url]        : Set the node mirror. Defaults to https://nodejs.org/dist/. Leave [url] blank to use default url.</span><br><span class="line">  nvm npm_mirror [url]         : Set the npm mirror. Defaults to https://github.com/npm/cli/archive/. Leave [url] blank to default url.</span><br><span class="line">  nvm uninstall &lt;version&gt;      : The version must be a specific version.</span><br><span class="line">  nvm use [version] [arch]     : Switch to use the specified version. Optionally use <span class="string">"latest"</span>, <span class="string">"lts"</span>, or <span class="string">"newest"</span>.</span><br><span class="line">                                 <span class="string">"newest"</span> is the latest installed version. Optionally specify 32/64bit architecture.</span><br><span class="line">                                 nvm use &lt;arch&gt; will <span class="built_in">continue</span> using the selected version, but switch to 32/64 bit mode.</span><br><span class="line">  nvm root [path]              : Set the directory <span class="built_in">where</span> nvm should store different versions of node.js.</span><br><span class="line">                                 If &lt;path&gt; is not <span class="built_in">set</span>, the current root will be displayed.</span><br><span class="line">  nvm version                  : Displays the current running version of nvm <span class="keyword">for</span> Windows. Aliased as v.</span><br></pre></td></tr></table></figure>
 
@@ -322,7 +322,7 @@
   </li>
   <li class="post-copyright-link">
     <strong>文章連結：</strong>
-    <a href="https://poabob.github.io/2020/04/05/hello-workd/" title="Hexo部屬Nodejs version 14錯誤">https://poabob.github.io/2020/04/05/hello-workd/</a>
+    <a href="https://poabob.github.io/2020-04-05/hello-workd/" title="Hexo部屬Nodejs version 14錯誤">https://poabob.github.io/2020-04-05/hello-workd/</a>
   </li>
   <li class="post-copyright-license">
     <strong>版權聲明： </strong>本網誌所有文章除特別聲明外，均採用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-TW" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 許可協議。轉載請註明出處！
@@ -333,15 +333,22 @@
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/NVM/" rel="tag"># NVM</a>
               <a href="/tags/Hexo%E9%83%A8%E5%B1%AC%E9%8C%AF%E8%AA%A4/" rel="tag"># Hexo部屬錯誤</a>
               <a href="/tags/Node14/" rel="tag"># Node14</a>
+              <a href="/tags/NVM/" rel="tag"># NVM</a>
           </div>
 
         
 
 
         
+    <div class="post-nav">
+      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/2022-03-25/draft/nginx-limit-req/" rel="next" title="nginx-limit-req">
+      nginx-limit-req <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
       </footer>
     
   </article>
@@ -419,7 +426,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">1</span>
+          <span class="site-state-item-count">4</span>
           <span class="site-state-item-name">文章</span>
         </a>
       </div>
@@ -611,7 +618,7 @@ NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
       repo        : 'poabob.github.io',
       owner       : 'POABOB',
       admin       : ['POABOB'],
-      id          : 'a4999745e0f91e9cbf1e3d6aa0146a9a',
+      id          : '6d74ab444c696a3958109e4f7295090b',
         language: 'en | es-ES | fr | ru | zh-CN | zh-TW',
       distractionFreeMode: true
     });

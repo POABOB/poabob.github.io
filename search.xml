@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>2022-dcard-backend-intern-project</title>
+    <url>/2022-03-25/2022-dcard-backend-intern-project/</url>
+    <content><![CDATA[]]></content>
+  </entry>
+  <entry>
     <title>Hexo部屬Nodejs version 14錯誤</title>
-    <url>/2020/04/05/hello-workd/</url>
+    <url>/2020-04-05/hello-workd/</url>
     <content><![CDATA[<h3 id="一、Hexo-deploy報錯"><a href="#一、Hexo-deploy報錯" class="headerlink" title="一、Hexo deploy報錯"></a>一、Hexo deploy報錯</h3><p>最近當我開始把以前使用過的Hexo拿來重新架設Blog，突然發現再deploy的情況產生了Error…</p>
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ C:\Users\poabob\Desktop\my-blog&gt; npm run deploy</span><br><span class="line"></span><br><span class="line">&gt; hexo-site@0.0.0 deploy C:\Users\poabob\Desktop\my-blog</span><br><span class="line">&gt; hexo deploy</span><br><span class="line"></span><br><span class="line">(node:10324) Warning: Accessing non-existent property <span class="string">'lineno'</span> of module exports inside circular dependency</span><br><span class="line">(Use `node --trace-warnings ...` to show <span class="built_in">where</span> the warning was created)</span><br><span class="line">(node:10324) Warning: Accessing non-existent property <span class="string">'column'</span> of module exports inside circular dependency</span><br><span class="line">(node:10324) Warning: Accessing non-existent property <span class="string">'filename'</span> of module exports inside circular dependency</span><br><span class="line">(node:10324) Warning: Accessing non-existent property <span class="string">'lineno'</span> of module exports inside circular dependency</span><br><span class="line">(node:10324) Warning: Accessing non-existent property <span class="string">'column'</span> of module exports inside circular dependency</span><br><span class="line">(node:10324) Warning: Accessing non-existent property <span class="string">'filename'</span> of module exports inside circular dependency</span><br><span class="line">INFO  Deploying: git</span><br><span class="line">INFO  Clearing .deploy_git folder...</span><br><span class="line">INFO  Copying files from public folder...</span><br><span class="line">FATAL Something<span class="string">'s wrong. Maybe you can find the solution here: https://hexo.io/docs/troubleshooting.html</span></span><br><span class="line"><span class="string">TypeError [ERR_INVALID_ARG_TYPE]: The "mode" argument must be integer. Received an instance of Object</span></span><br><span class="line"><span class="string">    at copyFile (fs.js:2042:10)</span></span><br><span class="line"><span class="string">    at tryCatcher (C:\Users\poabob\Desktop\my-blog\node_modules\bluebird\js\release\util.js:16:23)</span></span><br><span class="line"><span class="string">    at ret (eval at makeNodePromisifiedEval (C:\Users\poabob\Desktop\my-blog\node_modules\bluebird\js\release\promisify.js:184:12), &lt;anonymous&gt;:13:39)</span></span><br><span class="line"><span class="string">    at C:\Users\poabob\Desktop\my-blog\node_modules\hexo-fs\lib\fs.js:144:39</span></span><br></pre></td></tr></table></figure>
 <a id="more"></a> 
@@ -22,13 +27,13 @@
 </li>
 </ul>
 <p>後來想想如果要寫個Blog用Docker跑Container要等有點久，降版本也不是一個治本的方式(如果一個專案發現版本過低，那又要升回去)，於是我就想起以前曾經網路上有人提到的<a href="https://github.com/coreybutler/nvm-windows/releases" target="_blank" rel="noopener">NVM-Windows</a>可以使用(早期<a href="https://github.com/nvm-sh/nvm" target="_blank" rel="noopener">NVM</a>只有支援Linux、MacOS)，立馬點擊下載。</p>
-<p><img src="/images/hello-world_a.jpg" alt="(下載列表)"></p>
+<p><img src="/images/a.jpg" alt="(下載列表)"></p>
 <p>如果是Linux則直接照著NVM官方Github上的<a href="https://github.com/nvm-sh/nvm#install--update-script" target="_blank" rel="noopener">README</a>來安裝、MacOS請參考<a href="https://tecadmin.net/install-nvm-macos-with-homebrew/" target="_blank" rel="noopener">這篇文章</a>。</p>
-<p><img src="/images/hello-world_b.jpg" alt="(下載指令)"></p>
+<p><img src="/images/b.jpg" alt="(下載指令)"></p>
 <blockquote>
 <p>注意：Winddows環境下安裝的話，請事先確認安裝的路徑<strong>是否有無空格</strong>，如果有的話，在使用的時候會產生<a href="https://github.com/coreybutler/nvm-windows/issues/168" target="_blank" rel="noopener">exit status 145</a>，導致無法正確使用nvm指令。</p>
 </blockquote>
-<p><img src="/images/hello-world_c.jpg" alt="(安裝提醒)"></p>
+<p><img src="/hello-world/c.jpg" alt="(安裝提醒)"></p>
 <p>安裝完後，將terminal全部關掉重開，就可以執行 <code>nvm</code>。</p>
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">C:\Users\poabob&gt; nvm</span><br><span class="line"></span><br><span class="line">Running version 1.1.9.</span><br><span class="line"></span><br><span class="line">Usage:</span><br><span class="line"></span><br><span class="line">  nvm arch                     : Show <span class="keyword">if</span> node is running <span class="keyword">in</span> 32 or 64 bit mode.</span><br><span class="line">  nvm current                  : Display active version.</span><br><span class="line">  nvm install &lt;version&gt; [arch] : The version can be a specific version, <span class="string">"latest"</span> <span class="keyword">for</span> the latest current version, or <span class="string">"lts"</span> <span class="keyword">for</span> the</span><br><span class="line">                                 most recent LTS version. Optionally specify whether to install the 32 or 64 bit version (defaults</span><br><span class="line">                                 to system arch). Set [arch] to <span class="string">"all"</span> to install 32 AND 64 bit versions.</span><br><span class="line">                                 Add --insecure to the end of this <span class="built_in">command</span> to bypass SSL validation of the remote download server.</span><br><span class="line">  nvm list [available]         : List the node.js installations. Type <span class="string">"available"</span> at the end to see what can be installed. Aliased as ls.</span><br><span class="line">  nvm on                       : Enable node.js version management.</span><br><span class="line">  nvm off                      : Disable node.js version management.</span><br><span class="line">  nvm proxy [url]              : Set a proxy to use <span class="keyword">for</span> downloads. Leave [url] blank to see the current proxy.</span><br><span class="line">                                 Set [url] to <span class="string">"none"</span> to remove the proxy.</span><br><span class="line">  nvm node_mirror [url]        : Set the node mirror. Defaults to https://nodejs.org/dist/. Leave [url] blank to use default url.</span><br><span class="line">  nvm npm_mirror [url]         : Set the npm mirror. Defaults to https://github.com/npm/cli/archive/. Leave [url] blank to default url.</span><br><span class="line">  nvm uninstall &lt;version&gt;      : The version must be a specific version.</span><br><span class="line">  nvm use [version] [arch]     : Switch to use the specified version. Optionally use <span class="string">"latest"</span>, <span class="string">"lts"</span>, or <span class="string">"newest"</span>.</span><br><span class="line">                                 <span class="string">"newest"</span> is the latest installed version. Optionally specify 32/64bit architecture.</span><br><span class="line">                                 nvm use &lt;arch&gt; will <span class="built_in">continue</span> using the selected version, but switch to 32/64 bit mode.</span><br><span class="line">  nvm root [path]              : Set the directory <span class="built_in">where</span> nvm should store different versions of node.js.</span><br><span class="line">                                 If &lt;path&gt; is not <span class="built_in">set</span>, the current root will be displayed.</span><br><span class="line">  nvm version                  : Displays the current running version of nvm <span class="keyword">for</span> Windows. Aliased as v.</span><br></pre></td></tr></table></figure>
 
@@ -52,9 +57,19 @@
         <category>Hexo</category>
       </categories>
       <tags>
-        <tag>NVM</tag>
         <tag>Hexo部屬錯誤</tag>
         <tag>Node14</tag>
+        <tag>NVM</tag>
       </tags>
+  </entry>
+  <entry>
+    <title>nginx-limit-req</title>
+    <url>/2022-03-25/draft/nginx-limit-req/</url>
+    <content><![CDATA[]]></content>
+  </entry>
+  <entry>
+    <title>implementation-of-ShortId-with-id-in-order</title>
+    <url>/2022-03-25/draft/implementation-of-ShortId-with-id-in-order/</url>
+    <content><![CDATA[]]></content>
   </entry>
 </search>
