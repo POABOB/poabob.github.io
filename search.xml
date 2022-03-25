@@ -12,7 +12,7 @@
 </ul>
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">C:\Users\poabob\Desktop\my-blog&gt; node -v</span><br><span class="line">v14.19.1</span><br><span class="line">C:\Users\poabob\Desktop\my-blog&gt; npm -v</span><br><span class="line">6.14.16</span><br></pre></td></tr></table></figure>
 
-<p>使用 <code>hexo build</code> 、 <code>hexo clean</code> 、 <code>hexo server</code> 也都沒有相關的錯誤提示，查看<a href="https://github.com/hexojs/hexo/issues/4695" target="_blank" rel="noopener">Github Issue</a>上後才發現原來node版本太高。</p>
+<p>使用 <code>hexo build</code> 、 <code>hexo clean</code> 、 <code>hexo server</code> 也都沒有相關的錯誤提示，查看<span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL2hleG9qcy9oZXhvL2lzc3Vlcy80Njk1">Github Issue<i class="fa fa-external-link-alt"></i></span>上後才發現原來node版本太高。</p>
 <h3 id="二、解決辦法：安裝NVM-Node-Version-Manager"><a href="#二、解決辦法：安裝NVM-Node-Version-Manager" class="headerlink" title="二、解決辦法：安裝NVM(Node Version Manager)"></a>二、解決辦法：安裝NVM(Node Version Manager)</h3><ul>
 <li>方法<ol>
 <li><del>使用 Docker</del></li>
@@ -21,12 +21,12 @@
 </ol>
 </li>
 </ul>
-<p>後來想想如果要寫個Blog用Docker跑Container要等有點久，降版本也不是一個治本的方式(如果一個專案發現版本過低，那又要升回去)，於是我就想起以前曾經網路上有人提到的<a href="https://github.com/coreybutler/nvm-windows/releases" target="_blank" rel="noopener">NVM-Windows</a>可以使用(早期<a href="https://github.com/nvm-sh/nvm" target="_blank" rel="noopener">NVM</a>只有支援Linux、MacOS)，立馬點擊下載。</p>
+<p>後來想想如果要寫個Blog用Docker跑Container要等有點久，降版本也不是一個治本的方式(如果一個專案發現版本過低，那又要升回去)，於是我就想起以前曾經網路上有人提到的<span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL2NvcmV5YnV0bGVyL252bS13aW5kb3dzL3JlbGVhc2Vz">NVM-Windows<i class="fa fa-external-link-alt"></i></span>可以使用(早期<span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL252bS1zaC9udm0=">NVM<i class="fa fa-external-link-alt"></i></span>只有支援Linux、MacOS)，立馬點擊下載。</p>
 <p><img src="/images/hello-world/a.jpg" alt="(下載列表)"></p>
-<p>如果是Linux則直接照著NVM官方Github上的<a href="https://github.com/nvm-sh/nvm#install--update-script" target="_blank" rel="noopener">README</a>來安裝、MacOS請參考<a href="https://tecadmin.net/install-nvm-macos-with-homebrew/" target="_blank" rel="noopener">這篇文章</a>。</p>
+<p>如果是Linux則直接照著NVM官方Github上的<span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL252bS1zaC9udm0jaW5zdGFsbC0tdXBkYXRlLXNjcmlwdA==">README<i class="fa fa-external-link-alt"></i></span>來安裝、MacOS請參考<span class="exturl" data-url="aHR0cHM6Ly90ZWNhZG1pbi5uZXQvaW5zdGFsbC1udm0tbWFjb3Mtd2l0aC1ob21lYnJldy8=">這篇文章<i class="fa fa-external-link-alt"></i></span>。</p>
 <p><img src="/images/hello-world/b.jpg" alt="(下載指令)"></p>
 <blockquote>
-<p>注意：Winddows環境下安裝的話，請事先確認安裝的路徑<strong>是否有無空格</strong>，如果有的話，在使用的時候會產生<a href="https://github.com/coreybutler/nvm-windows/issues/168" target="_blank" rel="noopener">exit status 145</a>，導致無法正確使用nvm指令。</p>
+<p>注意：Winddows環境下安裝的話，請事先確認安裝的路徑<strong>是否有無空格</strong>，如果有的話，在使用的時候會產生<span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL2NvcmV5YnV0bGVyL252bS13aW5kb3dzL2lzc3Vlcy8xNjg=">exit status 145<i class="fa fa-external-link-alt"></i></span>，導致無法正確使用nvm指令。</p>
 </blockquote>
 <p><img src="/hello-world/c.jpg" alt="(安裝提醒)"></p>
 <p>安裝完後，將terminal全部關掉重開，就可以執行 <code>nvm</code>。</p>
@@ -35,7 +35,7 @@
 <h3 id="三、NVM如何使用"><a href="#三、NVM如何使用" class="headerlink" title="三、NVM如何使用"></a>三、NVM如何使用</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">//安裝指定版本的 Nodejs</span><br><span class="line">//nvm install 12</span><br><span class="line">nvm install &lt;version&gt;</span><br><span class="line"></span><br><span class="line">//刪除指定版本</span><br><span class="line">//nvm uninstall 12.22.11 (要確定詳細版本)</span><br><span class="line">nvm uninstall &lt;version&gt;    </span><br><span class="line"></span><br><span class="line">//使用指定版本的 node</span><br><span class="line">//nvm uninstall 12.22.11 (要確定詳細版本)</span><br><span class="line">nvm use [version]           </span><br><span class="line"></span><br><span class="line">//列出本機已安裝的版本</span><br><span class="line">nvm list</span><br></pre></td></tr></table></figure>
 
 <blockquote>
-<p>注意：如果在terminal下執行 <code>nvm use &lt;version&gt;</code> 或 <code>nvm on</code> 產生<a href="https://github.com/coreybutler/nvm-windows/issues/717" target="_blank" rel="noopener">exit status 1</a>，並且是亂碼，請在開啟的terminal的時候，選擇以管理員身分執行，這樣才能夠自由的切換。</p>
+<p>注意：如果在terminal下執行 <code>nvm use &lt;version&gt;</code> 或 <code>nvm on</code> 產生<span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL2NvcmV5YnV0bGVyL252bS13aW5kb3dzL2lzc3Vlcy83MTc=">exit status 1<i class="fa fa-external-link-alt"></i></span>，並且是亂碼，請在開啟的terminal的時候，選擇以管理員身分執行，這樣才能夠自由的切換。</p>
 </blockquote>
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">C:\Users\poabob&gt; nvm use 12.22.11</span><br><span class="line"><span class="built_in">exit</span> status 1: �z�S���������v���i���榹�ާ@�C</span><br><span class="line"></span><br><span class="line">C:\Users\poabob&gt; nvm on</span><br><span class="line">nvm enabled</span><br><span class="line"><span class="built_in">exit</span> status 1: �z�S���������v���i���榹�ާ@�C</span><br></pre></td></tr></table></figure>
 
@@ -61,13 +61,13 @@
     <title>2022 Dcard後端實習生面試作業 - URL Shortener</title>
     <url>/2022-03-25/2022-dcard-backend-intern-project/</url>
     <content><![CDATA[<h2 id="一、前言"><a href="#一、前言" class="headerlink" title="一、前言"></a>一、前言</h2><blockquote>
-<p>碩一下這學期相對課業沒那麼重，剛剛好<a href="https://kenchen879.github.io" target="_blank" rel="noopener">友人陳同學</a>告訴我有一個<a href="https://boards.greenhouse.io/dcard/jobs/3874841" target="_blank" rel="noopener">Dcard後端實習面試</a>，完整詳讀之後發現其實題目不難且待遇豐厚，引起我對於實習面試的熱誠。</p>
+<p>碩一下這學期相對課業沒那麼重，剛剛好<span class="exturl" data-url="aHR0cHM6Ly9rZW5jaGVuODc5LmdpdGh1Yi5pbw==">友人陳同學<i class="fa fa-external-link-alt"></i></span>告訴我有一個<span class="exturl" data-url="aHR0cHM6Ly9ib2FyZHMuZ3JlZW5ob3VzZS5pby9kY2FyZC9qb2JzLzM4NzQ4NDE=">Dcard後端實習面試<i class="fa fa-external-link-alt"></i></span>，完整詳讀之後發現其實題目不難且待遇豐厚，引起我對於實習面試的熱誠。</p>
 <p>學習了後端也有一段時間了，時常因為沒有做筆記，需要翻找己以前的程式碼片段(還好都沒有刪掉)，許多相關知識也因此停留在記憶的角落而堆積灰塵，若我不去主動複習，也許他就真的被我遺忘了吧?</p>
 <p>因此讓我知道建立學習紀錄的重要性，所以我才倉促架設這個部落格，一部分想記錄我實作這項作業的方式，另外一部分是想分享自己的知識讓需要的人可以了解。</p>
 <p>由於篇幅關係，後續還會有兩篇文章，主要是關於這篇基礎功能的優化和加強，那就請大家來閱讀敝人對於作業的解題。</p>
 </blockquote>
 <ul>
-<li>Repo：<a href="https://github.com/POABOB/Dcard-intern-project" target="_blank" rel="noopener">https://github.com/POABOB/Dcard-intern-project</a></li>
+<li>Repo：<span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL1BPQUJPQi9EY2FyZC1pbnRlcm4tcHJvamVjdA==">https://github.com/POABOB/Dcard-intern-project<i class="fa fa-external-link-alt"></i></span></li>
 </ul>
 <a id="more"></a> 
 
@@ -106,7 +106,7 @@
 <ol>
 <li><p><del>短網址的 url_id 必須是一個唯一值，如果說使用md5取前幾位數的話，那麼很容易產生碰撞，所以不適合。</del></p>
 </li>
-<li><p><del>使用三方函式庫<a href="https://www.npmjs.com/package/shortid" target="_blank" rel="noopener">shortid</a>，自動生成短網址(我覺得都是解題，對於程式的流程解釋相對來說是一個必要的功課，不採用)</del>。</p>
+<li><p><del>使用三方函式庫<span class="exturl" data-url="aHR0cHM6Ly93d3cubnBtanMuY29tL3BhY2thZ2Uvc2hvcnRpZA==">shortid<i class="fa fa-external-link-alt"></i></span>，自動生成短網址(我覺得都是解題，對於程式的流程解釋相對來說是一個必要的功課，不採用)</del>。</p>
 </li>
 <li><p>手寫兩個function可以使用<strong>64進位</strong>的方式，將 <code>url</code> 和 <code>expireAt</code> 資料插入mysql中返回的<strong>自增id(唯一且以主鍵搜尋很快)</strong>作轉換</p>
 <ul>
@@ -330,7 +330,7 @@
 <td></td>
 </tr>
 <tr>
-<td><a href="http://www.js" target="_blank" rel="noopener">www.js</a></td>
+<td><span class="exturl" data-url="aHR0cDovL3d3dy5qcw==">www.js<i class="fa fa-external-link-alt"></i></span></td>
 <td>100</td>
 <td>100</td>
 <td>100</td>
