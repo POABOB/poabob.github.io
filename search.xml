@@ -142,6 +142,9 @@
 <p>不過搞了這麼久，其實還有很多方式可以解決，只不過我想在原本這個架構上作延伸，優化我想解決的問題，之後還會有一篇關於nginx限流的部分，做完大致上這個作業應該就完整了。</p>
 </blockquote>
 ]]></content>
+      <categories>
+        <category>後端</category>
+      </categories>
       <tags>
         <tag>自增id亂序產生ShortId</tag>
         <tag>Dcard實習面試</tag>
