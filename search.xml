@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>URL Shortener - 自增id亂序產生ShortId</title>
+    <title>URL Shortener - 自增id亂數產生ShortId</title>
     <url>/2022-03-26/implementation-of-ShortId-with-id-in-order/</url>
     <content><![CDATA[<h2 id="一、前言"><a href="#一、前言" class="headerlink" title="一、前言"></a>一、前言</h2><blockquote>
 <p>由於上一篇實作URL Shortener雖然在效能上有不錯的效果，可是當我們使用自增id順序的方式導致ShortId容易被眼尖的資安人員(or駭客)發現是有跡可循的，一來觀感不太好，二來容易預測導致被惡意使用。<br>那麼我們要如何在不改變現有的架構下，完美的解決這個問題呢?<br>於是我想到，如果在資料表中，id已經被生成好，但是欄位值是空的狀態下，是不是就可以搜尋特定範圍的空值，以更新的方式來代替插入?</p>
@@ -146,13 +146,13 @@
         <category>後端</category>
       </categories>
       <tags>
-        <tag>自增id亂序產生ShortId</tag>
         <tag>Dcard實習面試</tag>
         <tag>URL短網址</tag>
         <tag>Nodejs</tag>
         <tag>Mysql</tag>
         <tag>Redis</tag>
         <tag>crontab</tag>
+        <tag>自增id亂數產生ShortId</tag>
       </tags>
   </entry>
   <entry>
