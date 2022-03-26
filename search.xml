@@ -8,7 +8,7 @@
 </blockquote>
 <a id="more"></a>
 
-<h2 id="二、改善提案"><a href="#二、改善提案" class="headerlink" title="二、改善提案"></a>二、改善提案</h2><ol>
+<h2 id="二、改善方法"><a href="#二、改善方法" class="headerlink" title="二、改善方法"></a>二、改善方法</h2><ol>
 <li><p>新增 <code>url_random</code> 表預先插滿1,074,000,000筆空值資料，並且準備額外計數表(<code>url_random_nums</code>)來COUNT()非空值數量</p>
 <ul>
 <li><p>因為我們使用64進位的方式產生5位數字串，所以1,074,000,000筆剛好滿足我們這五位數的需求</p>
