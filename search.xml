@@ -23,7 +23,7 @@
 </li>
 </ul>
 <ul>
-<li>本篇主要是參考 <span class="exturl" data-url="aHR0cHM6Ly93d3cuZHJzYW53dWppYW5nLmNvbQ==">Fogless<i class="fa fa-external-link-alt"></i></span> 的<span class="exturl" data-url="aHR0cHM6Ly93d3cuZHJzYW53dWppYW5nLmNvbS9zbGltNC1idWlsZC1yZXN0ZnVsLWFwaS8jY3JlYXRlLXNsaW0tYXBwbGljYXRpb24=">Slim 4 搭建 RESTful API<i class="fa fa-external-link-alt"></i></span> 以及 <span class="exturl" data-url="aHR0cHM6Ly90d2l0dGVyLmNvbS9kb3BpdHo=">Daniel Opitz<i class="fa fa-external-link-alt"></i></span> 的<span class="exturl" data-url="aHR0cHM6Ly9vZGFuLmdpdGh1Yi5pby8yMDE5LzExLzA1L3NsaW00LXR1dG9yaWFsLmh0bWw=">Slim 4 - Tutorial<i class="fa fa-external-link-alt"></i></span>，並且結合自身所學，再根據個人習慣建構。Part 1 建構方向是能夠有基本的環境、 Slim 雛形、基本的返回JSON資訊、以及 Middleware 和 php-di 的相關配置。</li>
+<li>本篇主要是參考 <span class="exturl" data-url="aHR0cHM6Ly93d3cuZHJzYW53dWppYW5nLmNvbQ==">Fogless<i class="fa fa-external-link-alt"></i></span> 的<span class="exturl" data-url="aHR0cHM6Ly93d3cuZHJzYW53dWppYW5nLmNvbS9zbGltNC1idWlsZC1yZXN0ZnVsLWFwaS8jY3JlYXRlLXNsaW0tYXBwbGljYXRpb24=">Slim 4 搭建 RESTful API<i class="fa fa-external-link-alt"></i></span> 以及 <span class="exturl" data-url="aHR0cHM6Ly90d2l0dGVyLmNvbS9kb3BpdHo=">Daniel Opitz<i class="fa fa-external-link-alt"></i></span> 的<span class="exturl" data-url="aHR0cHM6Ly9vZGFuLmdpdGh1Yi5pby8yMDE5LzExLzA1L3NsaW00LXR1dG9yaWFsLmh0bWw=">Slim 4 - Tutorial<i class="fa fa-external-link-alt"></i></span>，並且結合自身所學，再根據個人習慣建構。基礎篇的建構方向是能夠有基本的環境、 Slim 雛形、基本的返回JSON資訊、以及 Middleware 和 php-di 的相關配置。</li>
 </ul>
 <h2 id="二、安裝"><a href="#二、安裝" class="headerlink" title="二、安裝"></a>二、安裝</h2><h3 id="本機最低需求"><a href="#本機最低需求" class="headerlink" title="本機最低需求"></a>本機最低需求</h3><ul>
 <li>PHP 8.0 (目前沒有使用 php-7.4 實測過，所以希望至少可以 8.0 以上)</li>
