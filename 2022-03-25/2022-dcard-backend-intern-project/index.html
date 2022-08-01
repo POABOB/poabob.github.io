@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+  <meta name="google-site-verification" content="gMiqErWj487BTNydQ4JwPWMijWfHq7w5bqkaC5JPH9c">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"poabob.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":true,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="一、前言 碩一下這學期相對課業沒那麼重，剛剛好友人陳同學告訴我有一個Dcard後端實習面試，完整詳讀之後發現其實題目不難且待遇豐厚，引起我對於實習面試的熱誠。 學習了後端也有一段時間了，時常因為沒有做筆記，需要翻找己以前的程式碼片段(還好都沒有刪掉)，許多相關知識也因此停留在記憶的角落而堆積灰塵，若我不去主動複習，也許他就真的被我遺忘了吧? 因此讓我知道建立學習紀錄的重要性，所以我才倉促架設這個部">
+<meta property="og:type" content="article">
+<meta property="og:title" content="2022 Dcard後端實習生面試作業 - URL Shortener">
+<meta property="og:url" content="https://poabob.github.io/2022-03-25/2022-dcard-backend-intern-project/index.html">
+<meta property="og:site_name" content="POABOB">
+<meta property="og:description" content="一、前言 碩一下這學期相對課業沒那麼重，剛剛好友人陳同學告訴我有一個Dcard後端實習面試，完整詳讀之後發現其實題目不難且待遇豐厚，引起我對於實習面試的熱誠。 學習了後端也有一段時間了，時常因為沒有做筆記，需要翻找己以前的程式碼片段(還好都沒有刪掉)，許多相關知識也因此停留在記憶的角落而堆積灰塵，若我不去主動複習，也許他就真的被我遺忘了吧? 因此讓我知道建立學習紀錄的重要性，所以我才倉促架設這個部">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://poabob.github.io/images/2022-dcard-backend-intern-project/a.jpg">
+<meta property="og:image" content="https://poabob.github.io/images/2022-dcard-backend-intern-project/b.jpg">
+<meta property="og:image" content="https://poabob.github.io/images/2022-dcard-backend-intern-project/c.jpg">
+<meta property="article:published_time" content="2022-03-25T13:45:35.000Z">
+<meta property="article:modified_time" content="2022-03-26T17:14:59.451Z">
+<meta property="article:author" content="POABOB">
+<meta property="article:tag" content="Dcard實習面試">
+<meta property="article:tag" content="URL短網址">
+<meta property="article:tag" content="Nodejs">
+<meta property="article:tag" content="Mysql">
+<meta property="article:tag" content="Redis">
+<meta property="article:tag" content="PM2">
+<meta property="article:tag" content="Test">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://poabob.github.io/images/2022-dcard-backend-intern-project/a.jpg">
+
+<link rel="canonical" href="https://poabob.github.io/2022-03-25/2022-dcard-backend-intern-project/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-TW'
+  };
+</script>
+
+  <title>2022 Dcard後端實習生面試作業 - URL Shortener | POABOB</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-162792341-1"></script>
+    <script data-pjax>
+      if (CONFIG.hostname === location.hostname) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-162792341-1');
+      }
+    </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">POABOB</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">小小工程師的筆記分享</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜尋..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://poabob.github.io/2022-03-25/2022-dcard-backend-intern-project/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="POABOB">
+      <meta itemprop="description" content="Life is but a span!">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="POABOB">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          2022 Dcard後端實習生面試作業 - URL Shortener
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+
+              <time title="創建時間：2022-03-25 21:45:35" itemprop="dateCreated datePublished" datetime="2022-03-25T21:45:35+08:00">2022-03-25</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新於</span>
+                <time title="修改時間：2022-03-27 01:14:59" itemprop="dateModified" datetime="2022-03-27T01:14:59+08:00">2022-03-27</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分類於</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%BE%8C%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">後端</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="一、前言"><a href="#一、前言" class="headerlink" title="一、前言"></a>一、前言</h2><blockquote>
+<p>碩一下這學期相對課業沒那麼重，剛剛好<span class="exturl" data-url="aHR0cHM6Ly9rZW5jaGVuODc5LmdpdGh1Yi5pbw==">友人陳同學<i class="fa fa-external-link-alt"></i></span>告訴我有一個<span class="exturl" data-url="aHR0cHM6Ly9ib2FyZHMuZ3JlZW5ob3VzZS5pby9kY2FyZC9qb2JzLzM4NzQ4NDE=">Dcard後端實習面試<i class="fa fa-external-link-alt"></i></span>，完整詳讀之後發現其實題目不難且待遇豐厚，引起我對於實習面試的熱誠。</p>
+<p>學習了後端也有一段時間了，時常因為沒有做筆記，需要翻找己以前的程式碼片段(還好都沒有刪掉)，許多相關知識也因此停留在記憶的角落而堆積灰塵，若我不去主動複習，也許他就真的被我遺忘了吧?</p>
+<p>因此讓我知道建立學習紀錄的重要性，所以我才倉促架設這個部落格，一部分想記錄我實作這項作業的方式，另外一部分是想分享自己的知識讓需要的人可以了解。</p>
+<p>由於篇幅關係，後續還會有兩篇文章，主要是關於這篇基礎功能的優化和加強，那就請大家來閱讀敝人對於作業的解題。</p>
+</blockquote>
+<ul>
+<li>Repo：<span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL1BPQUJPQi9EY2FyZC1pbnRlcm4tcHJvamVjdA==">https://github.com/POABOB/Dcard-intern-project<i class="fa fa-external-link-alt"></i></span></li>
+</ul>
+<a id="more"></a> 
+
+<h2 id="二、題目"><a href="#二、題目" class="headerlink" title="二、題目"></a>二、題目</h2><p><img src="/images/2022-dcard-backend-intern-project/a.jpg" alt="Dcard 題目"></p>
+<h2 id="三、解題思路"><a href="#三、解題思路" class="headerlink" title="三、解題思路"></a>三、解題思路</h2><h3 id="1-題目解釋"><a href="#1-題目解釋" class="headerlink" title="1. 題目解釋"></a>1. 題目解釋</h3><ul>
+<li><p>使用 Golang 或 Nodejs 其中一個語言建立兩個Restful API(包含<strong>Unit Test</strong>)</p>
+<ol>
+<li><p><strong>可以上傳一個URL網址和過期時間，並且返回一個被縮短好的URL</strong></p>
+</li>
+<li><p><strong>判斷系統生成的短網址是否存在且有無到期，如果到期和不存在，則返回404；反之，為原本URL進行轉址</strong></p>
+</li>
+</ol>
+</li>
+<li><p>可以使用任意三方函式庫和資料庫或Cache資料庫</p>
+</li>
+<li><p>替兩個API進行錯誤處理</p>
+</li>
+<li><p>不用Auth</p>
+</li>
+<li><p><strong>要考慮到客戶端同時大量請求短網址(包括不存在的短網址)的問題，將性能納入考量</strong></p>
+</li>
+</ul>
+<h3 id="2-程式邏輯"><a href="#2-程式邏輯" class="headerlink" title="2. 程式邏輯"></a>2. 程式邏輯</h3><blockquote>
+<p>這項作業有三大重點：</p>
+<ol>
+<li><p>製作兩個Restful API，分別是<strong>產生短網址(POST)</strong>和<strong>轉址短網址(GET)</strong>。</p>
+</li>
+<li><p>要考慮到<strong>Client端大量同時請求</strong>的性能表現，並且做出解決方案。</p>
+</li>
+<li><p>使用測試(Unit、Integration、E2E)來避免開發後難以找出程式碼的錯誤。</p>
+</li>
+</ol>
+</blockquote>
+<h4 id="a-產生短網址：POST-api-v1-urls"><a href="#a-產生短網址：POST-api-v1-urls" class="headerlink" title="a. 產生短網址：POST /api/v1/urls"></a>a. 產生短網址：POST /api/v1/urls</h4><ul>
+<li><p>方法</p>
+<ol>
+<li><p><del>短網址的 url_id 必須是一個唯一值，如果說使用md5取前幾位數的話，那麼很容易產生碰撞，所以不適合。</del></p>
+</li>
+<li><p><del>使用三方函式庫<span class="exturl" data-url="aHR0cHM6Ly93d3cubnBtanMuY29tL3BhY2thZ2Uvc2hvcnRpZA==">shortid<i class="fa fa-external-link-alt"></i></span>，自動生成短網址(我覺得都是解題，對於程式的流程解釋相對來說是一個必要的功課，不採用)</del>。</p>
+</li>
+<li><p>手寫兩個function可以使用<strong>64進位</strong>的方式，將 <code>url</code> 和 <code>expireAt</code> 資料插入mysql中返回的<strong>自增id(唯一且以主鍵搜尋很快)</strong>作轉換</p>
+<ul>
+<li><p>並且將自增id和資料插入Redis(查詢較Mysql快)</p>
+</li>
+<li><p>最後返回要求格式</p>
+</li>
+</ul>
+</li>
+</ol>
+</li>
+<li><p>程式流程</p>
+</li>
+</ul>
+<p><img src="/images/2022-dcard-backend-intern-project/b.jpg" alt="API 1"></p>
+<ul>
+<li><p><code>src/controller/index.js</code></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> &#123; <span class="keyword">get</span>, <span class="keyword">set</span> &#125; = require('../db/redis');</span><br><span class="line">const &#123; ErrorModel, BaseModel &#125; = <span class="built_in">require</span>(<span class="string">'../utils/response'</span>);</span><br><span class="line"><span class="keyword">const</span> &#123; HOST_CONF &#125; = <span class="built_in">require</span>(<span class="string">'../config/url'</span>);</span><br><span class="line"><span class="keyword">const</span> &#123; getURL, insertURL&#125; = <span class="built_in">require</span>(<span class="string">'../model/index'</span>);</span><br><span class="line"><span class="keyword">const</span> &#123; validateUrl, validateExpire, convertIdToShortId, convertShortIdToId &#125; = <span class="built_in">require</span>(<span class="string">"../utils/url"</span>);</span><br><span class="line"><span class="keyword">const</span> &#123; datetimeRegex &#125; = <span class="built_in">require</span>(<span class="string">"../utils/const"</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> insertOriginUrl = <span class="keyword">async</span> (req, res) =&gt; &#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">let</span> url = req.body.url;</span><br><span class="line">        <span class="keyword">let</span> expireAt = req.body.expireAt;</span><br><span class="line">        <span class="keyword">if</span>(url === <span class="string">""</span> || !validateUrl(url)) &#123;</span><br><span class="line">            res.writeHead(<span class="number">400</span>, &#123;<span class="string">"Content-type"</span>: <span class="string">"text/plain"</span>&#125;);</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> ErrorModel(<span class="string">`The post data url = <span class="subst">$&#123;url&#125;</span> is invalid!!!`</span>);</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span>(expireAt.match(datetimeRegex) === <span class="literal">null</span> || <span class="built_in">Date</span>.parse(expireAt) &lt; <span class="built_in">Date</span>.now() / <span class="number">1000</span>) &#123;</span><br><span class="line">            res.writeHead(<span class="number">400</span>, &#123;<span class="string">"Content-type"</span>: <span class="string">"text/plain"</span>&#125;);</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> ErrorModel(<span class="string">`The post data expireAt = <span class="subst">$&#123;expireAt&#125;</span> is invalid!!!`</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        expireAt = <span class="built_in">Math</span>.floor(<span class="keyword">new</span> <span class="built_in">Date</span>(expireAt).getTime() / <span class="number">1000</span>);</span><br><span class="line">        <span class="keyword">const</span> data = <span class="keyword">await</span> insertURL(url, expireAt)</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 插入redis</span></span><br><span class="line">        <span class="keyword">set</span>(data['id'], &#123; url: url, <span class="attr">expireAt</span>: expireAt &#125;)</span><br><span class="line">        <span class="comment">// 得到新增的id後</span></span><br><span class="line">        <span class="keyword">const</span> ShortId = convertIdToShortId(data[<span class="string">'id'</span>])</span><br><span class="line">        <span class="comment">// 返回BaseModel</span></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> BaseModel(ShortId, HOST_CONF + ShortId);</span><br><span class="line">    &#125; <span class="keyword">catch</span>(e) &#123;</span><br><span class="line">        res.writeHead(<span class="number">500</span>, &#123;<span class="string">"Content-type"</span>: <span class="string">"text/plain"</span>&#125;);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> ErrorModel(<span class="string">`<span class="subst">$&#123;e.stack&#125;</span>`</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>轉換url_id位數</p>
+<ul>
+<li><p>目前使用5位數字串(64 ^ 5 = 1,073,741,824)，原因是我使用unsigned int (4,294,967,295)，為了避免int不夠用</p>
+</li>
+<li><p>如果之後想要改更長，可以使用unsigned bigint(2 ^ 64 - 1)，就可以讓字串數增加至多到10位數字串(64 ^ 10)</p>
+</li>
+</ul>
+</li>
+</ul>
+<p><code>src/utils/url.js</code></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> &#123; _64Bit, urlMaxLength &#125; = <span class="built_in">require</span>(<span class="string">'./const'</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">//目前使用5位字串(64 ^ 5 = 1,073,741,824)，原因是我使用unsigned int (4,294,967,295)</span></span><br><span class="line"><span class="comment">//如果之後想要改更長，可以使用unsigned bigint(2 ^ 64 - 1)，就可以讓字串數增加至多到10位字串(64 ^ 10)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//將id轉換成64進位的5位字串</span></span><br><span class="line"><span class="keyword">const</span> convertIdToShortId = <span class="function">(<span class="params">id</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">let</span> ShortId = <span class="string">""</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">//將id值轉換成64位元的字符</span></span><br><span class="line">    <span class="keyword">while</span>(id !== <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">let</span> tmp = <span class="string">""</span>;</span><br><span class="line"></span><br><span class="line">        tmp = ShortId;</span><br><span class="line">        ShortId = _64Bit[id%<span class="number">64</span>] + tmp;</span><br><span class="line">        id = <span class="built_in">Math</span>.floor(id/<span class="number">64</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//小於5位，就補滿5位</span></span><br><span class="line">    <span class="keyword">while</span>(ShortId.length !== urlMaxLength) &#123;</span><br><span class="line">        ShortId = _64Bit[<span class="number">0</span>] + ShortId;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> ShortId;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//將64進位的5位字串轉換成id</span></span><br><span class="line"><span class="keyword">const</span> convertShortIdToId = <span class="function">(<span class="params">ShortId</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">let</span> i = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">let</span> id = <span class="number">0</span>;</span><br><span class="line">    <span class="comment">//將字串分割成array</span></span><br><span class="line">    <span class="keyword">const</span> ShortIdArray = ShortId.split(<span class="string">""</span>);</span><br><span class="line">    </span><br><span class="line">    <span class="comment">//轉換成原本id</span></span><br><span class="line">    <span class="keyword">while</span>(i &lt; urlMaxLength) &#123;</span><br><span class="line">        id += (_64Bit.findIndex(<span class="function"><span class="params">char</span> =&gt;</span> char === ShortIdArray[urlMaxLength - (i + <span class="number">1</span>)])) * <span class="built_in">Math</span>.pow(<span class="number">64</span>, i);</span><br><span class="line">        i++;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> id;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>64進位<ul>
+<li>我將 A-Z, a-z, 0-9, -, ~ 這些字元打亂順序之後，放入一個陣列當作進位表</li>
+</ul>
+</li>
+</ul>
+<p><code>src/utils/const.js</code></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> urlMaxLength = <span class="number">5</span>;</span><br><span class="line"><span class="keyword">const</span> datetimeRegex = <span class="regexp">/((19|2\d)\d\d)-((0[1-9])|(1[0-2]))-((0[1-9])|([1-2]\d)|(3[01]))([ T]&#123;1&#125;)(([0-1]\d)|(2[0-3])):(([0-5]\d)):(([0-5]\d))([Z]?)/</span>;</span><br><span class="line"><span class="keyword">const</span> _64Bit = <span class="keyword">new</span> <span class="built_in">Array</span>( <span class="string">"N"</span>, <span class="string">"O"</span>, <span class="string">"P"</span>, <span class="string">"4"</span>, <span class="string">"5"</span>, <span class="string">"6"</span>, <span class="string">"7"</span>, <span class="string">"8"</span>, <span class="string">"9"</span>, <span class="string">"m"</span>, <span class="string">"Q"</span>, <span class="string">"R"</span>, <span class="string">"S"</span>, <span class="string">"X"</span>, <span class="string">"Y"</span>, <span class="string">"A"</span>, <span class="string">"B"</span>, <span class="string">"C"</span>, <span class="string">"K"</span>, <span class="string">"L"</span>, <span class="string">"M"</span>, <span class="string">"D"</span>, <span class="string">"E"</span>, <span class="string">"T"</span>, <span class="string">"U"</span>, <span class="string">"V"</span>, <span class="string">"W"</span>, <span class="string">"F"</span>, <span class="string">"a"</span>, <span class="string">"b"</span>, <span class="string">"c"</span>, <span class="string">"d"</span>, <span class="string">"e"</span>, <span class="string">"f"</span>, <span class="string">"r"</span>, <span class="string">"s"</span>, <span class="string">"t"</span>, <span class="string">"u"</span>, <span class="string">"v"</span>, <span class="string">"w"</span>, <span class="string">"G"</span>, <span class="string">"H"</span>, <span class="string">"I"</span>, <span class="string">"J"</span>, <span class="string">"1"</span>, <span class="string">"2"</span>, <span class="string">"3"</span>, <span class="string">"-"</span>, <span class="string">"~"</span>, <span class="string">"Z"</span>, <span class="string">"g"</span>, <span class="string">"h"</span>, <span class="string">"i"</span>, <span class="string">"j"</span>, <span class="string">"k"</span>, <span class="string">"l"</span>, <span class="string">"n"</span>, <span class="string">"o"</span>, <span class="string">"p"</span>, <span class="string">"q"</span>, <span class="string">"x"</span>, <span class="string">"y"</span>, <span class="string">"z"</span>, <span class="string">"0"</span>,);</span><br></pre></td></tr></table></figure>
+
+<h4 id="b-轉址短網址：GET-ShortId-a-zA-Z0-9-5"><a href="#b-轉址短網址：GET-ShortId-a-zA-Z0-9-5" class="headerlink" title="b. 轉址短網址：GET /:ShortId([a-zA-Z0-9-~]{5})"></a>b. 轉址短網址：GET /:ShortId([a-zA-Z0-9-~]{5})</h4><ul>
+<li><p>方法</p>
+<ul>
+<li><p>由於後端性能的問題主要出在 網路頻寬速度 和 Disk I/O，在程式碼中就必須為資料庫方面減少負荷，多多採用記憶體作為一個快速的解決方案</p>
+</li>
+<li><p>所以我會先讓Nodejs先去從Redis中查找id是否存在</p>
+</li>
+<li><p>有則，判斷資料是否有效且有無過期，然後返回404或302</p>
+<ul>
+<li>使用302(暫時轉址)原因是因為短網址是有期限的，所以每次轉址都必須讓server判斷資料是否有效，雖然301(永久轉址)性能較好，但是他會被cache在瀏覽器，導致無法到server判斷資料</li>
+</ul>
+</li>
+<li><p>無則，向Mysql查找id是否存在</p>
+<ul>
+<li><p>若有該筆id，使用異步的方式儲存到Redis並判斷資料是否有效且有無過期，然後返回404或302</p>
+</li>
+<li><p>若無該筆id，異步新增一個{ url: null, expireAt: Date.now() / 1000 }資料到Redis，返回404</p>
+<ul>
+<li>因為題目中有提到如果該筆資料不存在那一直查找不存在的資料也是浪費性能，不如就儲存一個無效值在Redis，直接返回404</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>程式流程</li>
+</ul>
+<p><img src="/images/2022-dcard-backend-intern-project/c.jpg" alt="API 2"></p>
+<p><code>src/controller/index.js</code></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> &#123; <span class="keyword">get</span>, <span class="keyword">set</span> &#125; = require('../db/redis');</span><br><span class="line">const &#123; ErrorModel, BaseModel &#125; = <span class="built_in">require</span>(<span class="string">'../utils/response'</span>);</span><br><span class="line"><span class="keyword">const</span> &#123; HOST_CONF &#125; = <span class="built_in">require</span>(<span class="string">'../config/url'</span>);</span><br><span class="line"><span class="keyword">const</span> &#123; getURL, insertURL&#125; = <span class="built_in">require</span>(<span class="string">'../model/index'</span>);</span><br><span class="line"><span class="keyword">const</span> &#123; validateUrl, validateExpire, convertIdToShortId, convertShortIdToId &#125; = <span class="built_in">require</span>(<span class="string">"../utils/url"</span>);</span><br><span class="line"><span class="keyword">const</span> &#123; datetimeRegx &#125; = <span class="built_in">require</span>(<span class="string">"../utils/const"</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> getOriginUrlById = <span class="keyword">async</span> (req, res, ShortId) =&gt; &#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="comment">//先將64進位的id轉化10進位id</span></span><br><span class="line">        <span class="keyword">const</span> id = convertShortIdToId(ShortId);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//搜尋Redis</span></span><br><span class="line">        <span class="keyword">let</span> result = <span class="keyword">await</span> <span class="keyword">get</span>(id);</span><br><span class="line">        </span><br><span class="line">        if(result === null) &#123;</span><br><span class="line">            <span class="comment">// redis沒有，往mysql找</span></span><br><span class="line">            result = <span class="keyword">await</span> getURL(id)</span><br><span class="line">            <span class="comment">// 有沒有找到都要存入redis，目的是避免同時大量查找不存在的url</span></span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span>(result.length !== <span class="number">0</span>) &#123;</span><br><span class="line">                result = result[<span class="number">0</span>]</span><br><span class="line">                <span class="keyword">set</span>(id, &#123; url: result[<span class="string">'url'</span>], <span class="attr">expireAt</span>: result[<span class="string">'expireAt'</span>] &#125;)</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="keyword">set</span>(id, &#123; url: <span class="literal">null</span>, <span class="attr">expireAt</span>: <span class="built_in">Date</span>.now() / <span class="number">1000</span> &#125;)</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//redis有，直接從redis返回</span></span><br><span class="line">        <span class="keyword">if</span>(result[<span class="string">'url'</span>] !== <span class="literal">undefined</span> &amp;&amp; validateExpire(result[<span class="string">'expireAt'</span>])) &#123;</span><br><span class="line">            <span class="comment">//如果這筆短網址存在，使用302避免301 expire了照樣會有cache</span></span><br><span class="line">            res.writeHead(<span class="number">302</span>, &#123; <span class="string">'Location'</span>: result[<span class="string">'url'</span>] &#125;);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            res.writeHead(<span class="number">404</span>, &#123;<span class="string">"Content-type"</span>: <span class="string">"text/plain"</span>&#125;);</span><br><span class="line">            res.write(<span class="string">`<span class="subst">$&#123;req.method&#125;</span> <span class="subst">$&#123;req.path&#125;</span> 404 Not Found\n`</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        res.end();</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125; <span class="keyword">catch</span>(e) &#123;</span><br><span class="line">        res.writeHead(<span class="number">500</span>, &#123;<span class="string">"Content-type"</span>: <span class="string">"text/plain"</span>&#125;);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> ErrorModel(<span class="string">`<span class="subst">$&#123;e.stack&#125;</span>`</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h2 id="三、性能比較-使用ab"><a href="#三、性能比較-使用ab" class="headerlink" title="三、性能比較(使用ab)"></a>三、性能比較(使用ab)</h2><h3 id="1-對比有使用redis和沒使用redis的性能"><a href="#1-對比有使用redis和沒使用redis的性能" class="headerlink" title="1. 對比有使用redis和沒使用redis的性能"></a>1. 對比有使用redis和沒使用redis的性能</h3><h4 id="a-同時一百個請求，總共訪問一萬次有效短網址"><a href="#a-同時一百個請求，總共訪問一萬次有效短網址" class="headerlink" title="a. 同時一百個請求，總共訪問一萬次有效短網址"></a>a. 同時一百個請求，總共訪問一萬次有效短網址</h4><p><code>有redis</code></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">C:\Users\poabob\Desktop&gt; .\ab.exe -n 10000 -c 100 http://localhost/NNNNB</span><br><span class="line"></span><br><span class="line">Concurrency Level:      100</span><br><span class="line">Time taken <span class="keyword">for</span> tests:   5.225 seconds</span><br><span class="line">Complete requests:      10000</span><br><span class="line">Failed requests:        0</span><br><span class="line">Non-2xx responses:      10000</span><br><span class="line">Total transferred:      2000000 bytes</span><br><span class="line">HTML transferred:       0 bytes</span><br><span class="line">Requests per second:    1913.98 [<span class="comment">#/sec] (mean)</span></span><br><span class="line">Time per request:       52.247 [ms] (mean)</span><br><span class="line">Time per request:       0.522 [ms] (mean, across all concurrent requests)</span><br><span class="line">Transfer rate:          373.83 [Kbytes/sec] received</span><br></pre></td></tr></table></figure>
+
+<p><code>無redis，只有mysql</code></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">C:\Users\poabob\Desktop&gt; .\ab.exe -n 10000 -c 100 http://localhost/NNNNB</span><br><span class="line"></span><br><span class="line">Concurrency Level:      100</span><br><span class="line">Time taken <span class="keyword">for</span> tests:   8.549 seconds</span><br><span class="line">Complete requests:      10000</span><br><span class="line">Failed requests:        0</span><br><span class="line">Non-2xx responses:      10000</span><br><span class="line">Total transferred:      2000000 bytes</span><br><span class="line">HTML transferred:       0 bytes</span><br><span class="line">Requests per second:    1169.68 [<span class="comment">#/sec] (mean)</span></span><br><span class="line">Time per request:       85.493 [ms] (mean)</span><br><span class="line">Time per request:       0.855 [ms] (mean, across all concurrent requests)</span><br><span class="line">Transfer rate:          228.45 [Kbytes/sec] received</span><br></pre></td></tr></table></figure>
+
+<h4 id="b-同時一千個請求，總共訪問十萬次有效短網址"><a href="#b-同時一千個請求，總共訪問十萬次有效短網址" class="headerlink" title="b. 同時一千個請求，總共訪問十萬次有效短網址"></a>b. 同時一千個請求，總共訪問十萬次有效短網址</h4><p><code>有redis</code></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">C:\Users\poabob\Desktop&gt; .\ab.exe -n 100000 -c 1000 http://localhost/NNNNB</span><br><span class="line"></span><br><span class="line">Concurrency Level:      1000</span><br><span class="line">Time taken <span class="keyword">for</span> tests:   67.488 seconds</span><br><span class="line">Complete requests:      100000</span><br><span class="line">Failed requests:        0</span><br><span class="line">Non-2xx responses:      100000</span><br><span class="line">Total transferred:      20000000 bytes</span><br><span class="line">HTML transferred:       0 bytes</span><br><span class="line">Requests per second:    1481.74 [<span class="comment">#/sec] (mean)</span></span><br><span class="line">Time per request:       674.883 [ms] (mean)</span><br><span class="line">Time per request:       0.675 [ms] (mean, across all concurrent requests)</span><br><span class="line">Transfer rate:          289.40 [Kbytes/sec] received</span><br></pre></td></tr></table></figure>
+
+<p><code>無redis，只有mysql</code></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">C:\Users\poabob\Desktop&gt; .\ab.exe -n 100000 -c 1000 http://localhost/NNNNB</span><br><span class="line"></span><br><span class="line">Concurrency Level:      1000</span><br><span class="line">Time taken <span class="keyword">for</span> tests:   88.510 seconds</span><br><span class="line">Complete requests:      100000</span><br><span class="line">Failed requests:        0</span><br><span class="line">Non-2xx responses:      100000</span><br><span class="line">Total transferred:      20000000 bytes</span><br><span class="line">HTML transferred:       0 bytes</span><br><span class="line">Requests per second:    1129.81 [<span class="comment">#/sec] (mean)</span></span><br><span class="line">Time per request:       885.103 [ms] (mean)</span><br><span class="line">Time per request:       0.885 [ms] (mean, across all concurrent requests)</span><br><span class="line">Transfer rate:          220.67 [Kbytes/sec] received</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-還可不可以優化性能"><a href="#2-還可不可以優化性能" class="headerlink" title="2. 還可不可以優化性能?"></a>2. 還可不可以優化性能?</h3><h4 id="a-使用Pm2"><a href="#a-使用Pm2" class="headerlink" title="a. 使用Pm2"></a>a. 使用Pm2</h4><ul>
+<li><p>因為Nodejs是單線程的設計，我們可以使用pm2來實現多個Nodejs Cluster提高效率</p>
+</li>
+<li><p>安裝</p>
+</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm i pm2 --save-dev</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>新增一些pm2的常用指令， -i 是要啟用的process數量</li>
+</ul>
+<p><code>package.json</code></p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">"scripts": &#123;</span><br><span class="line">    "test": "echo \"Error: no test specified\" &amp;&amp; exit 1",</span><br><span class="line">    "dev": "cross-env NODE_ENV=dev nodemon ./bin/www.js",</span><br><span class="line">    "prd": "cross-env NODE_ENV=dev pm2 start ./bin/www.js -i 4",</span><br><span class="line">    "restart": "cross-env NODE_ENV=dev pm2 restart www",</span><br><span class="line">    "list": "cross-env NODE_ENV=dev pm2 list",</span><br><span class="line">    "stop": "cross-env NODE_ENV=dev pm2 stop www",</span><br><span class="line">    "delete": "cross-env NODE_ENV=dev pm2 delete www"</span><br><span class="line">  &#125;,</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>開啟服務</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">C:\Users\poabob\Desktop\Dcard&gt; npm run prd     </span><br><span class="line"></span><br><span class="line">&gt; Dcard@1.0.0 prd C:\Users\poabob\Desktop\Dcard</span><br><span class="line">&gt; cross-env NODE_ENV=dev pm2 start ./bin/www.js -i 4</span><br><span class="line"></span><br><span class="line">[PM2] Applying action restartProcessId on app [www](ids: [ 0, 1, 2, 3 ])</span><br><span class="line">[PM2] [www](0) ✓</span><br><span class="line">[PM2] [www](1) ✓</span><br><span class="line">[PM2] [www](3) ✓</span><br><span class="line">[PM2] [www](2) ✓</span><br><span class="line">[PM2] Process successfully started</span><br><span class="line">┌─────┬────────┬─────────────┬─────────┬─────────┬──────────┬────────┬──────┬───────────┬──────────┬──────────┬──────────┬──────────┐</span><br><span class="line">│ id  │ name   │ namespace   │ version │ mode    │ pid      │ uptime │ ↺    │ status    │ cpu      │ mem      │ user     │ watching │</span><br><span class="line">├─────┼────────┼─────────────┼─────────┼─────────┼──────────┼────────┼──────┼───────────┼──────────┼──────────┼──────────┼──────────┤</span><br><span class="line">│ 0   │ www    │ default     │ 1.0.0   │ cluster │ 23348    │ 1s     │ 0    │ online    │ 0%       │ 50.1mb   │ poabob   │ disabled │</span><br><span class="line">│ 1   │ www    │ default     │ 1.0.0   │ cluster │ 17940    │ 1s     │ 0    │ online    │ 0%       │ 49.9mb   │ poabob   │ disabled │</span><br><span class="line">│ 2   │ www    │ default     │ 1.0.0   │ cluster │ 15552    │ 1s     │ 0    │ online    │ 0%       │ 49.7mb   │ poabob   │ disabled │</span><br><span class="line">│ 3   │ www    │ default     │ 1.0.0   │ cluster │ 16468    │ 1s     │ 0    │ online    │ 0%       │ 49.9mb   │ poabob   │ disabled │</span><br><span class="line">└─────┴────────┴─────────────┴─────────┴─────────┴──────────┴────────┴──────┴───────────┴──────────┴──────────┴──────────┴──────────┘</span><br></pre></td></tr></table></figure>
+
+<h4 id="b-同時一百個請求，總共訪問一萬次有效短網址"><a href="#b-同時一百個請求，總共訪問一萬次有效短網址" class="headerlink" title="b. 同時一百個請求，總共訪問一萬次有效短網址"></a>b. 同時一百個請求，總共訪問一萬次有效短網址</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">C:\Users\poabob\Desktop&gt; .\ab.exe -n 10000 -c 100 http://localhost/NNNNB</span><br><span class="line"></span><br><span class="line">Concurrency Level:      100</span><br><span class="line">Time taken <span class="keyword">for</span> tests:   5.272 seconds</span><br><span class="line">Complete requests:      10000</span><br><span class="line">Failed requests:        0</span><br><span class="line">Non-2xx responses:      10000</span><br><span class="line">Total transferred:      2000000 bytes</span><br><span class="line">HTML transferred:       0 bytes</span><br><span class="line">Requests per second:    1896.64 [<span class="comment">#/sec] (mean)</span></span><br><span class="line">Time per request:       52.725 [ms] (mean)</span><br><span class="line">Time per request:       0.527 [ms] (mean, across all concurrent requests)</span><br><span class="line">Transfer rate:          370.44 [Kbytes/sec] received</span><br></pre></td></tr></table></figure>
+
+
+<h4 id="c-同時一千個請求，總共訪問十萬次有效短網址"><a href="#c-同時一千個請求，總共訪問十萬次有效短網址" class="headerlink" title="c. 同時一千個請求，總共訪問十萬次有效短網址"></a>c. 同時一千個請求，總共訪問十萬次有效短網址</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">C:\Users\poabob\Desktop&gt; .\ab.exe -n 100000 -c 1000 http://localhost/NNNNB</span><br><span class="line"></span><br><span class="line">Concurrency Level:      1000</span><br><span class="line">Time taken <span class="keyword">for</span> tests:   56.264 seconds</span><br><span class="line">Complete requests:      100000</span><br><span class="line">Failed requests:        0</span><br><span class="line">Non-2xx responses:      100000</span><br><span class="line">Total transferred:      20000000 bytes</span><br><span class="line">HTML transferred:       0 bytes</span><br><span class="line">Requests per second:    1777.33 [<span class="comment">#/sec] (mean)</span></span><br><span class="line">Time per request:       562.642 [ms] (mean)</span><br><span class="line">Time per request:       0.563 [ms] (mean, across all concurrent requests)</span><br><span class="line">Transfer rate:          347.13 [Kbytes/sec] received</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-其他擴充提案"><a href="#3-其他擴充提案" class="headerlink" title="3. 其他擴充提案"></a>3. 其他擴充提案</h3><ul>
+<li><p>Proposal A. 新增Nginx用反向代理、實現限流機制再分析access.log。</p>
+  <!-- * 利用nginx限制流量，避免大量請求導致系統崩潰
+
+  * 利用nginx限制個別ip連線數，預防流量攻擊導致正常用戶無法使用
+
+  * 使用nginx白名單機制，讓自己的ip可以進行壓力測試
+
+  * 藉由分析access.log，將資料新增至資料庫，可供後續資料統計(分析哪個時段流量最高) -->
+</li>
+<li><p><a href="https://poabob.github.io/2022-03-26/implementation-of-ShortId-with-id-in-order/">Proposal B. 將本專案自增id順序新增機制改成隨機新增方法。</a></p>
+<!-- 
+  * 預先產生離線所有id
+
+  * 先Redis獲取url_nums(key)查看有沒有數量
+
+  * 沒有，SELECT COUNT(id) FROM WHERE id in (1, 2, ..., 1000) url is NULL;
+
+  * 有，
+
+  * 每一千筆(1 - 1000, 1001 - 2000, ...)資料隨機抽取url為空值
+
+      1. SELECT COUNT(id) FROM WHERE url is NULL LIMIT 1000;
+
+      2. 如果返回為一千，插入Redis -> url_nums = 1000
+
+      3. 
+
+  * 將POST的資料更新至資料庫 -->
+
+
+</li>
+</ul>
+<h3 id="4-結論"><a href="#4-結論" class="headerlink" title="4. 結論"></a>4. 結論</h3><ul>
+<li><p>Redis確實可以替Mysql作到提速的作用</p>
+</li>
+<li><p>使用pm2來管理Nodejs Cluster，增加性能是可行的</p>
+</li>
+</ul>
+<h2 id="四、測試-Unit-Test、Integration-Test"><a href="#四、測試-Unit-Test、Integration-Test" class="headerlink" title="四、測試(Unit Test、Integration Test)"></a>四、測試(Unit Test、Integration Test)</h2><h3 id="1-Unit-Test"><a href="#1-Unit-Test" class="headerlink" title="1. Unit Test"></a>1. Unit Test</h3><ul>
+<li><p>測試ShortId和id雙向轉換</p>
+</li>
+<li><p>驗證日期是否過期</p>
+</li>
+<li><p>驗證url是否合法</p>
+</li>
+</ul>
+<p><code>src/utils/url.js</code></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> &#123; validateUrl, validateExpire, convertIdToShortId, convertShortIdToId &#125; = <span class="built_in">require</span>(<span class="string">'../../src/utils/url'</span>);</span><br><span class="line"></span><br><span class="line">test(<span class="string">'id =&gt; ShortId'</span>, (done) =&gt; &#123;</span><br><span class="line">    <span class="keyword">const</span> ShortId = convertIdToShortId(<span class="number">1</span>);</span><br><span class="line">    expect(ShortId).toBe(<span class="string">'NNNNO'</span>);</span><br><span class="line">    done();</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line"><span class="comment">//convertIdToShortId</span></span><br><span class="line">test(<span class="string">'ShortId =&gt; id to'</span>, (done) =&gt; &#123;</span><br><span class="line">    <span class="keyword">const</span> id = convertShortIdToId(<span class="string">'NNNNO'</span>);</span><br><span class="line">    expect(id).toBe(<span class="number">1</span>);</span><br><span class="line">    done();</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line"><span class="comment">//validateExpire</span></span><br><span class="line">test(<span class="string">'驗證過期'</span>, (done) =&gt; &#123;</span><br><span class="line">    <span class="keyword">const</span> res = validateExpire(<span class="number">1000000000</span>);</span><br><span class="line">    expect(res).toBe(<span class="literal">false</span>);</span><br><span class="line">    done();</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">test(<span class="string">'驗證未過期'</span>, (done) =&gt; &#123;</span><br><span class="line">    <span class="keyword">const</span> res = validateExpire(<span class="number">5000000000</span>);</span><br><span class="line">    expect(res).toBe(<span class="literal">true</span>);</span><br><span class="line">    done();</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line"><span class="comment">//validateUrl</span></span><br><span class="line">test(<span class="string">'驗證中文域名'</span>, (done) =&gt; &#123;</span><br><span class="line">    <span class="keyword">const</span> res = validateUrl(<span class="string">'http://中文.tw'</span>);</span><br><span class="line">    expect(res).toBe(<span class="literal">true</span>);</span><br><span class="line">    done();</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">test(<span class="string">'驗證錯誤值'</span>, (done) =&gt; &#123;</span><br><span class="line">    <span class="keyword">const</span> res = validateUrl(<span class="string">'http://       中文.tw'</span>);</span><br><span class="line">    expect(res).toBe(<span class="literal">false</span>);</span><br><span class="line">    done();</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>測試response返回格式</li>
+</ul>
+<p><code>src/utils/response.js</code></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> &#123; ErrorModel, BaseModel &#125; = <span class="built_in">require</span>(<span class="string">'../../src/utils/response'</span>);</span><br><span class="line"></span><br><span class="line">test(<span class="string">"測試一般response"</span>, (done) =&gt; &#123;</span><br><span class="line">    <span class="keyword">const</span> res = <span class="keyword">new</span> BaseModel(<span class="string">`NNNNP`</span>, <span class="string">`http://localhost/NNNNP`</span>);</span><br><span class="line">    expect(res).toEqual(&#123;<span class="string">"id"</span>: <span class="string">"NNNNP"</span>, <span class="string">"shortUrl"</span>: <span class="string">"http://localhost/NNNNP"</span>&#125;);</span><br><span class="line">    done();</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">test(<span class="string">"測試錯誤response"</span>, (done) =&gt; &#123;</span><br><span class="line">    <span class="keyword">const</span> res = <span class="keyword">new</span> ErrorModel(<span class="string">`The post data expireAt =  is invalid!!!`</span>);</span><br><span class="line">    expect(res).toEqual(&#123;<span class="string">"error"</span>: <span class="string">"The post data expireAt =  is invalid!!!"</span>&#125;);</span><br><span class="line">    done();</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+
+<h3 id="2-Integration-Test"><a href="#2-Integration-Test" class="headerlink" title="2. Integration Test"></a>2. Integration Test</h3><ul>
+<li><p>整合測試前，先新增url_test的測試表</p>
+</li>
+<li><p>測試POST API</p>
+</li>
+<li><p>測試GET API</p>
+</li>
+<li><p>整合測試後，刪除url_test的測試表</p>
+</li>
+</ul>
+<p><code>src/route.js</code></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> request = <span class="built_in">require</span>(<span class="string">'supertest'</span>);</span><br><span class="line"><span class="keyword">const</span> server = <span class="built_in">require</span>(<span class="string">'../../bin/www'</span>);</span><br><span class="line"><span class="keyword">const</span> mysql = <span class="built_in">require</span>(<span class="string">'../../src/db/mysql'</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> ShortId;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">//測試前新增測試表</span></span><br><span class="line">beforeAll(<span class="keyword">async</span> () =&gt; &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">await</span> mysql.exec(</span><br><span class="line">        <span class="string">`CREATE TABLE IF NOT EXISTS shortURL.url_test ( id INT UNSIGNED NOT NULL AUTO_INCREMENT , url TEXT NOT NULL , expireAt INT NOT NULL , PRIMARY KEY (id)) ENGINE = InnoDB;`</span></span><br><span class="line">    );</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">//新增後刪除測試表</span></span><br><span class="line">afterAll(<span class="keyword">async</span> () =&gt; &#123;</span><br><span class="line">    <span class="keyword">await</span> mysql.exec(<span class="string">`DROP TABLE url_test`</span>)</span><br><span class="line">&#125;);</span><br><span class="line">  </span><br><span class="line"></span><br><span class="line">describe(<span class="string">"POST /api/v1/urls"</span>, () =&gt; &#123;</span><br><span class="line">    it(<span class="string">'使用正確格式測試 POST /api/v1/urls'</span>, <span class="keyword">async</span> () =&gt; &#123;</span><br><span class="line">        <span class="keyword">const</span> res = <span class="keyword">await</span> request(server)</span><br><span class="line">            .post(<span class="string">'/api/v1/urls'</span>)</span><br><span class="line">            .send(&#123;</span><br><span class="line">                url: <span class="string">"http://www.google.com"</span>,</span><br><span class="line">                expireAt: <span class="string">"2025-02-02T20:20:20Z"</span></span><br><span class="line">            &#125;)</span><br><span class="line">            <span class="keyword">let</span> response = <span class="built_in">JSON</span>.parse(res.res.text)</span><br><span class="line">            ShortId = response.id;</span><br><span class="line">            expect(response).toHaveProperty(<span class="string">'id'</span>);</span><br><span class="line">            expect(response).toHaveProperty(<span class="string">'shortUrl'</span>);</span><br><span class="line">            expect(<span class="built_in">Object</span>.keys(response).length).toBe(<span class="number">2</span>);</span><br><span class="line">            expect(res.statusCode).toBe(<span class="number">200</span>);</span><br><span class="line">    &#125;);</span><br><span class="line"></span><br><span class="line">    it(<span class="string">'使用錯誤日期測試 POST /api/v1/urls'</span>, <span class="keyword">async</span> () =&gt; &#123;</span><br><span class="line">        <span class="keyword">const</span> res = <span class="keyword">await</span> request(server)</span><br><span class="line">            .post(<span class="string">'/api/v1/urls'</span>)</span><br><span class="line">            .send(&#123;</span><br><span class="line">                url: <span class="string">"http://www.google.com"</span>,</span><br><span class="line">                expireAt: <span class="string">"2025-02-0220:20:20Z"</span></span><br><span class="line">            &#125;)</span><br><span class="line">            <span class="keyword">let</span> response = <span class="built_in">JSON</span>.parse(res.res.text)</span><br><span class="line"></span><br><span class="line">            expect(response).toHaveProperty(<span class="string">'error'</span>);</span><br><span class="line">            expect(<span class="built_in">Object</span>.keys(response).length).toBe(<span class="number">1</span>);</span><br><span class="line">            expect(res.statusCode).toBe(<span class="number">400</span>);</span><br><span class="line">    &#125;);</span><br><span class="line"></span><br><span class="line">    it(<span class="string">'使用錯誤url測試 POST /api/v1/urls'</span>, <span class="keyword">async</span> () =&gt; &#123;</span><br><span class="line">        <span class="keyword">const</span> res = <span class="keyword">await</span> request(server)</span><br><span class="line">            .post(<span class="string">'/api/v1/urls'</span>)</span><br><span class="line">            .send(&#123;</span><br><span class="line">                url: <span class="string">"htt://www.google.com"</span>,</span><br><span class="line">                expireAt: <span class="string">"2025-02-02T20:20:20Z"</span></span><br><span class="line">            &#125;)</span><br><span class="line">            <span class="keyword">let</span> response = <span class="built_in">JSON</span>.parse(res.res.text)</span><br><span class="line"></span><br><span class="line">            expect(response).toHaveProperty(<span class="string">'error'</span>);</span><br><span class="line">            expect(<span class="built_in">Object</span>.keys(response).length).toBe(<span class="number">1</span>);</span><br><span class="line">            expect(res.statusCode).toBe(<span class="number">400</span>);</span><br><span class="line">    &#125;);</span><br><span class="line"></span><br><span class="line">    it(<span class="string">'使用錯誤url變數測試 POST /api/v1/urls'</span>, <span class="keyword">async</span> () =&gt; &#123;</span><br><span class="line">        <span class="keyword">const</span> res = <span class="keyword">await</span> request(server)</span><br><span class="line">            .post(<span class="string">'/api/v1/urls'</span>)</span><br><span class="line">            .send(&#123;</span><br><span class="line">                uri: <span class="string">"htt://www.google.com"</span>,</span><br><span class="line">                expireAt: <span class="string">"2025-02-02T20:20:20Z"</span></span><br><span class="line">            &#125;)</span><br><span class="line">            <span class="keyword">let</span> response = <span class="built_in">JSON</span>.parse(res.res.text)</span><br><span class="line"></span><br><span class="line">            expect(response).toHaveProperty(<span class="string">'error'</span>);</span><br><span class="line">            expect(<span class="built_in">Object</span>.keys(response).length).toBe(<span class="number">1</span>);</span><br><span class="line">            expect(res.statusCode).toBe(<span class="number">400</span>);</span><br><span class="line">    &#125;);</span><br><span class="line"></span><br><span class="line">    it(<span class="string">'使用錯誤expireAt變數測試 POST /api/v1/urls'</span>, <span class="keyword">async</span> () =&gt; &#123;</span><br><span class="line">        <span class="keyword">const</span> res = <span class="keyword">await</span> request(server)</span><br><span class="line">            .post(<span class="string">'/api/v1/urls'</span>)</span><br><span class="line">            .send(&#123;</span><br><span class="line">                uri: <span class="string">"htt://www.google.com"</span>,</span><br><span class="line">                expireat: <span class="string">"2025-02-02T20:20:20Z"</span></span><br><span class="line">            &#125;)</span><br><span class="line">            <span class="keyword">let</span> response = <span class="built_in">JSON</span>.parse(res.res.text)</span><br><span class="line"></span><br><span class="line">            expect(response).toHaveProperty(<span class="string">'error'</span>);</span><br><span class="line">            expect(<span class="built_in">Object</span>.keys(response).length).toBe(<span class="number">1</span>);</span><br><span class="line">            expect(res.statusCode).toBe(<span class="number">400</span>);</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">describe(<span class="string">"GET /:ShortId"</span>, () =&gt; &#123;</span><br><span class="line">    it(<span class="string">'使用正確ShortId測試 GET /:ShortId'</span>, <span class="keyword">async</span> () =&gt; &#123;</span><br><span class="line">        <span class="keyword">const</span> res = <span class="keyword">await</span> request(server).get(<span class="string">`/<span class="subst">$&#123;ShortId&#125;</span>`</span>);</span><br><span class="line">        expect(res.statusCode).toBe(<span class="number">302</span>);</span><br><span class="line">    &#125;);</span><br><span class="line"></span><br><span class="line">    it(<span class="string">'使用過短ShortId測試 GET /:ShortId'</span>, <span class="keyword">async</span> () =&gt; &#123;</span><br><span class="line">        <span class="keyword">const</span> res = <span class="keyword">await</span> request(server).get(<span class="string">`/a`</span>);</span><br><span class="line">            expect(res.text).toBe(<span class="string">'GET /a 404 Not Found\n'</span>);</span><br><span class="line">            expect(res.statusCode).toBe(<span class="number">404</span>);</span><br><span class="line">    &#125;);</span><br><span class="line"></span><br><span class="line">    it(<span class="string">'使用過長ShortId測試 GET /:ShortId'</span>, <span class="keyword">async</span> () =&gt; &#123;</span><br><span class="line">        <span class="keyword">const</span> res = <span class="keyword">await</span> request(server).get(<span class="string">`/sidufhsiufbwuibsusdi`</span>);</span><br><span class="line">        expect(res.text).toBe(<span class="string">'GET /sidufhsiufbwuibsusdi 404 Not Found\n'</span>);</span><br><span class="line">        expect(res.statusCode).toBe(<span class="number">404</span>);</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-測試結果"><a href="#3-測試結果" class="headerlink" title="3. 測試結果"></a>3. 測試結果</h3><table>
+<thead>
+<tr>
+<th>File</th>
+<th>% Stmts</th>
+<th>% Branch</th>
+<th>% Funcs</th>
+<th>% Lines</th>
+<th>Uncovered Line #s</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>All files</td>
+<td>83.91</td>
+<td>70.42</td>
+<td>96.77</td>
+<td>83.93</td>
+<td></td>
+</tr>
+<tr>
+<td>Dcard</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td></td>
+</tr>
+<tr>
+<td>app.js</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td></td>
+</tr>
+<tr>
+<td>Dcard/bin</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cDovL3d3dy5qcw==">www.js<i class="fa fa-external-link-alt"></i></span></td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td></td>
+</tr>
+<tr>
+<td>Dcard/src/config</td>
+<td>78.57</td>
+<td>66.66</td>
+<td>100</td>
+<td>78.57</td>
+<td></td>
+</tr>
+<tr>
+<td>db.js</td>
+<td>75</td>
+<td>66.66</td>
+<td>100</td>
+<td>75</td>
+<td>28-39</td>
+</tr>
+<tr>
+<td>url.js</td>
+<td>83.33</td>
+<td>66.66</td>
+<td>100</td>
+<td>83.33</td>
+<td>9</td>
+</tr>
+<tr>
+<td>Dcard/src/controller</td>
+<td>73.8</td>
+<td>75</td>
+<td>100</td>
+<td>73.8</td>
+<td></td>
+</tr>
+<tr>
+<td>index.js</td>
+<td>73.8</td>
+<td>75</td>
+<td>100</td>
+<td>73.8</td>
+<td>16-23,31-32,37-38,64-65</td>
+</tr>
+<tr>
+<td>Dcard/src/db</td>
+<td>74.41</td>
+<td>50</td>
+<td>100</td>
+<td>74.41</td>
+<td></td>
+</tr>
+<tr>
+<td>mysql.js</td>
+<td>73.68</td>
+<td>50</td>
+<td>100</td>
+<td>73.68</td>
+<td>19,24-25,35-36</td>
+</tr>
+<tr>
+<td>redis.js</td>
+<td>75</td>
+<td>50</td>
+<td>100</td>
+<td>75</td>
+<td>20-21,38,41-42,47</td>
+</tr>
+<tr>
+<td>Dcard/src/model</td>
+<td>80</td>
+<td>100</td>
+<td>66.66</td>
+<td>80</td>
+<td></td>
+</tr>
+<tr>
+<td>index.js</td>
+<td>80</td>
+<td>100</td>
+<td>66.66</td>
+<td>80</td>
+<td>6-8</td>
+</tr>
+<tr>
+<td>Dcard/src/router</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td></td>
+</tr>
+<tr>
+<td>index.js</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td></td>
+</tr>
+<tr>
+<td>Dcard/src/utils</td>
+<td>91.22</td>
+<td>68.42</td>
+<td>100</td>
+<td>92.3</td>
+<td></td>
+</tr>
+<tr>
+<td>const.js</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td></td>
+</tr>
+<tr>
+<td>post.js</td>
+<td>75</td>
+<td>75</td>
+<td>100</td>
+<td>75</td>
+<td>12-13,24-25</td>
+</tr>
+<tr>
+<td>response.js</td>
+<td>88.88</td>
+<td>50</td>
+<td>100</td>
+<td>100</td>
+<td>3-11</td>
+</tr>
+<tr>
+<td>url.js</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td></td>
+</tr>
+</tbody></table>
+<h2 id="五、程式架構"><a href="#五、程式架構" class="headerlink" title="五、程式架構"></a>五、程式架構</h2><h3 id="1-目錄結構"><a href="#1-目錄結構" class="headerlink" title="1. 目錄結構"></a>1. 目錄結構</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"> C:\Users\poabob\Desktop&gt; tree -I <span class="string">'node_modules|img'</span></span><br><span class="line">.</span><br><span class="line">├── app.js</span><br><span class="line">├── bin</span><br><span class="line">│   └── www.js</span><br><span class="line">├── docker-compose.yml</span><br><span class="line">├── Dockerfile</span><br><span class="line">├── init.sql</span><br><span class="line">├── package.json</span><br><span class="line">├── package-lock.json</span><br><span class="line">├── README.md</span><br><span class="line">├── src</span><br><span class="line">│   ├── config</span><br><span class="line">│   │   ├── db.js</span><br><span class="line">│   │   └── url.js</span><br><span class="line">│   ├── controller</span><br><span class="line">│   │   └── index.js</span><br><span class="line">│   ├── db</span><br><span class="line">│   │   ├── mysql.js</span><br><span class="line">│   │   └── redis.js</span><br><span class="line">│   ├── model</span><br><span class="line">│   │   └── index.js</span><br><span class="line">│   ├── router</span><br><span class="line">│   │   └── index.js</span><br><span class="line">│   └── utils</span><br><span class="line">│       ├── const.js</span><br><span class="line">│       ├── post.js</span><br><span class="line">│       ├── response.js</span><br><span class="line">│       ├── session.js</span><br><span class="line">│       └── url.js</span><br><span class="line">└── <span class="built_in">test</span></span><br><span class="line">    ├── router</span><br><span class="line">    │   └── index.test.js</span><br><span class="line">    └── utils</span><br><span class="line">        ├── response.test.js</span><br><span class="line">        └── url.test.js</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-引用的三方lib"><a href="#2-引用的三方lib" class="headerlink" title="2. 引用的三方lib"></a>2. 引用的三方lib</h3><ul>
+<li><p>主要引用mysql、redis、xss這三種作為本次作業的lib</p>
+<ul>
+<li><p>mysql、redis主要是讓nodejs連接兩個資料庫</p>
+</li>
+<li><p>xss用來避免mysql被插入惡意程式片段</p>
+</li>
+</ul>
+</li>
+<li><p>cross-env：方便在npm run指令的時候，建立環境變數，ex. mode=dev</p>
+</li>
+<li><p>jest、supertest：jest用來跑測試的lib，supertest可以測試api是否符合預期</p>
+</li>
+<li><p>nodemon、pm2：nodejs的開發(nodemon)和部屬(pm2)工具</p>
+</li>
+</ul>
+<p><code>package.json</code></p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"name"</span>: <span class="string">"Dcard"</span>,</span><br><span class="line">  <span class="attr">"version"</span>: <span class="string">"1.0.0"</span>,</span><br><span class="line">  <span class="attr">"description"</span>: <span class="string">""</span>,</span><br><span class="line">  <span class="attr">"main"</span>: <span class="string">"bin/www.js"</span>,</span><br><span class="line">  <span class="attr">"directories"</span>: &#123;</span><br><span class="line">    <span class="attr">"example"</span>: <span class="string">"example"</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">"scripts"</span>: &#123;</span><br><span class="line">    <span class="attr">"test"</span>: <span class="string">"cross-env NODE_ENV=test jest --forceExit --coverage --verbose"</span>,</span><br><span class="line">    <span class="attr">"dev"</span>: <span class="string">"cross-env NODE_ENV=dev nodemon ./bin/www.js"</span>,</span><br><span class="line">    <span class="attr">"prd-d"</span>: <span class="string">"cross-env NODE_ENV=production pm2-runtime start ./bin/www.js -i 4"</span>,</span><br><span class="line">    <span class="attr">"prd"</span>: <span class="string">"cross-env NODE_ENV=production pm2 start ./bin/www.js -i 4"</span>,</span><br><span class="line">    <span class="attr">"restart"</span>: <span class="string">"cross-env NODE_ENV=production pm2 restart www"</span>,</span><br><span class="line">    <span class="attr">"list"</span>: <span class="string">"cross-env NODE_ENV=production pm2 list"</span>,</span><br><span class="line">    <span class="attr">"stop"</span>: <span class="string">"cross-env NODE_ENV=production pm2 stop www"</span>,</span><br><span class="line">    <span class="attr">"delete"</span>: <span class="string">"cross-env NODE_ENV=production pm2 delete www"</span>,</span><br><span class="line">    <span class="attr">"logs"</span>: <span class="string">"cross-env NODE_ENV=production pm2 logs www"</span>,</span><br><span class="line">    <span class="attr">"flush"</span>: <span class="string">"pm2 flush"</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">"author"</span>: <span class="string">"POABOB"</span>,</span><br><span class="line">  <span class="attr">"license"</span>: <span class="string">"ISC"</span>,</span><br><span class="line">  <span class="attr">"devDependencies"</span>: &#123;</span><br><span class="line">    <span class="attr">"cross-env"</span>: <span class="string">"^6.0.0"</span>,</span><br><span class="line">    <span class="attr">"jest"</span>: <span class="string">"^27.5.1"</span>,</span><br><span class="line">    <span class="attr">"nodemon"</span>: <span class="string">"^2.0.15"</span>,</span><br><span class="line">    <span class="attr">"pm2"</span>: <span class="string">"^5.2.0"</span>,</span><br><span class="line">    <span class="attr">"supertest"</span>: <span class="string">"^6.2.2"</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">"dependencies"</span>: &#123;</span><br><span class="line">    <span class="attr">"mysql"</span>: <span class="string">"^2.17.1"</span>,</span><br><span class="line">    <span class="attr">"redis"</span>: <span class="string">"^3.1.2"</span>,</span><br><span class="line">    <span class="attr">"xss"</span>: <span class="string">"^1.0.6"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-程式解析"><a href="#3-程式解析" class="headerlink" title="3. 程式解析"></a>3. 程式解析</h3><ul>
+<li>執行檔案，主要是創建http服務</li>
+</ul>
+<p><code>bin/www.js</code></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> http = <span class="built_in">require</span>(<span class="string">'http'</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> PORT = <span class="number">9000</span>;</span><br><span class="line"><span class="keyword">const</span> serverHandler = <span class="built_in">require</span>(<span class="string">'../app'</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> server = http.createServer(serverHandler);</span><br><span class="line"></span><br><span class="line">server.listen(PORT);</span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">`Listening on port <span class="subst">$&#123;PORT&#125;</span>...Press CTRL-C to stop.`</span>);</span><br></pre></td></tr></table></figure>
+
+<ol>
+<li><p>獲取url path</p>
+</li>
+<li><p>獲取postData</p>
+</li>
+<li><p>Router判斷</p>
+</li>
+</ol>
+<p><code>app.js</code></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> &#123; getPostData &#125; = <span class="built_in">require</span>(<span class="string">'./src/utils/post'</span>);</span><br><span class="line"><span class="keyword">const</span> handleIndexRouter = <span class="built_in">require</span>(<span class="string">'./src/router/index'</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> serverHandler = <span class="function">(<span class="params">req, res</span>) =&gt;</span> &#123;</span><br><span class="line">	<span class="comment">//設定返回格式為JSON</span></span><br><span class="line">	res.setHeader(<span class="string">'Content-type'</span>, <span class="string">'application/json'</span>);</span><br><span class="line"></span><br><span class="line">	<span class="comment">//獲取path</span></span><br><span class="line">	<span class="keyword">const</span> url = req.url;</span><br><span class="line">	req.path = url.split(<span class="string">'?'</span>)[<span class="number">0</span>];</span><br><span class="line"></span><br><span class="line">    getPostData(req, res).then(<span class="function"><span class="params">postData</span> =&gt;</span> &#123;</span><br><span class="line">		req.body = postData;</span><br><span class="line">		</span><br><span class="line">		<span class="comment">//Router註冊</span></span><br><span class="line">		<span class="comment">//處理index路由</span></span><br><span class="line">		<span class="keyword">const</span> index =  handleIndexRouter(req, res);</span><br><span class="line">		<span class="keyword">if</span>(index) &#123;</span><br><span class="line">			index.then(<span class="function"><span class="params">data</span> =&gt;</span> res.end(<span class="built_in">JSON</span>.stringify(data)))</span><br><span class="line">			<span class="keyword">return</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		</span><br><span class="line">		<span class="comment">//404</span></span><br><span class="line">		res.writeHead(<span class="number">404</span>, &#123;<span class="string">"Content-type"</span>: <span class="string">"text/plain"</span>&#125;);</span><br><span class="line">		res.write(<span class="string">`<span class="subst">$&#123;req.method&#125;</span> <span class="subst">$&#123;req.path&#125;</span> 404 Not Found\n`</span>);</span><br><span class="line">		res.end();</span><br><span class="line">	&#125;);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>使用stream的方式去擷取data，並判斷method和header是否正確</li>
+</ul>
+<p><code>src/utils/post.js</code></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 獲取post過來的data</span></span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">	getPostData: <span class="function">(<span class="params">req, res</span>) =&gt;</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function">(<span class="params">resolve, reject</span>) =&gt;</span> &#123;</span><br><span class="line">			<span class="comment">//如果方法不是POST，返回空</span></span><br><span class="line">			<span class="keyword">if</span>(req.method === <span class="string">'GET'</span> || req.method === <span class="string">'DELETE'</span>) &#123;</span><br><span class="line">				resolve(&#123;&#125;);</span><br><span class="line">				<span class="keyword">return</span>;</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="comment">//如果header不是json，返回空</span></span><br><span class="line">			<span class="keyword">if</span>(req.headers[<span class="string">'content-type'</span>] !== <span class="string">'application/json'</span>) &#123;</span><br><span class="line">				resolve(&#123;&#125;);</span><br><span class="line">				<span class="keyword">return</span>;</span><br><span class="line">			&#125;</span><br><span class="line"></span><br><span class="line">			<span class="keyword">let</span> postData = <span class="string">''</span>;</span><br><span class="line">			req.on(<span class="string">'data'</span>, chunk =&gt;&#123;</span><br><span class="line">				postData += chunk.toString();</span><br><span class="line">			&#125;);</span><br><span class="line"></span><br><span class="line">			<span class="comment">//如果沒有POST資料，返回空</span></span><br><span class="line">			req.on(<span class="string">'end'</span>, () =&gt; &#123;</span><br><span class="line">				<span class="keyword">if</span>(!postData) &#123;</span><br><span class="line">					resolve(&#123;&#125;);</span><br><span class="line">					<span class="keyword">return</span>;</span><br><span class="line">				&#125;</span><br><span class="line"></span><br><span class="line">				resolve(<span class="built_in">JSON</span>.parse(postData));</span><br><span class="line">			&#125;);</span><br><span class="line">		&#125;);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>判斷method和用正則來判斷url path是否正確，如果沒有就不return，直接404</p>
+</li>
+<li><p>原本想要使用path-to-regexp來判斷url path，但其實也只有一個路由需要判斷，所以決定手寫</p>
+</li>
+</ul>
+<p><code>src/router/index.js</code></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> &#123; getOriginUrlById, insertOriginUrl &#125; = <span class="built_in">require</span>(<span class="string">"../controller/index"</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> handleIndexRouter = <span class="function">(<span class="params">req, res</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="comment">// 獲取方法和動態url_id的key</span></span><br><span class="line">	<span class="keyword">const</span> method = req.method;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//GET，獲取短url</span></span><br><span class="line">    <span class="comment">//只能ShortId匹配 大小寫字母 數字 - ~</span></span><br><span class="line">    <span class="comment">// ex. /ABCE~ or /AB-DE/</span></span><br><span class="line">    <span class="keyword">const</span> ShortId = req.path.match(<span class="regexp">/^\/([A-Za-z0-9\-~]&#123;5&#125;)\/?$/</span>)</span><br><span class="line">	<span class="keyword">if</span>(method === <span class="string">'GET'</span> &amp;&amp; ShortId !== <span class="literal">null</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> getOriginUrlById(ShortId[<span class="number">1</span>], req, res)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//POST，新增短URL</span></span><br><span class="line">	<span class="keyword">if</span>(method === <span class="string">'POST'</span> &amp;&amp; req.path === <span class="string">'/api/v1/urls'</span>) &#123;</span><br><span class="line">		<span class="keyword">return</span> insertOriginUrl(req.body.url, req.body.expireAt);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>Mysql功能模組化</li>
+</ul>
+<p><code>src/db/mysql.js</code></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> mysql = <span class="built_in">require</span>(<span class="string">'mysql'</span>);</span><br><span class="line"><span class="keyword">const</span> &#123; MYSQL_CONF &#125; = <span class="built_in">require</span>(<span class="string">'../config/db'</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">//不使用箭頭函數原因是因為不能使用this</span></span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">	config: MYSQL_CONF,</span><br><span class="line">	pool: <span class="literal">null</span>,</span><br><span class="line">	create: <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">		<span class="keyword">if</span>(!<span class="keyword">this</span>.pool) &#123;</span><br><span class="line">			<span class="keyword">this</span>.pool = mysql.createPool(<span class="keyword">this</span>.config)</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;,</span><br><span class="line">	exec: <span class="keyword">async</span> <span class="function"><span class="keyword">function</span> (<span class="params">sql, values</span>)  </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function">(<span class="params"> resolve, reject </span>) =&gt;</span> &#123;</span><br><span class="line">			<span class="keyword">try</span> &#123;</span><br><span class="line">				<span class="keyword">this</span>.create();</span><br><span class="line">				<span class="keyword">this</span>.pool.getConnection(<span class="function"><span class="keyword">function</span>(<span class="params">err, connection</span>) </span>&#123;</span><br><span class="line">					<span class="keyword">if</span> (err) &#123;</span><br><span class="line">						reject(err);</span><br><span class="line">					&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">						connection.query(sql, values, (err, result) =&gt; &#123;</span><br><span class="line"></span><br><span class="line">							<span class="keyword">if</span> (err) &#123;</span><br><span class="line">								reject(err);</span><br><span class="line">									<span class="built_in">console</span>.error(err);</span><br><span class="line">							&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">								resolve(result);</span><br><span class="line">								</span><br><span class="line">							&#125;</span><br><span class="line">							connection.release();</span><br><span class="line">						&#125;);</span><br><span class="line">					&#125;</span><br><span class="line">				&#125;);</span><br><span class="line">			&#125; <span class="keyword">catch</span> (e) &#123;</span><br><span class="line">				reject(e);</span><br><span class="line">				<span class="built_in">console</span>.error(e);</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;);</span><br><span class="line">	&#125;,</span><br><span class="line">	<span class="built_in">escape</span>: mysql.escape</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>Redis功能模組化</li>
+</ul>
+<p><code>src/db/redis.js</code></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> redis = <span class="built_in">require</span>(<span class="string">'redis'</span>);</span><br><span class="line"><span class="keyword">const</span> &#123; REDIS_CONF &#125; = <span class="built_in">require</span>(<span class="string">'../config/db'</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 生成redis的client</span></span><br><span class="line"><span class="keyword">const</span> client = redis.createClient(REDIS_CONF.port, REDIS_CONF.host);</span><br><span class="line"><span class="comment">// client.connect();</span></span><br><span class="line"><span class="comment">// client.on('error', err =&gt; &#123;</span></span><br><span class="line"><span class="comment">// 	console.log(err);</span></span><br><span class="line"><span class="comment">// &#125;);</span></span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">	<span class="comment">// 存储值</span></span><br><span class="line">	<span class="keyword">set</span>: async (key, val) =&gt; &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function">(<span class="params">resolve, reject</span>) =&gt;</span> &#123;</span><br><span class="line">			<span class="keyword">if</span>(<span class="keyword">typeof</span> val === <span class="string">'object'</span>) &#123;</span><br><span class="line">				val = <span class="built_in">JSON</span>.stringify(val);</span><br><span class="line">			&#125;</span><br><span class="line">	</span><br><span class="line">			client.set(key, val, (err, res) =&gt; &#123;</span><br><span class="line">				<span class="keyword">if</span>(err) &#123;</span><br><span class="line">					reject(err);</span><br><span class="line">					<span class="keyword">return</span>;</span><br><span class="line">				&#125;</span><br><span class="line">	</span><br><span class="line">				<span class="keyword">try</span> &#123;</span><br><span class="line">					resolve(<span class="built_in">JSON</span>.parse(res));</span><br><span class="line">				&#125; <span class="keyword">catch</span>(ex) &#123;</span><br><span class="line">					resolve(res);</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;);</span><br><span class="line">		&#125;);</span><br><span class="line">	&#125;,</span><br><span class="line"> </span><br><span class="line">	<span class="comment">// 获取string</span></span><br><span class="line">	<span class="keyword">get</span>: async (key) =&gt; &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function">(<span class="params">resolve, reject</span>) =&gt;</span> &#123;</span><br><span class="line">			client.get(key, (err, val) =&gt; &#123;</span><br><span class="line">				<span class="keyword">if</span> (err) &#123;</span><br><span class="line">					reject(err);</span><br><span class="line">				&#125;<span class="keyword">else</span>&#123;</span><br><span class="line">					<span class="keyword">if</span>(val === <span class="literal">null</span>) &#123;</span><br><span class="line">							resolve(<span class="literal">null</span>);</span><br><span class="line">							<span class="keyword">return</span>;</span><br><span class="line">					&#125;</span><br><span class="line">					<span class="keyword">try</span> &#123;</span><br><span class="line">						resolve(<span class="built_in">JSON</span>.parse(val));</span><br><span class="line">					&#125; <span class="keyword">catch</span> (err) &#123;</span><br><span class="line">						reject(err);</span><br><span class="line">					&#125;</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;);</span><br><span class="line">		&#125;);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>執行sql語法，並返回結果</li>
+</ul>
+<p><code>src/model/index.js</code></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> mysql = <span class="built_in">require</span>(<span class="string">'../db/mysql'</span>);</span><br><span class="line"><span class="keyword">const</span> xss = <span class="built_in">require</span>(<span class="string">'xss'</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> env = process.env.NODE_ENV;</span><br><span class="line"><span class="keyword">const</span> tableName = <span class="string">`url<span class="subst">$&#123;(env === <span class="string">'test'</span>) ? <span class="string">'_test'</span> : <span class="string">''</span>&#125;</span>`</span></span><br><span class="line"><span class="comment">//查</span></span><br><span class="line"><span class="keyword">const</span> getURL = <span class="keyword">async</span> (id) =&gt; &#123;</span><br><span class="line">	<span class="keyword">let</span> sql = <span class="string">`select url, expireAt from <span class="subst">$&#123;tableName&#125;</span> where id = <span class="subst">$&#123;xss(mysql.<span class="built_in">escape</span>(id))&#125;</span> limit 1;`</span>;</span><br><span class="line">	<span class="comment">//返回promise</span></span><br><span class="line">	<span class="keyword">return</span> mysql.exec(sql);</span><br><span class="line"></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">//增</span></span><br><span class="line"><span class="keyword">const</span> insertURL = <span class="keyword">async</span> (url, expireAt) =&gt; &#123;</span><br><span class="line">	<span class="keyword">let</span> sql = <span class="string">`INSERT INTO <span class="subst">$&#123;tableName&#125;</span> (url, expireAt) VALUES (<span class="subst">$&#123;xss(mysql.<span class="built_in">escape</span>(url))&#125;</span>,<span class="subst">$&#123;xss(mysql.<span class="built_in">escape</span>(expireAt))&#125;</span>);`</span>;</span><br><span class="line">	<span class="keyword">return</span> mysql.exec(sql).then(<span class="function"><span class="params">data</span> =&gt;</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> &#123; <span class="attr">id</span>: data.insertId &#125;</span><br><span class="line">	&#125;);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">	getURL,</span><br><span class="line">	insertURL,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<ol start="4">
+<li>作業心得</li>
+</ol>
+<p>其實原本一開始想說用express直接來簡單寫完就好，不過後來想想不用auth session，也只有兩個路由。不如就直接來動手寫http server，相對較有挑戰之外，也開始讓我更熟悉nodejs的Emit機制。我有好幾次都被異步給搞到頭很痛(習慣php寫法)，經過這次練習，我不但更熟悉了Promise，也複習以前曾經學習過的知識，還順便找回寫程式的熱情。</p>
+
+    </div>
+
+    
+    
+    
+        <div>
+        
+            <div style="text-align:center;color: #ccc;font-size:14px;">------ 本文結束 ------</div>
+        
+        </div>
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>作者： </strong>POABOB
+  </li>
+  <li class="post-copyright-link">
+    <strong>文章連結：</strong>
+    <a href="https://poabob.github.io/2022-03-25/2022-dcard-backend-intern-project/" title="2022 Dcard後端實習生面試作業 - URL Shortener">https://poabob.github.io/2022-03-25/2022-dcard-backend-intern-project/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版權聲明： </strong>本網誌所有文章除特別聲明外，均採用 <span class="exturl" data-url="aHR0cHM6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LW5jLXNhLzQuMC96aC1UVw=="><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</span> 許可協議。轉載請註明出處！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Dcard%E5%AF%A6%E7%BF%92%E9%9D%A2%E8%A9%A6/" rel="tag"># Dcard實習面試</a>
+              <a href="/tags/URL%E7%9F%AD%E7%B6%B2%E5%9D%80/" rel="tag"># URL短網址</a>
+              <a href="/tags/Nodejs/" rel="tag"># Nodejs</a>
+              <a href="/tags/Mysql/" rel="tag"># Mysql</a>
+              <a href="/tags/Redis/" rel="tag"># Redis</a>
+              <a href="/tags/PM2/" rel="tag"># PM2</a>
+              <a href="/tags/Test/" rel="tag"># Test</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020-04-05/hello-workd/" rel="prev" title="Hexo部屬Nodejs version 14錯誤">
+      <i class="fa fa-chevron-left"></i> Hexo部屬Nodejs version 14錯誤
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2022-03-26/implementation-of-ShortId-with-id-in-order/" rel="next" title="URL Shortener - 自增id亂數產生ShortId">
+      URL Shortener - 自增id亂數產生ShortId <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+  <div id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#一、前言"><span class="nav-number">1.</span> <span class="nav-text">一、前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、題目"><span class="nav-number">2.</span> <span class="nav-text">二、題目</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三、解題思路"><span class="nav-number">3.</span> <span class="nav-text">三、解題思路</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-題目解釋"><span class="nav-number">3.1.</span> <span class="nav-text">1. 題目解釋</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-程式邏輯"><span class="nav-number">3.2.</span> <span class="nav-text">2. 程式邏輯</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#a-產生短網址：POST-api-v1-urls"><span class="nav-number">3.2.1.</span> <span class="nav-text">a. 產生短網址：POST &#x2F;api&#x2F;v1&#x2F;urls</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#b-轉址短網址：GET-ShortId-a-zA-Z0-9-5"><span class="nav-number">3.2.2.</span> <span class="nav-text">b. 轉址短網址：GET &#x2F;:ShortId([a-zA-Z0-9-~]{5})</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三、性能比較-使用ab"><span class="nav-number">4.</span> <span class="nav-text">三、性能比較(使用ab)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-對比有使用redis和沒使用redis的性能"><span class="nav-number">4.1.</span> <span class="nav-text">1. 對比有使用redis和沒使用redis的性能</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#a-同時一百個請求，總共訪問一萬次有效短網址"><span class="nav-number">4.1.1.</span> <span class="nav-text">a. 同時一百個請求，總共訪問一萬次有效短網址</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#b-同時一千個請求，總共訪問十萬次有效短網址"><span class="nav-number">4.1.2.</span> <span class="nav-text">b. 同時一千個請求，總共訪問十萬次有效短網址</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-還可不可以優化性能"><span class="nav-number">4.2.</span> <span class="nav-text">2. 還可不可以優化性能?</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#a-使用Pm2"><span class="nav-number">4.2.1.</span> <span class="nav-text">a. 使用Pm2</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#b-同時一百個請求，總共訪問一萬次有效短網址"><span class="nav-number">4.2.2.</span> <span class="nav-text">b. 同時一百個請求，總共訪問一萬次有效短網址</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#c-同時一千個請求，總共訪問十萬次有效短網址"><span class="nav-number">4.2.3.</span> <span class="nav-text">c. 同時一千個請求，總共訪問十萬次有效短網址</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-其他擴充提案"><span class="nav-number">4.3.</span> <span class="nav-text">3. 其他擴充提案</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-結論"><span class="nav-number">4.4.</span> <span class="nav-text">4. 結論</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#四、測試-Unit-Test、Integration-Test"><span class="nav-number">5.</span> <span class="nav-text">四、測試(Unit Test、Integration Test)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-Unit-Test"><span class="nav-number">5.1.</span> <span class="nav-text">1. Unit Test</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-Integration-Test"><span class="nav-number">5.2.</span> <span class="nav-text">2. Integration Test</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-測試結果"><span class="nav-number">5.3.</span> <span class="nav-text">3. 測試結果</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#五、程式架構"><span class="nav-number">6.</span> <span class="nav-text">五、程式架構</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-目錄結構"><span class="nav-number">6.1.</span> <span class="nav-text">1. 目錄結構</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-引用的三方lib"><span class="nav-number">6.2.</span> <span class="nav-text">2. 引用的三方lib</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-程式解析"><span class="nav-number">6.3.</span> <span class="nav-text">3. 程式解析</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="POABOB"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">POABOB</p>
+  <div class="site-description" itemprop="description">Life is but a span!</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">5</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL1BPQUJPQg==" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;POABOB"><i class="fab fa-github fa-fw"></i>GitHub</span>
+      </span>
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="bWFpbHRvOnp4Yzc1MjE2NkBnbWFpbC5jb20=" title="E-Mail → mailto:zxc752166@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</span>
+      </span>
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="aHR0cHM6Ly93d3cuZmFjZWJvb2suY29tL3Byb2ZpbGUucGhwP2lkPTEwMDAwMDMyMTQwMDU5MA==" title="FB Page → https:&#x2F;&#x2F;www.facebook.com&#x2F;profile.php?id&#x3D;100000321400590"><i class="fab fa-facebook fa-fw"></i>FB Page</span>
+      </span>
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="aHR0cHM6Ly9pbnN0YWdyYW0uY29tLzB4N2YyZWI=" title="Instagram → https:&#x2F;&#x2F;instagram.com&#x2F;0x7f2eb"><i class="fab fa-instagram fa-fw"></i>Instagram</span>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">POABOB</span>
+</div>
+  <div class="powered-by">由 <span class="exturl theme-link" data-url="aHR0cHM6Ly9oZXhvLmlv">Hexo</span> & <span class="exturl theme-link" data-url="aHR0cHM6Ly9waXNjZXMudGhlbWUtbmV4dC5vcmc=">NexT.Pisces</span> 強力驅動
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/pjax/pjax.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+  <script>
+var pjax = new Pjax({
+  selectors: [
+    'head title',
+    '#page-configurations',
+    '.content-wrap',
+    '.post-toc-wrap',
+    '.languages',
+    '#pjax'
+  ],
+  switches: {
+    '.post-toc-wrap': Pjax.switches.innerHTML
+  },
+  analytics: false,
+  cacheBust: false,
+  scrollTo : !CONFIG.bookmark.enable
+});
+
+window.addEventListener('pjax:success', () => {
+  document.querySelectorAll('script[data-pjax], script#page-configurations, #pjax script').forEach(element => {
+    var code = element.text || element.textContent || element.innerHTML || '';
+    var parent = element.parentNode;
+    parent.removeChild(element);
+    var script = document.createElement('script');
+    if (element.id) {
+      script.id = element.id;
+    }
+    if (element.className) {
+      script.className = element.className;
+    }
+    if (element.type) {
+      script.type = element.type;
+    }
+    if (element.src) {
+      script.src = element.src;
+      // Force synchronous loading of peripheral JS.
+      script.async = false;
+    }
+    if (element.dataset.pjax !== undefined) {
+      script.dataset.pjax = '';
+    }
+    if (code !== '') {
+      script.appendChild(document.createTextNode(code));
+    }
+    parent.appendChild(script);
+  });
+  NexT.boot.refresh();
+  // Define Motion Sequence & Bootstrap Motion.
+  if (CONFIG.motion.enable) {
+    NexT.motion.integrator
+      .init()
+      .add(NexT.motion.middleWares.subMenu)
+      .add(NexT.motion.middleWares.postList)
+      .bootstrap();
+  }
+  NexT.utils.updateSidebarPosition();
+});
+</script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div id="pjax">
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="https://gist.githubusercontent.com/POABOB/65b37ccc358df67efffeedf571219b2a/raw/b26f8f05e0951aa1c22d11122f3232b986012141/md5.min.js"></script>
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : '5aa580a2136b90e75fd6',
+      clientSecret: '128f00ea948ebd5cb1c0c2c7c3a2b81f067257ea',
+      repo        : 'poabob.github.io',
+      owner       : 'POABOB',
+      admin       : ['POABOB'],
+      id          : '8553af1a008f444aae877a7ccd666c2e',
+        language: 'en | es-ES | fr | ru | zh-CN | zh-TW',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+    </div>
+</body>
+</html>
