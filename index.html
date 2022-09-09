@@ -209,6 +209,90 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://poabob.github.io/2022-09-02/Build-a-PHP-RESTful-Framework-using-Slim-4-Part2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="POABOB">
+      <meta itemprop="description" content="Life is but a span!">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="POABOB">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022-09-02/Build-a-PHP-RESTful-Framework-using-Slim-4-Part2/" class="post-title-link" itemprop="url">使用 PHP Slim 4 建立一個 RESTful 框架 (進階篇)</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+
+              <time title="創建時間：2022-09-02 11:18:43" itemprop="dateCreated datePublished" datetime="2022-09-02T11:18:43+08:00">2022-09-02</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新於</span>
+                <time title="修改時間：2022-09-10 03:43:29" itemprop="dateModified" datetime="2022-09-10T03:43:29+08:00">2022-09-10</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分類於</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%BE%8C%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">後端</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><blockquote>
+<p>藉由 <a href="https://poabob.github.io/2022-07-28/Build-a-PHP-RESTful-Framework-using-Slim-4-Part1/">基礎篇</a> 所提供的簡單範例，我們可以發現如果我們把每個路由都寫成一個<code>閉包(Closure)</code>的形式，很容易導致程式碼<code>不易閱讀</code>，並且把所有資料都寫在一個檔案非常難以去釐清 RESTful API <code>服務的類型</code>和<code>相關的依賴類</code>。</p>
+<p>所以本篇將要介紹如何將 SLIM 4 構建成一個屬於 <code>ADR 模式</code>的一個框架，構建之前也會介紹傳統 <code>MVC 框架</code>的架構，之後再來講解如何使用 <code>JWT</code> 如何用作<code>登入後產生 Token</code> 並且<code>驗證其身份資訊</code>。</p>
+</blockquote>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2022-09-02/Build-a-PHP-RESTful-Framework-using-Slim-4-Part2/#more" rel="contents">
+                閱讀全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-TW">
     <link itemprop="mainEntityOfPage" href="https://poabob.github.io/2022-07-28/Build-a-PHP-RESTful-Framework-using-Slim-4-Part1/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -240,7 +324,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新於</span>
-                <time title="修改時間：2022-08-01 08:57:21" itemprop="dateModified" datetime="2022-08-01T08:57:21+08:00">2022-08-01</time>
+                <time title="修改時間：2022-09-10 03:44:06" itemprop="dateModified" datetime="2022-09-10T03:44:06+08:00">2022-09-10</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -699,7 +783,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">5</span>
+          <span class="site-state-item-count">6</span>
           <span class="site-state-item-name">文章</span>
         </a>
       </div>
