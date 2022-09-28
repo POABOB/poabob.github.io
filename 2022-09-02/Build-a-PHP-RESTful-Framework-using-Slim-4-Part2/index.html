@@ -40,7 +40,7 @@
 <meta property="og:image" content="https://poabob.github.io/images/Build-a-PHP-RESTful-Framework-using-Slim-4-Part2/5.jpg">
 <meta property="og:image" content="https://poabob.github.io/images/Build-a-PHP-RESTful-Framework-using-Slim-4-Part2/6.jpg">
 <meta property="article:published_time" content="2022-09-02T03:18:43.000Z">
-<meta property="article:modified_time" content="2022-09-09T19:43:29.497Z">
+<meta property="article:modified_time" content="2022-09-28T18:03:23.381Z">
 <meta property="article:author" content="POABOB">
 <meta property="article:tag" content="Swagger-ui">
 <meta property="article:tag" content="PHP">
@@ -250,7 +250,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新於</span>
-                <time title="修改時間：2022-09-10 03:43:29" itemprop="dateModified" datetime="2022-09-10T03:43:29+08:00">2022-09-10</time>
+                <time title="修改時間：2022-09-29 02:03:23" itemprop="dateModified" datetime="2022-09-29T02:03:23+08:00">2022-09-29</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -291,7 +291,7 @@
 </li>
 </ul>
 <ul>
-<li>本篇主要是參考 <span class="exturl" data-url="aHR0cHM6Ly93d3cuZHJzYW53dWppYW5nLmNvbQ==">Fogless<i class="fa fa-external-link-alt"></i></span> 的<span class="exturl" data-url="aHR0cHM6Ly93d3cuZHJzYW53dWppYW5nLmNvbS9zbGltNC1idWlsZC1yZXN0ZnVsLWFwaS8jY3JlYXRlLXNsaW0tYXBwbGljYXRpb24=">Slim 4 搭建 RESTful API<i class="fa fa-external-link-alt"></i></span> 以及 <span class="exturl" data-url="aHR0cHM6Ly90d2l0dGVyLmNvbS9kb3BpdHo=">Daniel Opitz<i class="fa fa-external-link-alt"></i></span> 的<span class="exturl" data-url="aHR0cHM6Ly9vZGFuLmdpdGh1Yi5pby8yMDE5LzExLzA1L3NsaW00LXR1dG9yaWFsLmh0bWw=">Slim 4 - Tutorial<i class="fa fa-external-link-alt"></i></span>，並且結合自身所學，再根據個人習慣建構。基礎篇的建構方向是能夠有基本的環境、 Slim 雛形、基本的返回JSON資訊、以及 Middleware 和 php-di 的相關配置。</li>
+<li>本篇主要是參考 <span class="exturl" data-url="aHR0cHM6Ly93d3cuZHJzYW53dWppYW5nLmNvbQ==">Fogless<i class="fa fa-external-link-alt"></i></span> 的<span class="exturl" data-url="aHR0cHM6Ly93d3cuZHJzYW53dWppYW5nLmNvbS9zbGltNC1idWlsZC1yZXN0ZnVsLWFwaS8jY3JlYXRlLXNsaW0tYXBwbGljYXRpb24=">Slim 4 搭建 RESTful API<i class="fa fa-external-link-alt"></i></span> 以及 <span class="exturl" data-url="aHR0cHM6Ly90d2l0dGVyLmNvbS9kb3BpdHo=">Daniel Opitz<i class="fa fa-external-link-alt"></i></span> 的<span class="exturl" data-url="aHR0cHM6Ly9vZGFuLmdpdGh1Yi5pby8yMDE5LzExLzA1L3NsaW00LXR1dG9yaWFsLmh0bWw=">Slim 4 - Tutorial<i class="fa fa-external-link-alt"></i></span>，並且結合自身所學，再根據個人習慣建構。進階篇的建構方向是藉由基礎篇的基礎，將 Slim 4 的 <code>ADR 框架</code>建立完成，並且實現 <code>表單驗證</code>、<code>統一回應格式</code>、<code>Jwt</code>、<code>登入登出</code>功能。</li>
 </ul>
 <h2 id="安裝"><a href="#安裝" class="headerlink" title="安裝"></a>安裝</h2><h3 id="本機最低需求"><a href="#本機最低需求" class="headerlink" title="本機最低需求"></a>本機最低需求</h3><ul>
 <li>PHP 8.0 (目前沒有使用 php-7.4 實測過，所以希望至少可以 8.0 以上)</li>
@@ -618,7 +618,10 @@
     <a href="/2022-07-28/Build-a-PHP-RESTful-Framework-using-Slim-4-Part1/" rel="prev" title="使用 PHP Slim 4 建立一個 RESTful 框架 (基本配置篇)">
       <i class="fa fa-chevron-left"></i> 使用 PHP Slim 4 建立一個 RESTful 框架 (基本配置篇)
     </a></div>
-      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/2022-09-29/Deploy-a-static-project-using-SSL-DNS-with-a-free-way/" rel="next" title="使用 GCP 建置一個具有 SSL 和 DNS 的靜態網站(完全免費!!!)">
+      使用 GCP 建置一個具有 SSL 和 DNS 的靜態網站(完全免費!!!) <i class="fa fa-chevron-right"></i>
+    </a></div>
     </div>
       </footer>
     
@@ -697,20 +700,20 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">6</span>
+          <span class="site-state-item-count">7</span>
           <span class="site-state-item-name">文章</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-count">4</span>
         <span class="site-state-item-name">分類</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-count">28</span>
         <span class="site-state-item-name">標籤</span></a>
       </div>
   </nav>
