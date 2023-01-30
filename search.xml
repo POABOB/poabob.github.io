@@ -1244,7 +1244,7 @@
 <h3 id="Cronjob"><a href="#Cronjob" class="headerlink" title="Cronjob"></a>Cronjob</h3><ul>
 <li>為了避免我們憑證過期，所以我們要在<code>使用 Scheduler</code> 來<code>定期更新憑證</code></li>
 </ul>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 編輯 Scheduler</span></span><br><span class="line">sudo nano /etc/crontab</span><br><span class="line"></span><br><span class="line"><span class="comment"># 加入以下指令，每周定期RENEW SSL 憑證</span></span><br><span class="line">0  0    * * 0   root    docker-compose run --rm certbot renew</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 編輯 Scheduler</span></span><br><span class="line">sudo crontab -e</span><br><span class="line"></span><br><span class="line"><span class="comment"># 加入以下指令，每周定期RENEW SSL 憑證</span></span><br><span class="line">0  0    * * 0   root    docker-compose run --rm certbot renew</span><br></pre></td></tr></table></figure>
 
 
 <h2 id="參考資料"><a href="#參考資料" class="headerlink" title="參考資料"></a>參考資料</h2><ul>
@@ -1466,6 +1466,97 @@
       </categories>
       <tags>
         <tag>KKCompany面試解題</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Golang 最佳化打包 Docker Image 至上線環境</title>
+    <url>/2023-01-31/The-Best-Way-of-Building-A-Smallest-Docker-Image-on-Production-Environment-Using-Golang/</url>
+    <content><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><blockquote>
+<p>由於 Docker 讓我們開發者不論是在開發還是上線環境有一個統一的環境可以讓我們執行，導致容器化的部屬方式變得非常熱門。<br>然而，每次當我們在 Docker 打包 golang 的執行檔時，常常發現<code>鏡像(Docker Image)</code>佔用空間非常大，甚至可能有幾GB的大小這麼多。於是，優化其鏡像大小成為了一個重要的議題。<br>本篇文章將會將實際專案，從原本<code>1.51GB</code>大小的鏡像縮減至<code>38MB</code>，如果對於本文有更好的建議也歡迎留言提出來。</p>
+</blockquote>
+<a id="more"></a> 
+
+<h2 id="初始Dockerfile"><a href="#初始Dockerfile" class="headerlink" title="初始Dockerfile"></a>初始Dockerfile</h2><p><code>Dockerfile.prod</code></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">FROM golang:1.19-alpine AS builder</span><br><span class="line"></span><br><span class="line"># 建立環境變數</span><br><span class="line">ENV GO111MODULE&#x3D;auto \</span><br><span class="line">    CGO_ENABLED&#x3D;0 \</span><br><span class="line">    GOOS&#x3D;linux \</span><br><span class="line">    GOARCH&#x3D;amd64</span><br><span class="line"></span><br><span class="line"># 指定工作目錄</span><br><span class="line">WORKDIR &#x2F;app&#x2F;go&#x2F;</span><br><span class="line"></span><br><span class="line"># 把當前專案複製到&#x2F;app&#x2F;go裡</span><br><span class="line">COPY . &#x2F;app&#x2F;go</span><br><span class="line"></span><br><span class="line"># 安裝環境依賴函式庫</span><br><span class="line">RUN go mod tidy</span><br><span class="line">RUN go mod download </span><br><span class="line">RUN CGO_ENABLED&#x3D;0 GOOS&#x3D;linux GOARCH&#x3D;amd64 go build -o go-pano.output *.go</span><br><span class="line">RUN go install github.com&#x2F;rubenv&#x2F;sql-migrate&#x2F;...@latest</span><br><span class="line"></span><br><span class="line"># 暴露端口</span><br><span class="line">EXPOSE 80</span><br><span class="line"></span><br><span class="line"># 執行</span><br><span class="line">CMD [&quot;&#x2F;app&#x2F;go&#x2F;go-pano.output&quot;]</span><br></pre></td></tr></table></figure>
+
+<p>當我一開始執行 <code>docker build</code> 的時候，發現打包後竟然高達<code>1.51GB</code>，這樣線上環境如果要pull的話肯定很花時間和流量。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ docker build -f ./Dockerfile.prod -t poabob/pano-go:prod . </span><br><span class="line">$ docker image ls poabob/pano-go</span><br><span class="line">REPOSITORY       TAG       IMAGE ID       CREATED          SIZE</span><br><span class="line">poabob/pano-go   prod      4ae56d080e02   34 seconds ago   1.51GB</span><br></pre></td></tr></table></figure>
+
+<h2 id="優化流程"><a href="#優化流程" class="headerlink" title="優化流程"></a>優化流程</h2><h3 id="使用-dockerignore-避免非必要的文件打包進入鏡像"><a href="#使用-dockerignore-避免非必要的文件打包進入鏡像" class="headerlink" title="使用 .dockerignore 避免非必要的文件打包進入鏡像"></a>使用 <code>.dockerignore</code> 避免非必要的文件打包進入鏡像</h3><p>我們可以在原始檔案發現在打包的時候會<code>將本地專案目錄的資料完全複製到容器之中</code>，可是如果專案目錄<code>有些檔案本來就沒有必要被打包</code>進去的話，勢必就要來避免這些檔案的移動。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">COPY . &#x2F;app&#x2F;go</span><br></pre></td></tr></table></figure>
+
+<p>我們可以使用 <code>.dockerignore</code> 來聲明哪些檔案在打包的時候要避免掉(用法跟<code>.gitignore</code>一樣)。</p>
+<p><code>.dockerignore</code></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">**&#x2F;.git</span><br><span class="line">**&#x2F;.DS_Store</span><br><span class="line"></span><br><span class="line"># 裡面有存放開發環境留下來的volume</span><br><span class="line">**&#x2F;dist</span><br><span class="line"></span><br><span class="line">*.log</span><br><span class="line">Dockerfile*</span><br><span class="line">docker-compose*</span><br><span class="line">.dockerignore</span><br><span class="line">.git</span><br><span class="line">.gitignore</span><br><span class="line">.vscode</span><br></pre></td></tr></table></figure>
+
+<p>接著我們可以再來重新打包試試看大小有無變化。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ docker build -f ./Dockerfile.prod -t poabob/pano-go:prod .</span><br><span class="line">$ docker image ls poabob/pano-go                             </span><br><span class="line">REPOSITORY       TAG       IMAGE ID       CREATED          SIZE</span><br><span class="line">poabob/pano-go   prod      a7629caa7217   15 seconds ago   946MB</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>結果將原本的 <code>1.51GB</code> 縮減至 <code>946MB</code>，原因是因為 <code>dist</code> 目錄中有<code>python 的 service</code> 本來就不該被打包進來。</li>
+</ul>
+<h3 id="減少使用會增加鏡像layer的指令"><a href="#減少使用會增加鏡像layer的指令" class="headerlink" title="減少使用會增加鏡像layer的指令"></a>減少使用會增加鏡像layer的指令</h3><p>鏡像中的 layer 與我們 Git 的 commit 一樣，用來區分版本與版本之間的差異，藉此來我們在重複打包的時候，可以藉由原本 Layer 中儲存的 Cache 來節省我們打包的時間。</p>
+<p>但是鏡像的 layer 是會佔空間的，所以每當我們打包環境的層數越多，就會讓該鏡像越肥大。目前有三種指令會增加 layer 的數量。</p>
+<ul>
+<li><code>RUN</code></li>
+<li><code>ADD</code></li>
+<li><code>COPY</code></li>
+</ul>
+<p><code>Dockerfile.prod</code></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">FROM golang:1.19-alpine AS builder</span><br><span class="line"></span><br><span class="line"># 建立環境變數</span><br><span class="line">ENV GO111MODULE&#x3D;auto \</span><br><span class="line">    CGO_ENABLED&#x3D;0 \</span><br><span class="line">    GOOS&#x3D;linux \</span><br><span class="line">    GOARCH&#x3D;amd64</span><br><span class="line"></span><br><span class="line"># 指定工作目錄</span><br><span class="line">WORKDIR &#x2F;app&#x2F;go&#x2F;</span><br><span class="line"></span><br><span class="line"># 把當前專案複製到&#x2F;app&#x2F;go裡</span><br><span class="line">COPY . &#x2F;app&#x2F;go</span><br><span class="line"></span><br><span class="line"># 安裝環境依賴函式庫</span><br><span class="line">RUN go mod tidy \</span><br><span class="line">    &amp;&amp; go mod download \</span><br><span class="line">    &amp;&amp; CGO_ENABLED&#x3D;0 GOOS&#x3D;linux GOARCH&#x3D;amd64 go build -o go-pano.output *.go \</span><br><span class="line">    &amp;&amp; go install github.com&#x2F;rubenv&#x2F;sql-migrate&#x2F;...@latest</span><br><span class="line"></span><br><span class="line"># 暴露端口</span><br><span class="line">EXPOSE 80</span><br><span class="line"></span><br><span class="line"># 執行</span><br><span class="line">CMD [&quot;&#x2F;app&#x2F;go&#x2F;go-pano.output&quot;]</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ docker build -f ./Dockerfile.prod -t poabob/pano-go:prod . </span><br><span class="line">$ docker image ls poabob/pano-go                             </span><br><span class="line">REPOSITORY       TAG       IMAGE ID       CREATED          SIZE</span><br><span class="line">poabob/pano-go   prod      615b8016ccf7   15 seconds ago   946MB</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>結果還是原本的 <code>946MB</code> QQ，理論上應該縮小的。</li>
+</ul>
+<h3 id="使用更小的鏡像執行環境"><a href="#使用更小的鏡像執行環境" class="headerlink" title="使用更小的鏡像執行環境"></a>使用更小的鏡像執行環境</h3><p>當我們在 golang 官方鏡像的 DockerHub 可以看到，每個鏡像都有不同的<code>標籤來當作後綴</code>，而我一開始就使用 <code>alpine</code> 作為打包環境其實已經算是最小了，其他標籤解釋如下：</p>
+<ul>
+<li><code>buster</code><ul>
+<li><code>Debian LTS 版本 10.7</code>，其代號就是 <code>Buster</code>。所以原始環境是以 Debian 作為底層作業系統，並且<code>擁有完整的相關依賴函式庫</code>，缺點就是<code>肥大</code>。</li>
+</ul>
+</li>
+<li><code>alpine</code><ul>
+<li>基於 <code>Alpine Linux</code> 所產生的鏡像，其<code>佔用空間算是最小的</code>，大多數人都會使用它來作為縮小鏡像大小的手段，但是他就是因為什麼都沒有，很容易遇到<code>相關依賴函式庫不支援的狀況</code>。</li>
+</ul>
+</li>
+<li><code>slim</code><ul>
+<li>相對來說是<code>上述兩者的折衷選擇</code>，提供較少的資源，達到減少空間的效果，但是專案能不能正常運行還是要實際測試才知道。</li>
+</ul>
+</li>
+</ul>
+<p><img src="/images/The-Best-Way-of-Building-A-Smallest-Docker-Image-on-Production-Environment-Using-Golang/QAWsa2V.jpg" alt=""></p>
+<h3 id="使用多階段構建-multistage-builds-，不打包執行環境到鏡像中"><a href="#使用多階段構建-multistage-builds-，不打包執行環境到鏡像中" class="headerlink" title="使用多階段構建(multistage builds)，不打包執行環境到鏡像中"></a>使用多階段構建(multistage builds)，不打包執行環境到鏡像中</h3><p>上述操作流程我們很明顯的可以看到有把 <code>golang</code> 的執行環境給整個打包進來，可是我們的應用程式都<code>打包成為二進位制檔案</code>了，根本<code>不需要這個開發環境</code>。<br>於是 <code>Dockerfile</code> 可以讓我們在同一個檔案內，使用不同鏡像進行<code>多階段構建(multistage builds)</code>，我們只需要打包好執行檔，並將執行檔打包進去<code>另外一個乾淨的執行環境</code>即可。</p>
+<p><code>Dockerfile.prod</code></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># Build Stage</span><br><span class="line">FROM golang:1.19-alpine AS builder</span><br><span class="line"></span><br><span class="line"># 建立環境變數</span><br><span class="line">ENV GO111MODULE&#x3D;auto \</span><br><span class="line">    CGO_ENABLED&#x3D;0 \</span><br><span class="line">    GOOS&#x3D;linux \</span><br><span class="line">    GOARCH&#x3D;amd64</span><br><span class="line"></span><br><span class="line"># 指定工作目錄</span><br><span class="line">WORKDIR &#x2F;app&#x2F;go&#x2F;</span><br><span class="line"></span><br><span class="line"># 把當前專案複製到&#x2F;app&#x2F;go裡</span><br><span class="line">COPY . &#x2F;app&#x2F;go</span><br><span class="line"></span><br><span class="line"># 安裝環境依賴函式庫</span><br><span class="line">RUN go mod tidy \</span><br><span class="line">    &amp;&amp; go mod download \</span><br><span class="line">    &amp;&amp; CGO_ENABLED&#x3D;0 GOOS&#x3D;linux GOARCH&#x3D;amd64 go build -o go-pano.output *.go</span><br><span class="line"></span><br><span class="line"># Deploy Stage</span><br><span class="line">FROM alpine:3.16.2 AS prod</span><br><span class="line"></span><br><span class="line"># 指定工作目錄</span><br><span class="line">WORKDIR &#x2F;app&#x2F;go&#x2F;</span><br><span class="line"></span><br><span class="line">COPY --from&#x3D;builder &#x2F;app&#x2F;go&#x2F;go-pano.output &#x2F;app&#x2F;go&#x2F;go-pano.output</span><br><span class="line">COPY --from&#x3D;builder &#x2F;app&#x2F;go&#x2F;config-prod.yml &#x2F;app&#x2F;go&#x2F;config.yml</span><br><span class="line"></span><br><span class="line"># 暴露端口</span><br><span class="line">EXPOSE 80</span><br><span class="line"></span><br><span class="line"># 執行</span><br><span class="line">CMD [&quot;&#x2F;app&#x2F;go&#x2F;go-pano.output&quot;]</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">$ docker build -f .&#x2F;Dockerfile.prod -t poabob&#x2F;pano-go:prod . </span><br><span class="line">$ docker image ls poabob&#x2F;pano-go                             </span><br><span class="line">REPOSITORY       TAG       IMAGE ID       CREATED          SIZE</span><br><span class="line">poabob&#x2F;pano-go   prod      d1db126af432   25 minutes ago   38MB</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>結果將 <code>946MB</code> 大幅度的縮減至 <code>38MB</code>，並且測試過後基本上沒有任何功能上的缺失。</li>
+</ul>
+<h2 id="結論"><a href="#結論" class="headerlink" title="結論"></a>結論</h2><p>本篇文章透過以下方式來減少我們在打包鏡像所遇到的鏡像肥大問題。</p>
+<ol>
+<li>使用 <code>.dockerignore</code></li>
+<li>減少使用會增加鏡像layer的指令</li>
+<li>使用更小的鏡像執行環境</li>
+<li>使用<code>多階段構建(multistage builds)</code></li>
+</ol>
+<p>其中本篇是基於 <code>golang</code> 作為使用的範例，根據不同的程式語言像是 <code>python</code> 這種直譯式語言可能就不符合<code>使用多階段構建(multistage builds)</code>的方式，所以根據條件以及需求還煩請各位大大審慎評估後使用，畢竟很常聽說 <code>alpine</code> 鏡像的坑大大小小都有，最後還是得讓應用可以正常運行才是主要的任務。</p>
+<h2 id="參考資料"><a href="#參考資料" class="headerlink" title="參考資料"></a>參考資料</h2><ul>
+<li><span class="exturl" data-url="aHR0cHM6Ly9qdWVqaW4uY24vcG9zdC83MTI2NzU0MDQxNDQyMzM2Nzc1">https://juejin.cn/post/7126754041442336775<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cDovL2Jsb2cuaXRwdWIubmV0LzcwMDAyMjE1L3ZpZXdzcGFjZS0yNzgxNjI5Lw==">http://blog.itpub.net/70002215/viewspace-2781629/<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly93d3cudGltaWd1by5jb20vYXJjaGl2ZXMvMjIzLw==">https://www.timiguo.com/archives/223/<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly9odWIuZG9ja2VyLmNvbS9fL2dvbGFuZw==">https://hub.docker.com/_/golang<i class="fa fa-external-link-alt"></i></span></li>
+</ul>
+]]></content>
+      <categories>
+        <category>後端</category>
+      </categories>
+      <tags>
+        <tag>Docker</tag>
+        <tag>Dolang</tag>
+        <tag>Production</tag>
       </tags>
   </entry>
   <entry>
