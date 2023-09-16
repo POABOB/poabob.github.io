@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+  <meta name="google-site-verification" content="gMiqErWj487BTNydQ4JwPWMijWfHq7w5bqkaC5JPH9c">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"poabob.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":true,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="前言 最近因為 CakeResume 作品集不能給非會員觀看，這時就想說來自己架一個站好了，那麼我主要是利用 GCP 建立免費的 VM，No-IP 使用免費的 DNS，Certbot 自動申請免費的 SSL 憑證，在 OS 之中，主要都是以 Docker 作為主力容器服務。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用 GCP 建置一個具有 SSL 和 DNS 的靜態網站(完全免費!!!)">
+<meta property="og:url" content="https://poabob.github.io/2022-09-29/Deploy-a-static-project-using-SSL-DNS-with-a-free-way/index.html">
+<meta property="og:site_name" content="POABOB">
+<meta property="og:description" content="前言 最近因為 CakeResume 作品集不能給非會員觀看，這時就想說來自己架一個站好了，那麼我主要是利用 GCP 建立免費的 VM，No-IP 使用免費的 DNS，Certbot 自動申請免費的 SSL 憑證，在 OS 之中，主要都是以 Docker 作為主力容器服務。">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://i.imgur.com/bhhEhQK.jpg">
+<meta property="og:image" content="https://i.imgur.com/EiNFr2T.jpg">
+<meta property="og:image" content="https://i.imgur.com/t2dBn6f.jpg">
+<meta property="og:image" content="https://i.imgur.com/bSQbwEa.jpg">
+<meta property="og:image" content="https://i.imgur.com/ir5ppwh.jpg">
+<meta property="og:image" content="https://i.imgur.com/a1RekCw.jpg">
+<meta property="og:image" content="https://i.imgur.com/rOY9b1B.jpg">
+<meta property="og:image" content="https://i.imgur.com/vbKx1pN.jpg">
+<meta property="og:image" content="https://i.imgur.com/6eSAWE6.jpg">
+<meta property="og:image" content="https://i.imgur.com/nxIKvRi.jpg">
+<meta property="og:image" content="https://i.imgur.com/hEU5JJW.jpg">
+<meta property="og:image" content="https://i.imgur.com/5WoSffZ.jpg">
+<meta property="og:image" content="https://i.imgur.com/wTbc3mG.jpg">
+<meta property="og:image" content="https://i.imgur.com/jxUvmcj.jpg">
+<meta property="og:image" content="https://i.imgur.com/3b4jmac.jpg">
+<meta property="og:image" content="https://i.imgur.com/TBZWjME.jpg">
+<meta property="og:image" content="https://i.imgur.com/AdmKJf8.jpg">
+<meta property="og:image" content="https://i.imgur.com/r57py2N.jpg">
+<meta property="article:published_time" content="2022-09-28T17:36:01.000Z">
+<meta property="article:modified_time" content="2023-01-30T19:29:56.000Z">
+<meta property="article:author" content="POABOB">
+<meta property="article:tag" content="Docker">
+<meta property="article:tag" content="GCP">
+<meta property="article:tag" content="SSL">
+<meta property="article:tag" content="DNS">
+<meta property="article:tag" content="Free">
+<meta property="article:tag" content="Nginx">
+<meta property="article:tag" content="Certbot">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.imgur.com/bhhEhQK.jpg">
+
+<link rel="canonical" href="https://poabob.github.io/2022-09-29/Deploy-a-static-project-using-SSL-DNS-with-a-free-way/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-TW'
+  };
+</script>
+
+  <title>使用 GCP 建置一個具有 SSL 和 DNS 的靜態網站(完全免費!!!) | POABOB</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-162792341-1"></script>
+    <script data-pjax>
+      if (CONFIG.hostname === location.hostname) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-162792341-1');
+      }
+    </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">POABOB</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">小小工程師的筆記分享</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜尋..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://poabob.github.io/2022-09-29/Deploy-a-static-project-using-SSL-DNS-with-a-free-way/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="POABOB">
+      <meta itemprop="description" content="Life is but a span!">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="POABOB">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          使用 GCP 建置一個具有 SSL 和 DNS 的靜態網站(完全免費!!!)
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+
+              <time title="創建時間：2022-09-29 01:36:01" itemprop="dateCreated datePublished" datetime="2022-09-29T01:36:01+08:00">2022-09-29</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新於</span>
+                <time title="修改時間：2023-01-31 03:29:56" itemprop="dateModified" datetime="2023-01-31T03:29:56+08:00">2023-01-31</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分類於</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/DevOps/" itemprop="url" rel="index"><span itemprop="name">DevOps</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><blockquote>
+<p>最近因為 <code>CakeResume</code> 作品集不能給非會員觀看，這時就想說來自己架一個站好了，那麼我主要是利用 <code>GCP</code> 建立<code>免費的 VM</code>，<code>No-IP</code> 使用<code>免費的 DNS</code>，<code>Certbot</code> 自動<code>申請免費的 SSL 憑證</code>，在 OS 之中，主要都是以 <code>Docker</code> 作為主力容器服務。</p>
+</blockquote>
+<a id="more"></a> 
+<h2 id="建立免費-GCP-VM"><a href="#建立免費-GCP-VM" class="headerlink" title="建立免費 GCP VM"></a>建立免費 GCP VM</h2><h3 id="官方免費-VM-服務條件"><a href="#官方免費-VM-服務條件" class="headerlink" title="官方免費 VM 服務條件"></a>官方免費 VM 服務條件</h3><ul>
+<li>其實一般人除了<strong>初次90天內300美元的額度</strong>可以使用以外，GCP 還有提供一個條件可以讓你<code>免費使用他的 VM 服務</code>。<ul>
+<li><code>使用 e2-micro (2 個 vCPU，1 GB 記憶體)</code> 的硬體</li>
+<li>VM 位置在<code>奧勒岡州：us-west1</code>、<code>愛荷華州：us-central1</code>、<code>南卡羅來納州：us-east1</code> </li>
+<li>硬碟空間最多使用<code>30GB</code>。(<code>個人使用10GB</code>而已，以前有用過30GB被收費過QQ)</li>
+<li>快照(Snapshot)空間就是 <code>GCP 可以備份你的 VM</code>，而限制就是 <code>5GB</code>(超容易達成，<code>建議不要用</code>)</li>
+</ul>
+</li>
+</ul>
+<p><img src="https://i.imgur.com/bhhEhQK.jpg" alt=""></p>
+<blockquote>
+<p>P.S. </p>
+<ol>
+<li>流量費用另外計算，但我的作法是 VM 只展示靜態檔案，這樣就可以避免如果架設後端 API 被亂 call。</li>
+<li>每幾年基本上都會有些免費條件的調整，要請大家注意自己的帳單是否開始成長。</li>
+</ol>
+</blockquote>
+<h3 id="選擇-建立-Porject"><a href="#選擇-建立-Porject" class="headerlink" title="選擇/建立 Porject"></a>選擇/建立 Porject</h3><ul>
+<li>一開始進入後台的時候，GCP 會先要求你<code>建立或是選擇一個 Project</code> 來當作專案分類。</li>
+<li>我們可以點擊側邊欄的左上角的Dropdown <code>選擇或建立我們的Project</code>。</li>
+</ul>
+<p><img src="https://i.imgur.com/EiNFr2T.jpg" alt=""><br><img src="https://i.imgur.com/t2dBn6f.jpg" alt=""></p>
+<ul>
+<li>如果沒有 Project 那麼直接輸入一個即可。</li>
+</ul>
+<p><img src="https://i.imgur.com/bSQbwEa.jpg" alt=""></p>
+<ul>
+<li>選擇好 Project 後，請將 Compute Engine API 的服務順便啟用。</li>
+</ul>
+<p><img src="https://i.imgur.com/ir5ppwh.jpg" alt=""></p>
+<h3 id="建立-VM"><a href="#建立-VM" class="headerlink" title="建立 VM"></a>建立 VM</h3><ul>
+<li>進入 <code>Compute Engine &gt; VM執行個體</code>的頁面之後，請點擊<code>建立執行個體</code></li>
+</ul>
+<p><img src="https://i.imgur.com/a1RekCw.jpg" alt=""></p>
+<ul>
+<li>將你的 <code>VM 名稱</code>、<code>區域</code>、<code>硬體條件(vCpu、Memory)</code>、<code>硬碟(大小、OS)</code>、<code>防火牆(HTTP、HTTPS)</code>設定好，<code>點擊建立</code>。</li>
+</ul>
+<p><img src="https://i.imgur.com/rOY9b1B.jpg" alt=""><br><img src="https://i.imgur.com/vbKx1pN.jpg" alt=""></p>
+<h3 id="安裝-Docker"><a href="#安裝-Docker" class="headerlink" title="安裝 Docker"></a>安裝 Docker</h3><ul>
+<li>使用瀏覽器的 SSH 進入 VM</li>
+</ul>
+<p><img src="https://i.imgur.com/6eSAWE6.jpg" alt=""></p>
+<ul>
+<li>安裝指令</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 先清空 VM 內的舊版本 Docker</span></span><br><span class="line">sudo apt-get remove docker docker-engine docker.io containerd runc</span><br><span class="line"></span><br><span class="line"><span class="comment"># 系統上更新並安裝基本的依賴</span></span><br><span class="line">sudo apt-get update</span><br><span class="line">sudo apt-get install \</span><br><span class="line">    apt-transport-https \</span><br><span class="line">    ca-certificates \</span><br><span class="line">    curl \</span><br><span class="line">    gnupg \</span><br><span class="line">    lsb-release</span><br><span class="line">    </span><br><span class="line"><span class="comment"># 添加 Dokcer 官方的 GPG 密鑰</span></span><br><span class="line">curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg</span><br><span class="line"></span><br><span class="line"><span class="comment"># 添加 Docker 到我們的 APT 倉庫之中</span></span><br><span class="line"><span class="built_in">echo</span> \</span><br><span class="line">  <span class="string">"deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/debian \</span></span><br><span class="line"><span class="string">  <span class="variable">$(lsb_release -cs)</span> stable"</span> | sudo tee /etc/apt/sources.list.d/docker.list &gt; /dev/null</span><br><span class="line"> </span><br><span class="line"><span class="comment"># 更新</span></span><br><span class="line">sudo apt-get update</span><br><span class="line"></span><br><span class="line"><span class="comment"># 安裝Docker</span></span><br><span class="line">sudo apt-get install docker-ce \</span><br><span class="line">                    docker-ce-cli \</span><br><span class="line">                    containerd.io \</span><br><span class="line">                    docker-compose \</span><br><span class="line">                    docker-compose-plugin</span><br><span class="line"></span><br><span class="line"><span class="comment"># 測試是否安裝成功，如果找得到指令就沒問題了</span></span><br><span class="line">sudo docker --<span class="built_in">help</span></span><br><span class="line">sudo docker-compose -h</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>刪除步驟：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 刪除安裝包</span></span><br><span class="line">sudo apt-get purge docker-ce docker-ce-cli containerd.io docker-compose docker-compose-plugin</span><br><span class="line"></span><br><span class="line"><span class="comment"># 刪除鏡像、容器、配置相關文件</span></span><br><span class="line">sudo rm -rf /var/lib/docker</span><br></pre></td></tr></table></figure>
+
+</blockquote>
+<h3 id="撰寫-docker-compose-yml"><a href="#撰寫-docker-compose-yml" class="headerlink" title="撰寫 docker-compose.yml"></a>撰寫 docker-compose.yml</h3><ul>
+<li>撰寫 <code>/home/{user}/docker-compose.yml</code> 是為了可以讓我們之後一鍵開啟容器服務，並且將 <code>nginx</code> 的相關配置也寫好</li>
+</ul>
+<p><code>/home/{user}/docker-compose.yml</code></p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">version:</span> <span class="string">'3'</span></span><br><span class="line"></span><br><span class="line"><span class="attr">services:</span></span><br><span class="line">  <span class="attr">webserver:</span></span><br><span class="line">    <span class="comment"># 獲取最新鏡像</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">nginx:latest</span></span><br><span class="line">    <span class="comment"># 端口映射 VM:CONTAINER</span></span><br><span class="line">    <span class="attr">ports:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="number">80</span><span class="string">:80</span></span><br><span class="line">      <span class="bullet">-</span> <span class="number">443</span><span class="string">:443</span></span><br><span class="line">    <span class="comment"># 自動重啟</span></span><br><span class="line">    <span class="attr">restart:</span> <span class="string">always</span></span><br><span class="line">    <span class="comment"># 文件映射</span></span><br><span class="line">    <span class="attr">volumes:</span></span><br><span class="line">      <span class="comment"># :ro代表在container之中的文件是read-only</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">./nginx/conf/:/etc/nginx/conf.d/:ro</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">./html:/etc/nginx/html/:ro</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">./certbot/www:/var/www/certbot/:ro</span></span><br></pre></td></tr></table></figure>
+
+<p><code>/home/{user}/nginx/conf/default.conf</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">    # 開啟gzip 節省流量</span><br><span class="line">    gzip on;</span><br><span class="line">    gzip_vary on;</span><br><span class="line"></span><br><span class="line">    listen 80;</span><br><span class="line">    listen [::]:80;</span><br><span class="line"></span><br><span class="line">    # DNS配置</span><br><span class="line">    server_name example.org;</span><br><span class="line">    server_tokens off;</span><br><span class="line"></span><br><span class="line">    # 以下等我們下面段落會使用</span><br><span class="line">    # certbot 驗證所需路徑</span><br><span class="line">    # location &#x2F;.well-known&#x2F;acme-challenge&#x2F; &#123;</span><br><span class="line">    #     root &#x2F;var&#x2F;www&#x2F;certbot;</span><br><span class="line">    # &#125;</span><br><span class="line"></span><br><span class="line">    # http 301 redirect https</span><br><span class="line">    # location &#x2F; &#123;</span><br><span class="line">    #     return 301 https:&#x2F;&#x2F;example.org$request_uri;</span><br><span class="line">    # &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>建立 <code>/home/{user}/html/index.html</code>，等等可以直接查看 Server 是否正常運行</li>
+</ul>
+<p><code>/home/{user}/html/index.html</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html lang&#x3D;&quot;en&quot;&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;meta charset&#x3D;&quot;UTF-8&quot;&gt;</span><br><span class="line">  &lt;meta http-equiv&#x3D;&quot;X-UA-Compatible&quot; content&#x3D;&quot;IE&#x3D;edge&quot;&gt;</span><br><span class="line">  &lt;meta name&#x3D;&quot;viewport&quot; content&#x3D;&quot;width&#x3D;device-width, initial-scale&#x3D;1.0&quot;&gt;</span><br><span class="line">  &lt;title&gt;Hello World&lt;&#x2F;title&gt;</span><br><span class="line">&lt;&#x2F;head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">  &lt;h1&gt;Hello I am NGINX SERVER!!!&lt;&#x2F;h1&gt;</span><br><span class="line">&lt;&#x2F;body&gt;</span><br><span class="line">&lt;&#x2F;html&gt;</span><br></pre></td></tr></table></figure>
+
+<h4 id="Nginx-DEMO"><a href="#Nginx-DEMO" class="headerlink" title="Nginx DEMO"></a>Nginx DEMO</h4><ul>
+<li>配置好我們的文件之後，我們只要<code>切換的家目錄</code>，<code>下 docker-compose 指令</code>，就可以開啟 http 服務</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 切換到USER 家目錄</span></span><br><span class="line"><span class="built_in">cd</span>  </span><br><span class="line"></span><br><span class="line"><span class="comment"># docker-compose 開啟 nginx</span></span><br><span class="line">sudo docker-compose up -d webserver</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>然後開啟瀏覽器，輸入 IP 就可以看到我們的 HTML。</li>
+</ul>
+<p><img src="https://i.imgur.com/nxIKvRi.jpg" alt=""></p>
+<h4 id="測試-GZIP-是否開啟成功"><a href="#測試-GZIP-是否開啟成功" class="headerlink" title="測試 GZIP 是否開啟成功"></a>測試 GZIP 是否開啟成功</h4><ul>
+<li>進入測試網站<ul>
+<li><span class="exturl" data-url="aHR0cHM6Ly93d3cuZ2lmdG9mc3BlZWQuY29tL2d6aXAtdGVzdC8=">https://www.giftofspeed.com/gzip-test/<i class="fa fa-external-link-alt"></i></span></li>
+</ul>
+</li>
+<li>輸入自己的IP，只要顯示<code>Enabled</code>即可</li>
+</ul>
+<p><img src="https://i.imgur.com/hEU5JJW.jpg" alt=""></p>
+<h2 id="使用-No-IP-免費DNS服務"><a href="#使用-No-IP-免費DNS服務" class="headerlink" title="使用 No-IP 免費DNS服務"></a>使用 No-IP 免費DNS服務</h2><h3 id="註冊會員"><a href="#註冊會員" class="headerlink" title="註冊會員"></a>註冊會員</h3><ul>
+<li><p>點擊No-IP的註冊連結</p>
+<ul>
+<li><span class="exturl" data-url="aHR0cHM6Ly93d3cubm9pcC5jb20vc2lnbi11cA==">https://www.noip.com/sign-up<i class="fa fa-external-link-alt"></i></span></li>
+</ul>
+</li>
+<li><p>簡單註冊並輸入想使用的 DNS，記得點擊<code>Free Sign Up</code>，其他服務要收費</p>
+</li>
+</ul>
+<p><img src="https://i.imgur.com/5WoSffZ.jpg" alt=""><br><img src="https://i.imgur.com/wTbc3mG.jpg" alt=""></p>
+<h3 id="指定-VM-的-IP"><a href="#指定-VM-的-IP" class="headerlink" title="指定 VM 的 IP"></a>指定 VM 的 IP</h3><ul>
+<li>收取驗證信後，去到後台的<code>My Services&gt; Managed DNS</code>，編輯自己 DNS 所指向的 IP</li>
+</ul>
+<p><img src="https://i.imgur.com/jxUvmcj.jpg" alt=""></p>
+<ul>
+<li>編輯時，<code>點選DNS Hostname(A)</code>，並<code>輸入自己在 GCP 上的 IP</code> 就可以了</li>
+</ul>
+<p><img src="https://i.imgur.com/3b4jmac.jpg" alt=""></p>
+<h3 id="DEMO"><a href="#DEMO" class="headerlink" title="DEMO"></a>DEMO</h3><ul>
+<li>瀏覽器輸入自己的 DNS</li>
+</ul>
+<p><img src="https://i.imgur.com/TBZWjME.jpg" alt=""></p>
+<h2 id="GCP-SSL-配置"><a href="#GCP-SSL-配置" class="headerlink" title="GCP SSL 配置"></a>GCP SSL 配置</h2><h3 id="撰寫配置文件"><a href="#撰寫配置文件" class="headerlink" title="撰寫配置文件"></a>撰寫配置文件</h3><ul>
+<li>SSL 加密之中，有一個免費的服務叫 <code>Let&#39;s Encrypt</code>，由於它派發的憑證<code>每90天就要更新一次</code>，所以我們必須使用自動化的方式來自動更新憑證，那麼 <code>Certbot</code> 就是我們所需要的。</li>
+</ul>
+<p><code>/home/{user}/docker-compose.yml</code></p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">version:</span> <span class="string">'3'</span></span><br><span class="line"></span><br><span class="line"><span class="attr">services:</span></span><br><span class="line">  <span class="attr">webserver:</span></span><br><span class="line">    <span class="comment"># 獲取最新鏡像</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">nginx:latest</span></span><br><span class="line">    <span class="comment"># 端口映射 VM:CONTAINER</span></span><br><span class="line">    <span class="attr">ports:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="number">80</span><span class="string">:80</span></span><br><span class="line">      <span class="bullet">-</span> <span class="number">443</span><span class="string">:443</span></span><br><span class="line">    <span class="comment"># 自動重啟</span></span><br><span class="line">    <span class="attr">restart:</span> <span class="string">always</span></span><br><span class="line">    <span class="comment"># 文件映射</span></span><br><span class="line">    <span class="attr">volumes:</span></span><br><span class="line">      <span class="comment"># :ro代表在container之中的文件是read-only</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">./nginx/conf/:/etc/nginx/conf.d/:ro</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">./html:/etc/nginx/html/:ro</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">./certbot/www:/var/www/certbot/:ro</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">./certbot/conf/:/etc/nginx/ssl/:ro</span></span><br><span class="line">  <span class="comment"># SSL 驗證機器人</span></span><br><span class="line">  <span class="attr">certbot:</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">certbot/certbot:latest</span></span><br><span class="line">    <span class="attr">volumes:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">./certbot/www/:/var/www/certbot/:rw</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">./certbot/conf/:/etc/letsencrypt/:rw</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>把 Certbot 的註解還原</li>
+</ul>
+<p><code>/home/{user}/nginx/conf/default.conf</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">    &#x2F;&#x2F; ...</span><br><span class="line"></span><br><span class="line">    # 以下等我們下面段落會使用</span><br><span class="line">    # certbot 驗證所需路徑</span><br><span class="line">     location &#x2F;.well-known&#x2F;acme-challenge&#x2F; &#123;</span><br><span class="line">         root &#x2F;var&#x2F;www&#x2F;certbot;</span><br><span class="line">     &#125;</span><br><span class="line"></span><br><span class="line">    # http 301 redirect https</span><br><span class="line">    #location &#x2F; &#123;</span><br><span class="line">    #     return 301 https:&#x2F;&#x2F;example.org$request_uri;</span><br><span class="line">    #&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<h3 id="Cerbot-服務"><a href="#Cerbot-服務" class="headerlink" title="Cerbot 服務"></a>Cerbot 服務</h3><ul>
+<li>下指令去讓 Certbot 安裝憑證</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 先開啟NGINX服務，讓Certbot驗證</span></span><br><span class="line">sudo docker-compose up -d  webserver</span><br><span class="line"></span><br><span class="line"><span class="comment"># 一次性將憑證安裝好，DNS請更改成自己的</span></span><br><span class="line">docker-compose run --rm  certbot certonly --webroot --webroot-path /var/www/certbot/ -d example.org</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://i.imgur.com/AdmKJf8.jpg" alt=""></p>
+<h3 id="HTTP-301-跳轉-HTTPS"><a href="#HTTP-301-跳轉-HTTPS" class="headerlink" title="HTTP 301 跳轉 HTTPS"></a>HTTP 301 跳轉 HTTPS</h3><ul>
+<li>由於我們已經申請好憑證了，但是如果我們訪問 <code>http://{DNS}</code> 仍然會可以看到頁面，這時我們就需要自動幫使用者做跳轉</li>
+</ul>
+<p><code>/home/{user}/nginx/conf/default.conf</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">    &#x2F;&#x2F; ...</span><br><span class="line"></span><br><span class="line">    # http 301 redirect https</span><br><span class="line">    location &#x2F; &#123;</span><br><span class="line">         return 301 https:&#x2F;&#x2F;example.org$request_uri;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">server &#123;</span><br><span class="line">    listen 443 default_server ssl http2;</span><br><span class="line">    listen [::]:443 ssl http2;</span><br><span class="line"></span><br><span class="line">    server_name example.org;</span><br><span class="line"></span><br><span class="line">    # DNS 請自行修改</span><br><span class="line">    ssl_certificate &#x2F;etc&#x2F;nginx&#x2F;ssl&#x2F;live&#x2F;example.org&#x2F;fullchain.pem;</span><br><span class="line">    ssl_certificate_key &#x2F;etc&#x2F;nginx&#x2F;ssl&#x2F;live&#x2F;example.org&#x2F;privkey.pem;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="SSL-DEMO"><a href="#SSL-DEMO" class="headerlink" title="SSL DEMO"></a>SSL DEMO</h3><p><img src="https://i.imgur.com/r57py2N.jpg" alt=""></p>
+<h3 id="Cronjob"><a href="#Cronjob" class="headerlink" title="Cronjob"></a>Cronjob</h3><ul>
+<li>為了避免我們憑證過期，所以我們要在<code>使用 Scheduler</code> 來<code>定期更新憑證</code></li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 編輯 Scheduler</span></span><br><span class="line">sudo crontab -e</span><br><span class="line"></span><br><span class="line"><span class="comment"># 加入以下指令，每周定期RENEW SSL 憑證</span></span><br><span class="line">0  0    * * 0   root    docker-compose run --rm certbot renew</span><br></pre></td></tr></table></figure>
+
+
+<h2 id="參考資料"><a href="#參考資料" class="headerlink" title="參考資料"></a>參考資料</h2><ul>
+<li>GCP建置、免費額度<ul>
+<li><span class="exturl" data-url="aHR0cHM6Ly9oYWNrbWQuaW8vQEpCLUxpbi9CMUpFUHNxSXc=">https://hackmd.io/@JB-Lin/B1JEPsqIw<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly93d3cudGFza2luZ2hvdXNlLmNvbS9wb3N0cy9nb29nbGUtY2xvdWQtcGxhdGZvcm0tZnJlZS1wbGFuLWFmdGVyLXRyaWFsLw==">https://www.taskinghouse.com/posts/google-cloud-platform-free-plan-after-trial/<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly9jbG91ZC5nb29nbGUuY29tL2ZyZWUvZG9jcy9mcmVlLWNsb3VkLWZlYXR1cmVzP2hsPXpoLXR3I2ZyZWUtdGllci11c2FnZS1saW1pdHM=">https://cloud.google.com/free/docs/free-cloud-features?hl=zh-tw#free-tier-usage-limits<i class="fa fa-external-link-alt"></i></span></li>
+</ul>
+</li>
+<li>Debian 上安裝 Docker<ul>
+<li><span class="exturl" data-url="aHR0cHM6Ly9kb2NrZXJkb2NzLmNuL2VuZ2luZS9pbnN0YWxsL2RlYmlhbi8=">https://dockerdocs.cn/engine/install/debian/<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly93d3cucnVub29iLmNvbS9kb2NrZXIvZGViaWFuLWRvY2tlci1pbnN0YWxsLmh0bWw=">https://www.runoob.com/docker/debian-docker-install.html<i class="fa fa-external-link-alt"></i></span></li>
+</ul>
+</li>
+<li>docker-compose.yml &amp;&amp; SSL<ul>
+<li><span class="exturl" data-url="aHR0cHM6Ly9taW5kc2Vycy5ibG9nL3Bvc3QvaHR0cHMtdXNpbmctbmdpbngtY2VydGJvdC1kb2NrZXIv">https://mindsers.blog/post/https-using-nginx-certbot-docker/<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly91YmlxLmNvL3RlY2gtYmxvZy9ob3ctdG8tZW5hYmxlLW5naW54LWd6aXAtY29tcHJlc3Npb24v">https://ubiq.co/tech-blog/how-to-enable-nginx-gzip-compression/<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly9oYWNrbWQuaW8vQEpCLUxpbi9CMUpFUHNxSXc=">https://hackmd.io/@JB-Lin/B1JEPsqIw<i class="fa fa-external-link-alt"></i></span></li>
+</ul>
+</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        <div>
+        
+            <div style="text-align:center;color: #ccc;font-size:14px;">------ 本文結束 ------</div>
+        
+        </div>
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>作者： </strong>POABOB
+  </li>
+  <li class="post-copyright-link">
+    <strong>文章連結：</strong>
+    <a href="https://poabob.github.io/2022-09-29/Deploy-a-static-project-using-SSL-DNS-with-a-free-way/" title="使用 GCP 建置一個具有 SSL 和 DNS 的靜態網站(完全免費!!!)">https://poabob.github.io/2022-09-29/Deploy-a-static-project-using-SSL-DNS-with-a-free-way/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版權聲明： </strong>本網誌所有文章除特別聲明外，均採用 <span class="exturl" data-url="aHR0cHM6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LW5jLXNhLzQuMC96aC1UVw=="><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</span> 許可協議。轉載請註明出處！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Docker/" rel="tag"># Docker</a>
+              <a href="/tags/GCP/" rel="tag"># GCP</a>
+              <a href="/tags/SSL/" rel="tag"># SSL</a>
+              <a href="/tags/DNS/" rel="tag"># DNS</a>
+              <a href="/tags/Free/" rel="tag"># Free</a>
+              <a href="/tags/Nginx/" rel="tag"># Nginx</a>
+              <a href="/tags/Certbot/" rel="tag"># Certbot</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022-09-02/Build-a-PHP-RESTful-Framework-using-Slim-4-Part2/" rel="prev" title="使用 PHP Slim 4 建立一個 RESTful 框架 (進階篇)">
+      <i class="fa fa-chevron-left"></i> 使用 PHP Slim 4 建立一個 RESTful 框架 (進階篇)
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023-01-31/The-Best-Way-of-Building-A-Smallest-Docker-Image-on-Production-Environment-Using-Golang/" rel="next" title="Golang 最佳化打包 Docker Image 至上線環境">
+      Golang 最佳化打包 Docker Image 至上線環境 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+  <div id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#建立免費-GCP-VM"><span class="nav-number">2.</span> <span class="nav-text">建立免費 GCP VM</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#官方免費-VM-服務條件"><span class="nav-number">2.1.</span> <span class="nav-text">官方免費 VM 服務條件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#選擇-建立-Porject"><span class="nav-number">2.2.</span> <span class="nav-text">選擇&#x2F;建立 Porject</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#建立-VM"><span class="nav-number">2.3.</span> <span class="nav-text">建立 VM</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安裝-Docker"><span class="nav-number">2.4.</span> <span class="nav-text">安裝 Docker</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#撰寫-docker-compose-yml"><span class="nav-number">2.5.</span> <span class="nav-text">撰寫 docker-compose.yml</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Nginx-DEMO"><span class="nav-number">2.5.1.</span> <span class="nav-text">Nginx DEMO</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#測試-GZIP-是否開啟成功"><span class="nav-number">2.5.2.</span> <span class="nav-text">測試 GZIP 是否開啟成功</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用-No-IP-免費DNS服務"><span class="nav-number">3.</span> <span class="nav-text">使用 No-IP 免費DNS服務</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#註冊會員"><span class="nav-number">3.1.</span> <span class="nav-text">註冊會員</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#指定-VM-的-IP"><span class="nav-number">3.2.</span> <span class="nav-text">指定 VM 的 IP</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#DEMO"><span class="nav-number">3.3.</span> <span class="nav-text">DEMO</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GCP-SSL-配置"><span class="nav-number">4.</span> <span class="nav-text">GCP SSL 配置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#撰寫配置文件"><span class="nav-number">4.1.</span> <span class="nav-text">撰寫配置文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Cerbot-服務"><span class="nav-number">4.2.</span> <span class="nav-text">Cerbot 服務</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HTTP-301-跳轉-HTTPS"><span class="nav-number">4.3.</span> <span class="nav-text">HTTP 301 跳轉 HTTPS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SSL-DEMO"><span class="nav-number">4.4.</span> <span class="nav-text">SSL DEMO</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Cronjob"><span class="nav-number">4.5.</span> <span class="nav-text">Cronjob</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#參考資料"><span class="nav-number">5.</span> <span class="nav-text">參考資料</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="POABOB"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">POABOB</p>
+  <div class="site-description" itemprop="description">Life is but a span!</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">9</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">35</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL1BPQUJPQg==" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;POABOB"><i class="fab fa-github fa-fw"></i>GitHub</span>
+      </span>
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="bWFpbHRvOnp4Yzc1MjE2NkBnbWFpbC5jb20=" title="E-Mail → mailto:zxc752166@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</span>
+      </span>
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="aHR0cHM6Ly93d3cuZmFjZWJvb2suY29tL3Byb2ZpbGUucGhwP2lkPTEwMDAwMDMyMTQwMDU5MA==" title="FB Page → https:&#x2F;&#x2F;www.facebook.com&#x2F;profile.php?id&#x3D;100000321400590"><i class="fab fa-facebook fa-fw"></i>FB Page</span>
+      </span>
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="aHR0cHM6Ly9pbnN0YWdyYW0uY29tLzB4N2YyZWI=" title="Instagram → https:&#x2F;&#x2F;instagram.com&#x2F;0x7f2eb"><i class="fab fa-instagram fa-fw"></i>Instagram</span>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">POABOB</span>
+</div>
+  <div class="powered-by">由 <span class="exturl theme-link" data-url="aHR0cHM6Ly9oZXhvLmlv">Hexo</span> & <span class="exturl theme-link" data-url="aHR0cHM6Ly9waXNjZXMudGhlbWUtbmV4dC5vcmc=">NexT.Pisces</span> 強力驅動
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/pjax/pjax.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+  <script>
+var pjax = new Pjax({
+  selectors: [
+    'head title',
+    '#page-configurations',
+    '.content-wrap',
+    '.post-toc-wrap',
+    '.languages',
+    '#pjax'
+  ],
+  switches: {
+    '.post-toc-wrap': Pjax.switches.innerHTML
+  },
+  analytics: false,
+  cacheBust: false,
+  scrollTo : !CONFIG.bookmark.enable
+});
+
+window.addEventListener('pjax:success', () => {
+  document.querySelectorAll('script[data-pjax], script#page-configurations, #pjax script').forEach(element => {
+    var code = element.text || element.textContent || element.innerHTML || '';
+    var parent = element.parentNode;
+    parent.removeChild(element);
+    var script = document.createElement('script');
+    if (element.id) {
+      script.id = element.id;
+    }
+    if (element.className) {
+      script.className = element.className;
+    }
+    if (element.type) {
+      script.type = element.type;
+    }
+    if (element.src) {
+      script.src = element.src;
+      // Force synchronous loading of peripheral JS.
+      script.async = false;
+    }
+    if (element.dataset.pjax !== undefined) {
+      script.dataset.pjax = '';
+    }
+    if (code !== '') {
+      script.appendChild(document.createTextNode(code));
+    }
+    parent.appendChild(script);
+  });
+  NexT.boot.refresh();
+  // Define Motion Sequence & Bootstrap Motion.
+  if (CONFIG.motion.enable) {
+    NexT.motion.integrator
+      .init()
+      .add(NexT.motion.middleWares.subMenu)
+      .add(NexT.motion.middleWares.postList)
+      .bootstrap();
+  }
+  NexT.utils.updateSidebarPosition();
+});
+</script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div id="pjax">
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="https://gist.githubusercontent.com/POABOB/65b37ccc358df67efffeedf571219b2a/raw/b26f8f05e0951aa1c22d11122f3232b986012141/md5.min.js"></script>
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : '5aa580a2136b90e75fd6',
+      clientSecret: '128f00ea948ebd5cb1c0c2c7c3a2b81f067257ea',
+      repo        : 'poabob.github.io',
+      owner       : 'POABOB',
+      admin       : ['POABOB'],
+      id          : 'f2ee4d3677557d9bfb58c605cd1f1ee9',
+        language: 'en | es-ES | fr | ru | zh-CN | zh-TW',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+    </div>
+</body>
+</html>
