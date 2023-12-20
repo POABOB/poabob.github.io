@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+  <meta name="google-site-verification" content="gMiqErWj487BTNydQ4JwPWMijWfHq7w5bqkaC5JPH9c">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"poabob.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":true,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="定義Array 是 Golang 的原生型別，其長度固定。  Slice 是 Golang 中長度可以變動的資料型別，也就是可以隨意修改長度的 Array。 其中，Slice 會包含 Pointer、Capacity、Length，Pointer 負責指向實際底層的 Array 位址；Capacity 則是目前 Slice 的容量；Length 則是目前 Slice 內有多少元素在裏頭的長度。 1">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Golang Slice 介紹和運作方式">
+<meta property="og:url" content="https://poabob.github.io/2023-12-21/Golang-Introduction-to-Slice/index.html">
+<meta property="og:site_name" content="POABOB">
+<meta property="og:description" content="定義Array 是 Golang 的原生型別，其長度固定。  Slice 是 Golang 中長度可以變動的資料型別，也就是可以隨意修改長度的 Array。 其中，Slice 會包含 Pointer、Capacity、Length，Pointer 負責指向實際底層的 Array 位址；Capacity 則是目前 Slice 的容量；Length 則是目前 Slice 內有多少元素在裏頭的長度。 1">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://poabob.github.io/images/Golang-Introduction-to-Slice/a.png">
+<meta property="og:image" content="https://poabob.github.io/images/Golang-Introduction-to-Slice/b.png">
+<meta property="article:published_time" content="2023-12-20T18:07:54.000Z">
+<meta property="article:modified_time" content="2023-12-20T18:38:16.707Z">
+<meta property="article:author" content="POABOB">
+<meta property="article:tag" content="array">
+<meta property="article:tag" content="slice">
+<meta property="article:tag" content="golang">
+<meta property="article:tag" content="go">
+<meta property="article:tag" content="Backend">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://poabob.github.io/images/Golang-Introduction-to-Slice/a.png">
+
+<link rel="canonical" href="https://poabob.github.io/2023-12-21/Golang-Introduction-to-Slice/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-TW'
+  };
+</script>
+
+  <title>Golang Slice 介紹和運作方式 | POABOB</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-162792341-1"></script>
+    <script data-pjax>
+      if (CONFIG.hostname === location.hostname) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-162792341-1');
+      }
+    </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">POABOB</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">小小工程師的筆記分享</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜尋..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://poabob.github.io/2023-12-21/Golang-Introduction-to-Slice/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="POABOB">
+      <meta itemprop="description" content="Life is but a span!">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="POABOB">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Golang Slice 介紹和運作方式
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+              
+
+              <time title="創建時間：2023-12-21 02:07:54 / 修改時間：02:38:16" itemprop="dateCreated datePublished" datetime="2023-12-21T02:07:54+08:00">2023-12-21</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分類於</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%BE%8C%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">後端</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="定義"><a href="#定義" class="headerlink" title="定義"></a>定義</h2><p>Array 是 Golang 的原生型別，其<strong>長度固定</strong>。 </p>
+<p>Slice 是 Golang 中<strong>長度可以變動</strong>的資料型別，也就是可以隨意修改長度的 Array。</p>
+<p>其中，Slice 會包含 <code>Pointer</code>、<code>Capacity</code>、<code>Length</code>，Pointer 負責<strong>指向實際底層的 Array 位址</strong>；Capacity 則是<strong>目前 Slice 的容量</strong>；Length 則是目前 Slice 內<strong>有多少元素在裏頭的長度</strong>。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> slice <span class="keyword">struct</span> &#123;</span><br><span class="line">  array unsafe.Pointer</span><br><span class="line">  <span class="built_in">len</span>   <span class="keyword">int</span></span><br><span class="line">  <span class="built_in">cap</span>   <span class="keyword">int</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Golang-Introduction-to-Slice/a.png" alt="a.png"></p>
+<a id="more"></a> 
+
+<h2 id="宣告方式"><a href="#宣告方式" class="headerlink" title="宣告方式"></a>宣告方式</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[]T</span><br><span class="line"><span class="built_in">make</span>([]T, <span class="built_in">len</span>, <span class="built_in">cap</span>)</span><br></pre></td></tr></table></figure>
+
+<ol>
+<li>普遍使用 <code>make([]type, len, cap)</code>，<code>cap</code> 通常會在宣告的時候被忽略。</li>
+<li>直接定義明確資料，<code>[]string{&quot;Alice&quot;, &quot;Bob&quot;}</code>。</li>
+<li>宣告一個空 Slice，<code>var member []string</code>。</li>
+</ol>
+<blockquote>
+<p>如果 <code>Capacity</code> 沒有被定義，那麼它會與 <code>Length</code> 一樣，並且會先給定初始值。</p>
+</blockquote>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 法一 make([]type, len, cap)</span></span><br><span class="line"><span class="comment">// 宣告一個存放 string 的 Slicde，長度和容量都會是 4</span></span><br><span class="line">s := <span class="built_in">make</span>([]<span class="keyword">string</span>, <span class="number">4</span>) <span class="comment">// len=4 cap=4，["", "", "", ""]</span></span><br><span class="line"><span class="comment">// 長度 0，容量是 8</span></span><br><span class="line">s1 := <span class="built_in">make</span>([]srting, <span class="number">0</span>, <span class="number">8</span>)  <span class="comment">// len=0 cap=8，[]</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 法二 定義明確資料</span></span><br><span class="line">s2 := []<span class="keyword">string</span>&#123;<span class="string">"Alice"</span>, <span class="string">"Bob"</span>&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 法三 宣告空 Slice</span></span><br><span class="line"><span class="keyword">var</span> s3 []<span class="keyword">string</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="基本操作"><a href="#基本操作" class="headerlink" title="基本操作"></a>基本操作</h2><h3 id="長度調整"><a href="#長度調整" class="headerlink" title="長度調整"></a>長度調整</h3><p>使用 <code>slice[start:end:max]</code> 的方式來去對 Slice 長度進行修改，範圍將會是 <code>[start,end)</code>，<code>end</code>  則不會被納入範圍內，並且通常不會用到 <code>max</code> ，除非你想對 <code>Capacity</code> 進行調整。</p>
+<blockquote>
+<p>一旦 Slice 被修改，底層的 Array 元素也會一同被修改。</p>
+</blockquote>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">arr := [<span class="number">4</span>]<span class="keyword">string</span>&#123;<span class="string">"a"</span>,<span class="string">"b"</span>,<span class="string">"c"</span>,<span class="string">"d"</span>&#125;</span><br><span class="line">s := arr[<span class="number">2</span>:<span class="number">3</span>] <span class="comment">//[c]</span></span><br><span class="line">s[<span class="number">0</span>] = <span class="string">"f"</span></span><br><span class="line">fmt.Println(s) <span class="comment">//[f]</span></span><br><span class="line">fmt.Println(arr) <span class="comment">//[a b f d]</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 忽略 start 或 end，代表從頭取 或是 取至尾端</span></span><br><span class="line">s2 := arr[:<span class="number">2</span>] <span class="comment">// [a, b] len=2 cap=4</span></span><br><span class="line">s3 := arr[<span class="number">1</span>:] <span class="comment">// [b, c] len=2 cap=3</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 如果再使用 Slice 長度調整時，想要去調整容量，才會使用到 max</span></span><br><span class="line">s4 := arr[:<span class="number">2</span>:<span class="number">3</span>] <span class="comment">// [a, b] len=2 cap=3</span></span><br></pre></td></tr></table></figure>
+
+<p>上述的 <code>s2</code>、<code>s3</code> 變數可以看到為什麼明明都是取一樣的長度，可是<strong>容量卻不一樣</strong>呢?</p>
+<p>因為 Slice 是以 <code>start</code> 開始到 <code>原陣列長度</code> 作為其容量大小的預留記憶體，也就是說如果今天有一個 <code>[8]int</code> 要取 <code>array[4:6]</code> 那麼到最後，<code>len</code> 會是 <code>2</code>，則 <code>cap</code> 會是 <code>4</code>。</p>
+<p><img src="/images/Golang-Introduction-to-Slice/b.png" alt="b.png"></p>
+<h3 id="Append"><a href="#Append" class="headerlink" title="Append"></a>Append</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">append</span><span class="params">(s []T, x ...T)</span> []<span class="title">T</span></span></span><br></pre></td></tr></table></figure>
+
+<p>對 Slice 進行元素的<strong>向後新增</strong>，一旦 <code>容量小於 append 後整體的長度</code>，Slice 就會自行擴容，<code>重新宣告一個原本 2 倍</code> 容量大小，將原本的空間 <code>copy</code> 至新的 Slice。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">s := <span class="built_in">make</span>([]<span class="keyword">int</span>, <span class="number">0</span>, <span class="number">1</span>) <span class="comment">// [] len=0 cap=1</span></span><br><span class="line">s = <span class="built_in">append</span>(s, <span class="number">1</span>) <span class="comment">// [1] len=1 cap=1</span></span><br><span class="line">s = <span class="built_in">append</span>(s, <span class="number">1</span>) <span class="comment">// [1 1] len=2 cap=2</span></span><br><span class="line">s = <span class="built_in">append</span>(s, <span class="number">1</span>) <span class="comment">// [1 1 1] len=3 cap=4</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="Copy"><a href="#Copy" class="headerlink" title="Copy"></a>Copy</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">copy</span><span class="params">(dst, src []T)</span> <span class="title">int</span></span></span><br></pre></td></tr></table></figure>
+
+<p>將原本 Slice 的值，深拷貝到另外一個 Slice，return 為已被複製的數量。</p>
+<blockquote>
+<p>如果當 <code>cloneScores</code> 容量大於 <code>scores</code> 複製過來的元素長度，剩下多的空間則是會以 0 來補。<br>如果當 <code>cloneScores</code> 容量小於 <code>scores</code> 複製過來的元素長度，最多就是<code>當前容量</code> 而 <code>不會擴容</code>，多的元素會被忽略。</p>
+</blockquote>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">  scores := []<span class="keyword">int</span>&#123;<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>&#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// cloneScores 容量大於 scores 複製過來的元素長度</span></span><br><span class="line">  cloneScores := <span class="built_in">make</span>([]<span class="keyword">int</span>, <span class="number">4</span>)</span><br><span class="line">  <span class="built_in">copy</span>(cloneScores, scores[:<span class="built_in">len</span>(scores)<span class="number">-2</span>])</span><br><span class="line">  fmt.Println(cloneScores) <span class="comment">// [1,2,3,0]</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">// cloneScores 容量小於 scores 複製過來的元素長度</span></span><br><span class="line">  cloneScores2 := <span class="built_in">make</span>([]<span class="keyword">int</span>, <span class="number">3</span>)</span><br><span class="line">  <span class="built_in">copy</span>(cloneScores2, scores)</span><br><span class="line">  fmt.Println(cloneScores2) <span class="comment">// [1,2,3]</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Range"><a href="#Range" class="headerlink" title="Range"></a>Range</h3><p>用來遍歷 Slice 所使用的關鍵字，提供 <code>key</code> 和 <code>value</code>，如果某一個值不需要使用到，可以使用 <code>_</code> 來代替。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">  pow := []<span class="keyword">int</span> &#123;<span class="number">1</span>, <span class="number">2</span>, <span class="number">4</span>, <span class="number">8</span>&#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">for</span> key, value := <span class="keyword">range</span> pow &#123;</span><br><span class="line">    fmt.Printf(<span class="string">"2**%d = %d\n"</span>, key , value)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// for _, value := range pow &#123;</span></span><br><span class="line">  <span class="comment">//   fmt.Printf("2**%d = %d\n", key , value)</span></span><br><span class="line">  <span class="comment">// &#125;</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">// for key, _:= range pow &#123;</span></span><br><span class="line">  <span class="comment">//   fmt.Printf("2**%d = %d\n", key , value)</span></span><br><span class="line">  <span class="comment">// &#125;</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 結果</span></span><br><span class="line"><span class="comment">// 2**0 = 1</span></span><br><span class="line"><span class="comment">// 2**1 = 2</span></span><br><span class="line"><span class="comment">// 2**2 = 4</span></span><br><span class="line"><span class="comment">// 2**3 = 8</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="簡單練習"><a href="#簡單練習" class="headerlink" title="簡單練習"></a>簡單練習</h2><p><strong>問題一：請問以下輸出甚麼?</strong></p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">  <span class="string">"fmt"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">  <span class="keyword">var</span> array [<span class="number">20</span>]<span class="keyword">int</span></span><br><span class="line">  <span class="keyword">var</span> slice = array[<span class="number">10</span>:<span class="number">11</span>]</span><br><span class="line">  fmt.Println(<span class="string">"lenth: "</span>, <span class="built_in">len</span>(slice))</span><br><span class="line">  fmt.Println(<span class="string">"capacity: "</span>, <span class="built_in">cap</span>(slice))</span><br><span class="line">  fmt.Println(&amp;slice[<span class="number">0</span>] == &amp;array[<span class="number">10</span>])</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p><strong>答案一：</strong></p>
+  <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">lenth:  <span class="number">1</span></span><br><span class="line">capacity:  <span class="number">10</span></span><br><span class="line"><span class="literal">true</span></span><br></pre></td></tr></table></figure>
+
+
+</li>
+</ul>
+<p><strong>問題二：請問以下輸出甚麼?</strong></p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line"> <span class="string">"fmt"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line"> orderLen := <span class="number">5</span></span><br><span class="line"> order := <span class="built_in">make</span>([]<span class="keyword">uint16</span>, <span class="number">2</span> * orderLen)</span><br><span class="line"></span><br><span class="line"> pollorder := order[:orderLen:orderLen]</span><br><span class="line"> lockorder := order[orderLen:][:orderLen:orderLen]</span><br><span class="line"></span><br><span class="line"> fmt.Println(<span class="string">"len(pollorder) = "</span>, <span class="built_in">len</span>(pollorder))</span><br><span class="line"> fmt.Println(<span class="string">"cap(pollorder) = "</span>, <span class="built_in">cap</span>(pollorder))</span><br><span class="line"> fmt.Println(<span class="string">"len(lockorder) = "</span>, <span class="built_in">len</span>(lockorder))</span><br><span class="line"> fmt.Println(<span class="string">"cap(lockorder) = "</span>, <span class="built_in">cap</span>(lockorder))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p><strong>答案二：</strong></p>
+  <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">len</span>(pollorder) =  <span class="number">5</span></span><br><span class="line"><span class="built_in">cap</span>(pollorder) =  <span class="number">5</span></span><br><span class="line"><span class="built_in">len</span>(lockorder) =  <span class="number">5</span></span><br><span class="line"><span class="built_in">cap</span>(lockorder) =  <span class="number">5</span></span><br></pre></td></tr></table></figure>
+
+
+</li>
+</ul>
+<h2 id="結論"><a href="#結論" class="headerlink" title="結論"></a>結論</h2><ul>
+<li>建立 Slice 可以根據實際需求預先劃分好 <code>需要的容量</code> 以及 <code>初始值</code>。</li>
+<li>Slice 在進行 <code>copy</code> 時，要判斷是否目的 Slice 是否為需求所要。</li>
+<li>Slice 指向同一個 Array，請避免多次操作同一個 Slice。</li>
+<li>使用 <code>len()</code>、<code>cap()</code> 可以獲取 Slice 的長度和容量。</li>
+<li>Slice 在賦值時不會複製整個 Slice，而是獲取其 <code>Array 位址</code>、<code>長度</code> 和 <code>容量</code>。</li>
+<li>使用 <code>append</code> 可能會觸發擴容，若是想要避免，可以提前宣告足夠的容量。</li>
+</ul>
+<h2 id="參考資料"><a href="#參考資料" class="headerlink" title="參考資料"></a>參考資料</h2><ul>
+<li><span class="exturl" data-url="aHR0cHM6Ly9qdWVqaW4uY24vcG9zdC82OTk3MjEyNTUyMjQxMzQ4NjE2">https://juejin.cn/post/6997212552241348616<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly9wamNoZW5kZXIuZGV2L2dvbGFuZy9zbGljZS1hbmQtYXJyYXkv">https://pjchender.dev/golang/slice-and-array/<i class="fa fa-external-link-alt"></i></span></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        <div>
+        
+            <div style="text-align:center;color: #ccc;font-size:14px;">------ 本文結束 ------</div>
+        
+        </div>
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>作者： </strong>POABOB
+  </li>
+  <li class="post-copyright-link">
+    <strong>文章連結：</strong>
+    <a href="https://poabob.github.io/2023-12-21/Golang-Introduction-to-Slice/" title="Golang Slice 介紹和運作方式">https://poabob.github.io/2023-12-21/Golang-Introduction-to-Slice/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版權聲明： </strong>本網誌所有文章除特別聲明外，均採用 <span class="exturl" data-url="aHR0cHM6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LW5jLXNhLzQuMC96aC1UVw=="><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</span> 許可協議。轉載請註明出處！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/array/" rel="tag"># array</a>
+              <a href="/tags/slice/" rel="tag"># slice</a>
+              <a href="/tags/golang/" rel="tag"># golang</a>
+              <a href="/tags/go/" rel="tag"># go</a>
+              <a href="/tags/Backend/" rel="tag"># Backend</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023-09-15/Build-A-Goroutine-Pool/" rel="prev" title="如何實作 Goroutine Pool?">
+      <i class="fa fa-chevron-left"></i> 如何實作 Goroutine Pool?
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+  <div id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#定義"><span class="nav-number">1.</span> <span class="nav-text">定義</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#宣告方式"><span class="nav-number">2.</span> <span class="nav-text">宣告方式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#基本操作"><span class="nav-number">3.</span> <span class="nav-text">基本操作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#長度調整"><span class="nav-number">3.1.</span> <span class="nav-text">長度調整</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Append"><span class="nav-number">3.2.</span> <span class="nav-text">Append</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Copy"><span class="nav-number">3.3.</span> <span class="nav-text">Copy</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Range"><span class="nav-number">3.4.</span> <span class="nav-text">Range</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#簡單練習"><span class="nav-number">4.</span> <span class="nav-text">簡單練習</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#結論"><span class="nav-number">5.</span> <span class="nav-text">結論</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#參考資料"><span class="nav-number">6.</span> <span class="nav-text">參考資料</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="POABOB"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">POABOB</p>
+  <div class="site-description" itemprop="description">Life is but a span!</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">10</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">37</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL1BPQUJPQg==" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;POABOB"><i class="fab fa-github fa-fw"></i>GitHub</span>
+      </span>
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="bWFpbHRvOnp4Yzc1MjE2NkBnbWFpbC5jb20=" title="E-Mail → mailto:zxc752166@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</span>
+      </span>
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="aHR0cHM6Ly93d3cuZmFjZWJvb2suY29tL3Byb2ZpbGUucGhwP2lkPTEwMDAwMDMyMTQwMDU5MA==" title="FB Page → https:&#x2F;&#x2F;www.facebook.com&#x2F;profile.php?id&#x3D;100000321400590"><i class="fab fa-facebook fa-fw"></i>FB Page</span>
+      </span>
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="aHR0cHM6Ly9pbnN0YWdyYW0uY29tLzB4N2YyZWI=" title="Instagram → https:&#x2F;&#x2F;instagram.com&#x2F;0x7f2eb"><i class="fab fa-instagram fa-fw"></i>Instagram</span>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">POABOB</span>
+</div>
+  <div class="powered-by">由 <span class="exturl theme-link" data-url="aHR0cHM6Ly9oZXhvLmlv">Hexo</span> & <span class="exturl theme-link" data-url="aHR0cHM6Ly9waXNjZXMudGhlbWUtbmV4dC5vcmc=">NexT.Pisces</span> 強力驅動
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/pjax/pjax.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+  <script>
+var pjax = new Pjax({
+  selectors: [
+    'head title',
+    '#page-configurations',
+    '.content-wrap',
+    '.post-toc-wrap',
+    '.languages',
+    '#pjax'
+  ],
+  switches: {
+    '.post-toc-wrap': Pjax.switches.innerHTML
+  },
+  analytics: false,
+  cacheBust: false,
+  scrollTo : !CONFIG.bookmark.enable
+});
+
+window.addEventListener('pjax:success', () => {
+  document.querySelectorAll('script[data-pjax], script#page-configurations, #pjax script').forEach(element => {
+    var code = element.text || element.textContent || element.innerHTML || '';
+    var parent = element.parentNode;
+    parent.removeChild(element);
+    var script = document.createElement('script');
+    if (element.id) {
+      script.id = element.id;
+    }
+    if (element.className) {
+      script.className = element.className;
+    }
+    if (element.type) {
+      script.type = element.type;
+    }
+    if (element.src) {
+      script.src = element.src;
+      // Force synchronous loading of peripheral JS.
+      script.async = false;
+    }
+    if (element.dataset.pjax !== undefined) {
+      script.dataset.pjax = '';
+    }
+    if (code !== '') {
+      script.appendChild(document.createTextNode(code));
+    }
+    parent.appendChild(script);
+  });
+  NexT.boot.refresh();
+  // Define Motion Sequence & Bootstrap Motion.
+  if (CONFIG.motion.enable) {
+    NexT.motion.integrator
+      .init()
+      .add(NexT.motion.middleWares.subMenu)
+      .add(NexT.motion.middleWares.postList)
+      .bootstrap();
+  }
+  NexT.utils.updateSidebarPosition();
+});
+</script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div id="pjax">
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="https://gist.githubusercontent.com/POABOB/65b37ccc358df67efffeedf571219b2a/raw/b26f8f05e0951aa1c22d11122f3232b986012141/md5.min.js"></script>
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : '5aa580a2136b90e75fd6',
+      clientSecret: '128f00ea948ebd5cb1c0c2c7c3a2b81f067257ea',
+      repo        : 'poabob.github.io',
+      owner       : 'POABOB',
+      admin       : ['POABOB'],
+      id          : '3b494fe5d676bca35ba06d5a4b8e205b',
+        language: 'en | es-ES | fr | ru | zh-CN | zh-TW',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+    </div>
+</body>
+</html>

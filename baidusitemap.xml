@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://poabob.github.io/2023-12-21/Golang-Introduction-to-Slice/</loc>
+    <lastmod>2023-12-20</lastmod>
+  </url>  <url>
+    <loc>https://poabob.github.io/2023-09-15/Build-A-Goroutine-Pool/</loc>
+    <lastmod>2023-09-16</lastmod>
+  </url>  <url>
+    <loc>https://poabob.github.io/2022-09-29/Deploy-a-static-project-using-SSL-DNS-with-a-free-way/</loc>
+    <lastmod>2023-01-30</lastmod>
+  </url>  <url>
+    <loc>https://poabob.github.io/2023-01-31/The-Best-Way-of-Building-A-Smallest-Docker-Image-on-Production-Environment-Using-Golang/</loc>
+    <lastmod>2023-01-30</lastmod>
+  </url>  <url>
+    <loc>https://poabob.github.io/2022-09-02/Build-a-PHP-RESTful-Framework-using-Slim-4-Part2/</loc>
+    <lastmod>2022-09-28</lastmod>
+  </url>  <url>
+    <loc>https://poabob.github.io/2022-07-28/Build-a-PHP-RESTful-Framework-using-Slim-4-Part1/</loc>
+    <lastmod>2022-09-09</lastmod>
+  </url>  <url>
+    <loc>https://poabob.github.io/2022-04-04/KKCompany-interview-test/</loc>
+    <lastmod>2022-04-06</lastmod>
+  </url>  <url>
+    <loc>https://poabob.github.io/2022-04-04/hello-workd/</loc>
+    <lastmod>2022-04-03</lastmod>
+  </url>  <url>
+    <loc>https://poabob.github.io/2022-03-26/implementation-of-ShortId-with-id-in-order/</loc>
+    <lastmod>2022-03-26</lastmod>
+  </url>  <url>
+    <loc>https://poabob.github.io/2022-03-25/2022-dcard-backend-intern-project/</loc>
+    <lastmod>2022-03-26</lastmod>
+  </url>
+</urlset>
