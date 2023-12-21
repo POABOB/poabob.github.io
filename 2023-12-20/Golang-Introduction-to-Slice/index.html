@@ -26,14 +26,14 @@
   <meta name="description" content="定義Array 是 Golang 的原生型別，其長度固定。  Slice 是 Golang 中長度可以變動的資料型別，也就是可以隨意修改長度的 Array。 其中，Slice 會包含 Pointer、Capacity、Length，Pointer 負責指向實際底層的 Array 位址；Capacity 則是目前 Slice 的容量；Length 則是目前 Slice 內有多少元素在裏頭的長度。 1">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Golang Slice 介紹和運作方式">
-<meta property="og:url" content="https://poabob.github.io/2023-12-21/Golang-Introduction-to-Slice/index.html">
+<meta property="og:url" content="https://poabob.github.io/2023-12-20/Golang-Introduction-to-Slice/index.html">
 <meta property="og:site_name" content="POABOB">
 <meta property="og:description" content="定義Array 是 Golang 的原生型別，其長度固定。  Slice 是 Golang 中長度可以變動的資料型別，也就是可以隨意修改長度的 Array。 其中，Slice 會包含 Pointer、Capacity、Length，Pointer 負責指向實際底層的 Array 位址；Capacity 則是目前 Slice 的容量；Length 則是目前 Slice 內有多少元素在裏頭的長度。 1">
 <meta property="og:locale" content="zh_TW">
 <meta property="og:image" content="https://poabob.github.io/images/Golang-Introduction-to-Slice/a.png">
 <meta property="og:image" content="https://poabob.github.io/images/Golang-Introduction-to-Slice/b.png">
-<meta property="article:published_time" content="2023-12-20T18:07:54.000Z">
-<meta property="article:modified_time" content="2023-12-21T15:12:58.410Z">
+<meta property="article:published_time" content="2023-12-19T18:07:54.000Z">
+<meta property="article:modified_time" content="2023-12-21T16:12:11.936Z">
 <meta property="article:author" content="POABOB">
 <meta property="article:tag" content="array">
 <meta property="article:tag" content="slice">
@@ -44,7 +44,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://poabob.github.io/images/Golang-Introduction-to-Slice/a.png">
 
-<link rel="canonical" href="https://poabob.github.io/2023-12-21/Golang-Introduction-to-Slice/">
+<link rel="canonical" href="https://poabob.github.io/2023-12-20/Golang-Introduction-to-Slice/">
 
 
 <script id="page-configurations">
@@ -210,7 +210,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-TW">
-    <link itemprop="mainEntityOfPage" href="https://poabob.github.io/2023-12-21/Golang-Introduction-to-Slice/">
+    <link itemprop="mainEntityOfPage" href="https://poabob.github.io/2023-12-20/Golang-Introduction-to-Slice/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.png">
@@ -232,10 +232,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">發表於</span>
-              
 
-              <time title="創建時間：2023-12-21 02:07:54 / 修改時間：23:12:58" itemprop="dateCreated datePublished" datetime="2023-12-21T02:07:54+08:00">2023-12-21</time>
+              <time title="創建時間：2023-12-20 02:07:54" itemprop="dateCreated datePublished" datetime="2023-12-20T02:07:54+08:00">2023-12-20</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新於</span>
+                <time title="修改時間：2023-12-22 00:12:11" itemprop="dateModified" datetime="2023-12-22T00:12:11+08:00">2023-12-22</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -354,7 +360,7 @@
   </li>
   <li class="post-copyright-link">
     <strong>文章連結：</strong>
-    <a href="https://poabob.github.io/2023-12-21/Golang-Introduction-to-Slice/" title="Golang Slice 介紹和運作方式">https://poabob.github.io/2023-12-21/Golang-Introduction-to-Slice/</a>
+    <a href="https://poabob.github.io/2023-12-20/Golang-Introduction-to-Slice/" title="Golang Slice 介紹和運作方式">https://poabob.github.io/2023-12-20/Golang-Introduction-to-Slice/</a>
   </li>
   <li class="post-copyright-license">
     <strong>版權聲明： </strong>本網誌所有文章除特別聲明外，均採用 <span class="exturl" data-url="aHR0cHM6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LW5jLXNhLzQuMC96aC1UVw=="><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</span> 許可協議。轉載請註明出處！
@@ -656,7 +662,7 @@ NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
       repo        : 'poabob.github.io',
       owner       : 'POABOB',
       admin       : ['POABOB'],
-      id          : '3b494fe5d676bca35ba06d5a4b8e205b',
+      id          : 'f117c270297a01f8c61f0731a4aafa54',
         language: 'en | es-ES | fr | ru | zh-CN | zh-TW',
       distractionFreeMode: true
     });
