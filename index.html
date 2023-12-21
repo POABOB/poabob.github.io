@@ -209,6 +209,88 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://poabob.github.io/2023-12-21/Golang-Wait-Goroutine/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="POABOB">
+      <meta itemprop="description" content="Life is but a span!">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="POABOB">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023-12-21/Golang-Wait-Goroutine/" class="post-title-link" itemprop="url">Golang 主協程如何等待子協程</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+              
+
+              <time title="創建時間：2023-12-21 23:00:03 / 修改時間：23:12:48" itemprop="dateCreated datePublished" datetime="2023-12-21T23:00:03+08:00">2023-12-21</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分類於</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%BE%8C%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">後端</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="介紹"><a href="#介紹" class="headerlink" title="介紹"></a>介紹</h2><p>眾所周知，如果我們使用 <code>go</code> 關鍵字進行協程的操作時，如果 <code>主協程</code> 沒有等待其他協程的話，直接結束會導致 <code>任務無法完全執行</code>。</p>
+<p>範例如下：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">  <span class="keyword">go</span> sayHi()&#123;</span><br><span class="line">    fmt.Println(<span class="string">"say hello......"</span>)</span><br><span class="line">  &#125;()</span><br><span class="line">  fmt.Println(<span class="string">"main groutine...."</span>)</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 結果</span></span><br><span class="line"><span class="comment">// main groutine....</span></span><br></pre></td></tr></table></figure>
+
+<p>一般來說，最暴力解的方式就是 <code>讓主協程睡一會</code>，等待子協程完成再來去完成主協程的任務。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">time.Sleep(<span class="number">3</span> * time.Second)</span><br></pre></td></tr></table></figure>
+
+<p>但是這樣做非常沒有效率，且 <code>sleep</code> 的期間子協程可能早就已經結束了。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2023-12-21/Golang-Wait-Goroutine/#more" rel="contents">
+                閱讀全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-TW">
     <link itemprop="mainEntityOfPage" href="https://poabob.github.io/2023-12-21/Golang-Introduction-to-Slice/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -234,7 +316,7 @@
               <span class="post-meta-item-text">發表於</span>
               
 
-              <time title="創建時間：2023-12-21 02:07:54 / 修改時間：02:38:16" itemprop="dateCreated datePublished" datetime="2023-12-21T02:07:54+08:00">2023-12-21</time>
+              <time title="創建時間：2023-12-21 02:07:54 / 修改時間：23:12:58" itemprop="dateCreated datePublished" datetime="2023-12-21T02:07:54+08:00">2023-12-21</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -941,97 +1023,11 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-TW">
-    <link itemprop="mainEntityOfPage" href="https://poabob.github.io/2022-03-25/2022-dcard-backend-intern-project/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.png">
-      <meta itemprop="name" content="POABOB">
-      <meta itemprop="description" content="Life is but a span!">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="POABOB">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022-03-25/2022-dcard-backend-intern-project/" class="post-title-link" itemprop="url">2022 Dcard後端實習生面試作業 - URL Shortener</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">發表於</span>
-
-              <time title="創建時間：2022-03-25 21:45:35" itemprop="dateCreated datePublished" datetime="2022-03-25T21:45:35+08:00">2022-03-25</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新於</span>
-                <time title="修改時間：2022-03-27 01:15:00" itemprop="dateModified" datetime="2022-03-27T01:15:00+08:00">2022-03-27</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分類於</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%BE%8C%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">後端</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="一、前言"><a href="#一、前言" class="headerlink" title="一、前言"></a>一、前言</h2><blockquote>
-<p>碩一下這學期相對課業沒那麼重，剛剛好<span class="exturl" data-url="aHR0cHM6Ly9rZW5jaGVuODc5LmdpdGh1Yi5pbw==">友人陳同學<i class="fa fa-external-link-alt"></i></span>告訴我有一個<span class="exturl" data-url="aHR0cHM6Ly9ib2FyZHMuZ3JlZW5ob3VzZS5pby9kY2FyZC9qb2JzLzM4NzQ4NDE=">Dcard後端實習面試<i class="fa fa-external-link-alt"></i></span>，完整詳讀之後發現其實題目不難且待遇豐厚，引起我對於實習面試的熱誠。</p>
-<p>學習了後端也有一段時間了，時常因為沒有做筆記，需要翻找己以前的程式碼片段(還好都沒有刪掉)，許多相關知識也因此停留在記憶的角落而堆積灰塵，若我不去主動複習，也許他就真的被我遺忘了吧?</p>
-<p>因此讓我知道建立學習紀錄的重要性，所以我才倉促架設這個部落格，一部分想記錄我實作這項作業的方式，另外一部分是想分享自己的知識讓需要的人可以了解。</p>
-<p>由於篇幅關係，後續還會有兩篇文章，主要是關於這篇基礎功能的優化和加強，那就請大家來閱讀敝人對於作業的解題。</p>
-</blockquote>
-<ul>
-<li>Repo：<span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL1BPQUJPQi9EY2FyZC1pbnRlcm4tcHJvamVjdA==">https://github.com/POABOB/Dcard-intern-project<i class="fa fa-external-link-alt"></i></span></li>
-</ul>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2022-03-25/2022-dcard-backend-intern-project/#more" rel="contents">
-                閱讀全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
+  <nav class="pagination">
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right" aria-label="下一頁"></i></a>
+  </nav>
 
 
 
@@ -1101,7 +1097,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">10</span>
+          <span class="site-state-item-count">11</span>
           <span class="site-state-item-name">文章</span>
         </a>
       </div>
@@ -1114,7 +1110,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">37</span>
+        <span class="site-state-item-count">40</span>
         <span class="site-state-item-name">標籤</span></a>
       </div>
   </nav>
