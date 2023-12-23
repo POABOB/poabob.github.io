@@ -23,15 +23,15 @@
     var CONFIG = {"hostname":"poabob.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":true,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="定義HTTP Status Code 是用來 表示 Server 處理請求的狀態，從 1xx、2xx、3xx、4xx、5xx 開頭分別有其不一樣的意思。 1xx 參考資訊（Informational）代表請求已經被接收了，正在處理中，用來提醒 Client 等待 Server 的回應，再採取下個步驟。 2xx 成功（Successful）請求不但被接收了，也被執行成功。 常用狀態碼200：OK，代">
+  <meta name="description" content="定義HTTP Status Code 是用來 表示 Server 處理請求的狀態，從 1xx、2xx、3xx、4xx、5xx 開頭分別有其不一樣的意思。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="HTTP 狀態碼簡介">
 <meta property="og:url" content="https://poabob.github.io/2023-12-23/Introduction-to-HTTP-Status-Code/index.html">
 <meta property="og:site_name" content="POABOB">
-<meta property="og:description" content="定義HTTP Status Code 是用來 表示 Server 處理請求的狀態，從 1xx、2xx、3xx、4xx、5xx 開頭分別有其不一樣的意思。 1xx 參考資訊（Informational）代表請求已經被接收了，正在處理中，用來提醒 Client 等待 Server 的回應，再採取下個步驟。 2xx 成功（Successful）請求不但被接收了，也被執行成功。 常用狀態碼200：OK，代">
+<meta property="og:description" content="定義HTTP Status Code 是用來 表示 Server 處理請求的狀態，從 1xx、2xx、3xx、4xx、5xx 開頭分別有其不一樣的意思。">
 <meta property="og:locale" content="zh_TW">
 <meta property="article:published_time" content="2023-12-22T19:08:48.000Z">
-<meta property="article:modified_time" content="2023-12-23T19:10:36.394Z">
+<meta property="article:modified_time" content="2023-12-23T19:12:25.735Z">
 <meta property="article:author" content="POABOB">
 <meta property="article:tag" content="Backend">
 <meta property="article:tag" content="interview">
@@ -234,7 +234,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新於</span>
-                <time title="修改時間：2023-12-24 03:10:36" itemprop="dateModified" datetime="2023-12-24T03:10:36+08:00">2023-12-24</time>
+                <time title="修改時間：2023-12-24 03:12:25" itemprop="dateModified" datetime="2023-12-24T03:12:25+08:00">2023-12-24</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -258,6 +258,8 @@
 
       
         <h2 id="定義"><a href="#定義" class="headerlink" title="定義"></a>定義</h2><p>HTTP Status Code 是用來 <code>表示 Server 處理請求的狀態</code>，從 1xx、2xx、3xx、4xx、5xx 開頭分別有其不一樣的意思。</p>
+<a id="more"></a> 
+
 <h2 id="1xx-參考資訊（Informational）"><a href="#1xx-參考資訊（Informational）" class="headerlink" title="1xx 參考資訊（Informational）"></a>1xx 參考資訊（Informational）</h2><p>代表請求已經被接收了，正在處理中，用來提醒 Client 等待 Server 的回應，再採取下個步驟。</p>
 <h2 id="2xx-成功（Successful）"><a href="#2xx-成功（Successful）" class="headerlink" title="2xx 成功（Successful）"></a>2xx 成功（Successful）</h2><p>請求不但被接收了，也被執行成功。</p>
 <h3 id="常用狀態碼"><a href="#常用狀態碼" class="headerlink" title="常用狀態碼"></a><strong>常用狀態碼</strong></h3><p><code>200</code>：<code>OK</code>，代表 API 正常運作的狀態，並返回資料。</p>
