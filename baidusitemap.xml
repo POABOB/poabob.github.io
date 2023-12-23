@@ -2,12 +2,12 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://poabob.github.io/2023-12-22/Golang-Order-Map/</loc>
-    <lastmod>2023-12-22</lastmod>
-  </url>  <url>
-    <loc>https://poabob.github.io/2023-12-20/Golang-Introduction-to-Slice/</loc>
-    <lastmod>2023-12-21</lastmod>
+    <lastmod>2023-12-23</lastmod>
   </url>  <url>
     <loc>https://poabob.github.io/2023-12-21/Golang-Wait-Goroutine/</loc>
+    <lastmod>2023-12-23</lastmod>
+  </url>  <url>
+    <loc>https://poabob.github.io/2023-12-20/Golang-Introduction-to-Slice/</loc>
     <lastmod>2023-12-21</lastmod>
   </url>  <url>
     <loc>https://poabob.github.io/2023-09-15/Build-A-Goroutine-Pool/</loc>
