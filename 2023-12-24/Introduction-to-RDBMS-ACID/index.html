@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+  <meta name="google-site-verification" content="gMiqErWj487BTNydQ4JwPWMijWfHq7w5bqkaC5JPH9c">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"poabob.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":true,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="前言 在關聯式資料庫中，我們肯定會在資料異動的時候使用 Transaction 來確保資料的正確性，透過 ACID 的特性，才得以讓關聯式資料庫有如此穩定的操作，避免種種的問題發生。 本篇文章將會詳細介紹 ACID 的特性，並且分析每個特性的原理和解決方式。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="關聯式資料庫中的 ACID">
+<meta property="og:url" content="https://poabob.github.io/2023-12-24/Introduction-to-RDBMS-ACID/index.html">
+<meta property="og:site_name" content="POABOB">
+<meta property="og:description" content="前言 在關聯式資料庫中，我們肯定會在資料異動的時候使用 Transaction 來確保資料的正確性，透過 ACID 的特性，才得以讓關聯式資料庫有如此穩定的操作，避免種種的問題發生。 本篇文章將會詳細介紹 ACID 的特性，並且分析每個特性的原理和解決方式。">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://poabob.github.io/images/Introduction-to-RDBMS-ACID/a.png">
+<meta property="og:image" content="https://poabob.github.io/images/Introduction-to-RDBMS-ACID/b.png">
+<meta property="og:image" content="https://poabob.github.io/images/Introduction-to-RDBMS-ACID/c.png">
+<meta property="og:image" content="https://poabob.github.io/images/Introduction-to-RDBMS-ACID/d.png">
+<meta property="og:image" content="https://poabob.github.io/images/Introduction-to-RDBMS-ACID/e.png">
+<meta property="og:image" content="https://poabob.github.io/images/Introduction-to-RDBMS-ACID/f.png">
+<meta property="og:image" content="https://poabob.github.io/images/Introduction-to-RDBMS-ACID/g.png">
+<meta property="article:published_time" content="2023-12-23T23:06:45.000Z">
+<meta property="article:modified_time" content="2023-12-25T09:17:03.328Z">
+<meta property="article:author" content="POABOB">
+<meta property="article:tag" content="Backend">
+<meta property="article:tag" content="RDBMS">
+<meta property="article:tag" content="ACID">
+<meta property="article:tag" content="MySQL">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://poabob.github.io/images/Introduction-to-RDBMS-ACID/a.png">
+
+<link rel="canonical" href="https://poabob.github.io/2023-12-24/Introduction-to-RDBMS-ACID/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-TW'
+  };
+</script>
+
+  <title>關聯式資料庫中的 ACID | POABOB</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-162792341-1"></script>
+    <script data-pjax>
+      if (CONFIG.hostname === location.hostname) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-162792341-1');
+      }
+    </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">POABOB</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">小小工程師的筆記分享</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜尋..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://poabob.github.io/2023-12-24/Introduction-to-RDBMS-ACID/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="POABOB">
+      <meta itemprop="description" content="Life is but a span!">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="POABOB">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          關聯式資料庫中的 ACID
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+
+              <time title="創建時間：2023-12-24 07:06:45" itemprop="dateCreated datePublished" datetime="2023-12-24T07:06:45+08:00">2023-12-24</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新於</span>
+                <time title="修改時間：2023-12-25 17:17:03" itemprop="dateModified" datetime="2023-12-25T17:17:03+08:00">2023-12-25</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分類於</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%BE%8C%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">後端</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><blockquote>
+<p>在關聯式資料庫中，我們肯定會在資料異動的時候使用 Transaction 來確保資料的正確性，透過 ACID 的特性，才得以讓關聯式資料庫有如此穩定的操作，避免種種的問題發生。</p>
+<p>本篇文章將會詳細介紹 ACID 的特性，並且分析每個特性的原理和解決方式。</p>
+</blockquote>
+<a id="more"></a> 
+
+<h2 id="定義"><a href="#定義" class="headerlink" title="定義"></a>定義</h2><p>ACID 是由 <code>Atomicity</code>、<code>Consistency</code>、<code>Isolation</code>、<code>Durability</code> 四個特性所構成的，其中主要應用於 RDBMS 執行 Transaction 的過程。</p>
+<h2 id="Atomicity-原子性"><a href="#Atomicity-原子性" class="headerlink" title="Atomicity 原子性"></a>Atomicity 原子性</h2><p>每筆 Transaction 內都會包含 <code>至少一筆操作</code>，該特性會確保 Transaction 內這些操作不是 <code>全部成功</code>，就是 <code>全部失敗</code>。</p>
+<p><img src="/images/Introduction-to-RDBMS-ACID/a.png" alt="a"></p>
+<p><strong>舉例來說</strong></p>
+<p>假設 Alice 要透過網路銀行轉帳 100 元給 Bob，執行時必須確保 <code>Alice 有確實扣款</code>，而 <code>Bob 有實際收款</code>，那麼 <code>Atomicity</code> 就可以完美的確保執行操作的時候不會漏掉任何一方。</p>
+<p><img src="/images/Introduction-to-RDBMS-ACID/b.png" alt="b"></p>
+<p>以 <code>MySQL</code> 為例，在執行的時候，把需要執行的語句放在 <code>START TRANSACTION</code> 和 <code>COMMIT</code> 中，就可以確保這些操作有原子性。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 開啟 TRANSACTION</span></span><br><span class="line"><span class="keyword">START</span> <span class="keyword">TRANSACTION</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">SELECT</span> @A := money <span class="keyword">FROM</span> <span class="keyword">account</span> <span class="keyword">WHERE</span> <span class="keyword">name</span> = <span class="string">"Alice"</span> <span class="keyword">LIMIT</span> <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">IF (@A - 100) &gt; 0 THEN</span><br><span class="line">    <span class="keyword">UPDATE</span> <span class="keyword">account</span> <span class="keyword">SET</span> money = (@A - <span class="number">100</span>) <span class="keyword">WHERE</span> <span class="keyword">name</span> = <span class="string">"Alice"</span>;</span><br><span class="line">    <span class="keyword">SELECT</span> @B:=money <span class="keyword">FROM</span> <span class="keyword">account</span> <span class="keyword">WHERE</span> <span class="keyword">name</span> = <span class="string">"Bob"</span> <span class="keyword">LIMIT</span> <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">UPDATE</span> <span class="keyword">account</span> <span class="keyword">SET</span> money = (@B + <span class="number">100</span>) <span class="keyword">WHERE</span> <span class="keyword">name</span> = <span class="string">"Bob"</span>;</span><br><span class="line">    <span class="keyword">INSERT</span> <span class="keyword">INTO</span> <span class="keyword">log</span>(<span class="keyword">from</span>, <span class="keyword">to</span>, <span class="keyword">type</span>, amount) <span class="keyword">VALUES</span>(<span class="string">"Alice"</span>, <span class="string">"Bob"</span>, <span class="string">"transfer"</span>, <span class="number">100</span>);</span><br><span class="line"><span class="keyword">END</span> <span class="keyword">IF</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 結束 TRANSACTION，確認操作成功</span></span><br><span class="line"><span class="keyword">COMMIT</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Undo-Log"><a href="#Undo-Log" class="headerlink" title="Undo Log"></a><strong>Undo Log</strong></h3><p>InnoDB engine <code>用來執行 rollback 的一個 log</code>，主要實現了 <code>原子性</code> 的功能，每當 Transaction 中有任何一筆操作 (新增、更新、刪除)，就會將需要 rollback 的資訊記錄到 undo log 內，一旦發生了 rollback，就會讀取 undo log 的資料，並執行與原先相反的操作來還原原本資料。</p>
+<p><img src="/images/Introduction-to-RDBMS-ACID/c.png" alt="c"></p>
+<h2 id="Consistency-一致性"><a href="#Consistency-一致性" class="headerlink" title="Consistency 一致性"></a>Consistency 一致性</h2><p>在 Transaction 的改動中，資料的異動必須 <code>滿足 constraint</code> (Primary Key、Foreign Key、Unique Key)，確保資料始終處於一致的狀態，若是沒有遵守這些約束，該 Transaction 就會被認作失敗並 rollback。</p>
+<h2 id="Isolation-隔離性"><a href="#Isolation-隔離性" class="headerlink" title="Isolation 隔離性"></a>Isolation 隔離性</h2><p>隔離性主要是為了避免 <code>同時好幾個 Transaction 操作相同的表或資料</code>，所導致產生 <code>Race Condition</code> 的情況發生，可能產生的情況有 <code>髒讀（dirty read）</code>、<code>不可重複讀（non-repeatable read）</code>、<code>幻讀（phantom read）</code>。</p>
+<h3 id="髒讀-Dirty-Read"><a href="#髒讀-Dirty-Read" class="headerlink" title="髒讀 Dirty Read"></a>髒讀 Dirty Read</h3><p><strong>例子</strong></p>
+<p>如果現在有兩筆 Transaction 正要讀取同筆資料的餘額，一旦 Transaction A 更新完的資料 $200 被 Transaction B 所讀取，但最後 Transaction A Rollback 讓餘額回復到 $100，Transaction B 手上拿到的卻是過期的資料 $200，稱之為 <code>髒讀</code>。</p>
+<p><strong>解決方式</strong></p>
+<p>將資料庫隔離級別設定為 <code>Read Commited</code>，這樣在 Transaction B 讀取的時候就必須等待 Transaction A 將該筆資料 Commit 才有辦法完成讀取。</p>
+<p><img src="/images/Introduction-to-RDBMS-ACID/d.png" alt="d"></p>
+<h3 id="不可重複讀-Non-repeatable-Read"><a href="#不可重複讀-Non-repeatable-Read" class="headerlink" title="不可重複讀 Non-repeatable Read"></a>不可重複讀 Non-repeatable Read</h3><p><strong>例子</strong></p>
+<p>當 Transaction A 第一次讀取資料 $100 被 Transaction B 所更新，最後 Transaction A 再度讀取資料 $200，Transaction A 兩次讀取的資料都不相同，稱之為 <code>不可重複讀</code>。</p>
+<p><strong>解決方式</strong></p>
+<p>將資料庫隔離級別設定為 <code>Repeatable Read</code> (MySQL 預設隔離機制)，設定後 MySQL 會先去 <code>鎖定要讀取的**該行**</code>，直到 Transaction A 完成後才會讓 Transaction B 進行更新。</p>
+<p><img src="/images/Introduction-to-RDBMS-ACID/e.png" alt="e"></p>
+<h3 id="幻讀-Phantom-Read"><a href="#幻讀-Phantom-Read" class="headerlink" title="幻讀 Phantom Read"></a>幻讀 Phantom Read</h3><p><strong>例子</strong></p>
+<p>當 Transaction A 第一次讀取使用者人數 (500 人) 後被 Transaction B 所新增 700 人，最後 Transaction A 再度讀取人數發現變成 1200 人，Transaction A 兩次讀取的資料數量都不相同，稱之為 <code>幻讀</code>。</p>
+<blockquote>
+<p><code>幻讀</code> 與 <code>不可重複讀</code> 的差別是，幻讀是針對 <code>新增或刪除</code> 的操作所產生的 <code>整體改動</code>，不可重複讀則是針對 <code>更新</code> 某幾行資料所產生的 <code>局部改動</code>。</p>
+</blockquote>
+<p><strong>解決方式</strong></p>
+<p>將資料庫隔離級別設定為 <code>Serializable</code>，設定後 MySQL 會先去 <code>鎖定要讀取的**整張表**</code>，直到 Transaction A 完成後才會讓 Transaction B 進行更新。</p>
+<p><img src="/images/Introduction-to-RDBMS-ACID/f.png" alt="f"></p>
+<p>以下是 <code>資料庫的隔離級別</code> 對應可以 <code>避免 Race Condition</code> 的問題：</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Dirty Read</th>
+<th>Non-repeatable Read</th>
+<th>Phantom Read</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Read Uncommitted</td>
+<td>O</td>
+<td>O</td>
+<td>O</td>
+</tr>
+<tr>
+<td>Read Committed</td>
+<td>X</td>
+<td>O</td>
+<td>O</td>
+</tr>
+<tr>
+<td>Repeatable Read</td>
+<td>X</td>
+<td>X</td>
+<td>O</td>
+</tr>
+<tr>
+<td>Serializable</td>
+<td>X</td>
+<td>X</td>
+<td>X</td>
+</tr>
+</tbody></table>
+<p>一般來說，不會特意去使用 <code>Serializable</code> 鎖定 <code>整張表</code> 來避免 <code>幻讀</code> (效能太差了)，大多數都是使用 <code>Read Committed</code> 和 <code>Repeatable Read</code> 作為其隔離的級別。</p>
+<h2 id="Durability-持久性"><a href="#Durability-持久性" class="headerlink" title="Durability 持久性"></a>Durability 持久性</h2><p>當 Transaction 被 <code>Commit</code> 過後，資料可有永久儲存於硬碟之中，除非硬碟損毀。</p>
+<h3 id="Redo-log"><a href="#Redo-log" class="headerlink" title="Redo log"></a>Redo log</h3><p>redo log 是一個實體 log，用來記錄那些資料 Page 進行什麼樣的修改，只要每次 Transaction 被 Commit 過後，就會產生一或多筆 log 紀錄，這樣就算是執行完成了，之後後台的 thread 會將 Buffer Pool 的 資料 Page 更新至硬碟中。</p>
+<p>這也就是所謂的 <code>WAL (Write-Ahead Logging)</code> 技術，將 <code>操作先寫於 log</code> 中，並且 <code>等待合適的時間再將資料修改至硬碟</code>。</p>
+<p>這樣一來，如果我們在完成一筆 Transaction 後系統突然當機，MySQL 還是可以透過 redo log 的紀錄，將更改的資料寫入硬碟。</p>
+<p><img src="/images/Introduction-to-RDBMS-ACID/g.png" alt="g"></p>
+<h2 id="結論"><a href="#結論" class="headerlink" title="結論"></a>結論</h2><p>透過詳細介紹 ACID 的特性後，可以發現 RDBMS 與 NoSQL 所發展的特性不太相同，強調資料的 <code>一致性</code> 與 <code>持久性</code>，根據 <code>適當的業務場景</code> 採用適合的資料庫才是最佳選擇，而不是因為 NoSQL 擁有高效的分散式處理能力，就盲目的去使用它。</p>
+<h2 id="參考資料"><a href="#參考資料" class="headerlink" title="參考資料"></a>參考資料</h2><ul>
+<li><span class="exturl" data-url="aHR0cHM6Ly94aWFvbGluY29kaW5nLmNvbS9teXNxbC9sb2cvaG93X3VwZGF0ZS5odG1s">https://xiaolincoding.com/mysql/log/how_update.html<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly94aWFvbGluY29kaW5nLmNvbS9teXNxbC90cmFuc2FjdGlvbi9tdmNjLmh0bWw=">https://xiaolincoding.com/mysql/transaction/mvcc.html<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly9jbG91ZC50ZW5jZW50LmNvbS9kZXZlbG9wZXIvYXJ0aWNsZS8xNDUwNzcz">https://cloud.tencent.com/developer/article/1450773<i class="fa fa-external-link-alt"></i></span></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        <div>
+        
+            <div style="text-align:center;color: #ccc;font-size:14px;">------ 本文結束 ------</div>
+        
+        </div>
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>作者： </strong>POABOB
+  </li>
+  <li class="post-copyright-link">
+    <strong>文章連結：</strong>
+    <a href="https://poabob.github.io/2023-12-24/Introduction-to-RDBMS-ACID/" title="關聯式資料庫中的 ACID">https://poabob.github.io/2023-12-24/Introduction-to-RDBMS-ACID/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版權聲明： </strong>本網誌所有文章除特別聲明外，均採用 <span class="exturl" data-url="aHR0cHM6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LW5jLXNhLzQuMC96aC1UVw=="><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</span> 許可協議。轉載請註明出處！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Backend/" rel="tag"># Backend</a>
+              <a href="/tags/RDBMS/" rel="tag"># RDBMS</a>
+              <a href="/tags/ACID/" rel="tag"># ACID</a>
+              <a href="/tags/MySQL/" rel="tag"># MySQL</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023-12-23/Introduction-to-HTTP-Status-Code/" rel="prev" title="HTTP 狀態碼簡介">
+      <i class="fa fa-chevron-left"></i> HTTP 狀態碼簡介
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+  <div id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#定義"><span class="nav-number">2.</span> <span class="nav-text">定義</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Atomicity-原子性"><span class="nav-number">3.</span> <span class="nav-text">Atomicity 原子性</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Undo-Log"><span class="nav-number">3.1.</span> <span class="nav-text">Undo Log</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Consistency-一致性"><span class="nav-number">4.</span> <span class="nav-text">Consistency 一致性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Isolation-隔離性"><span class="nav-number">5.</span> <span class="nav-text">Isolation 隔離性</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#髒讀-Dirty-Read"><span class="nav-number">5.1.</span> <span class="nav-text">髒讀 Dirty Read</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#不可重複讀-Non-repeatable-Read"><span class="nav-number">5.2.</span> <span class="nav-text">不可重複讀 Non-repeatable Read</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#幻讀-Phantom-Read"><span class="nav-number">5.3.</span> <span class="nav-text">幻讀 Phantom Read</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Durability-持久性"><span class="nav-number">6.</span> <span class="nav-text">Durability 持久性</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Redo-log"><span class="nav-number">6.1.</span> <span class="nav-text">Redo log</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#結論"><span class="nav-number">7.</span> <span class="nav-text">結論</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#參考資料"><span class="nav-number">8.</span> <span class="nav-text">參考資料</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="POABOB"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">POABOB</p>
+  <div class="site-description" itemprop="description">Life is but a span!</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">14</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">45</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL1BPQUJPQg==" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;POABOB"><i class="fab fa-github fa-fw"></i>GitHub</span>
+      </span>
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="bWFpbHRvOnp4Yzc1MjE2NkBnbWFpbC5jb20=" title="E-Mail → mailto:zxc752166@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</span>
+      </span>
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="aHR0cHM6Ly93d3cuZmFjZWJvb2suY29tL3Byb2ZpbGUucGhwP2lkPTEwMDAwMDMyMTQwMDU5MA==" title="FB Page → https:&#x2F;&#x2F;www.facebook.com&#x2F;profile.php?id&#x3D;100000321400590"><i class="fab fa-facebook fa-fw"></i>FB Page</span>
+      </span>
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="aHR0cHM6Ly9pbnN0YWdyYW0uY29tLzB4N2YyZWI=" title="Instagram → https:&#x2F;&#x2F;instagram.com&#x2F;0x7f2eb"><i class="fab fa-instagram fa-fw"></i>Instagram</span>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">POABOB</span>
+</div>
+  <div class="powered-by">由 <span class="exturl theme-link" data-url="aHR0cHM6Ly9oZXhvLmlv">Hexo</span> & <span class="exturl theme-link" data-url="aHR0cHM6Ly9waXNjZXMudGhlbWUtbmV4dC5vcmc=">NexT.Pisces</span> 強力驅動
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/pjax/pjax.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+  <script>
+var pjax = new Pjax({
+  selectors: [
+    'head title',
+    '#page-configurations',
+    '.content-wrap',
+    '.post-toc-wrap',
+    '.languages',
+    '#pjax'
+  ],
+  switches: {
+    '.post-toc-wrap': Pjax.switches.innerHTML
+  },
+  analytics: false,
+  cacheBust: false,
+  scrollTo : !CONFIG.bookmark.enable
+});
+
+window.addEventListener('pjax:success', () => {
+  document.querySelectorAll('script[data-pjax], script#page-configurations, #pjax script').forEach(element => {
+    var code = element.text || element.textContent || element.innerHTML || '';
+    var parent = element.parentNode;
+    parent.removeChild(element);
+    var script = document.createElement('script');
+    if (element.id) {
+      script.id = element.id;
+    }
+    if (element.className) {
+      script.className = element.className;
+    }
+    if (element.type) {
+      script.type = element.type;
+    }
+    if (element.src) {
+      script.src = element.src;
+      // Force synchronous loading of peripheral JS.
+      script.async = false;
+    }
+    if (element.dataset.pjax !== undefined) {
+      script.dataset.pjax = '';
+    }
+    if (code !== '') {
+      script.appendChild(document.createTextNode(code));
+    }
+    parent.appendChild(script);
+  });
+  NexT.boot.refresh();
+  // Define Motion Sequence & Bootstrap Motion.
+  if (CONFIG.motion.enable) {
+    NexT.motion.integrator
+      .init()
+      .add(NexT.motion.middleWares.subMenu)
+      .add(NexT.motion.middleWares.postList)
+      .bootstrap();
+  }
+  NexT.utils.updateSidebarPosition();
+});
+</script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div id="pjax">
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="https://gist.githubusercontent.com/POABOB/65b37ccc358df67efffeedf571219b2a/raw/b26f8f05e0951aa1c22d11122f3232b986012141/md5.min.js"></script>
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : '5aa580a2136b90e75fd6',
+      clientSecret: '128f00ea948ebd5cb1c0c2c7c3a2b81f067257ea',
+      repo        : 'poabob.github.io',
+      owner       : 'POABOB',
+      admin       : ['POABOB'],
+      id          : '7de2fc65129f433ca86619152de9c5c7',
+        language: 'en | es-ES | fr | ru | zh-CN | zh-TW',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+    </div>
+</body>
+</html>
