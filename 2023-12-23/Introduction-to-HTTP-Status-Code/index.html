@@ -31,7 +31,7 @@
 <meta property="og:description" content="定義HTTP Status Code 是用來 表示 Server 處理請求的狀態，從 1xx、2xx、3xx、4xx、5xx 開頭分別有其不一樣的意思。">
 <meta property="og:locale" content="zh_TW">
 <meta property="article:published_time" content="2023-12-22T19:08:48.000Z">
-<meta property="article:modified_time" content="2023-12-23T19:12:25.735Z">
+<meta property="article:modified_time" content="2023-12-24T07:00:42.376Z">
 <meta property="article:author" content="POABOB">
 <meta property="article:tag" content="Backend">
 <meta property="article:tag" content="interview">
@@ -234,7 +234,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新於</span>
-                <time title="修改時間：2023-12-24 03:12:25" itemprop="dateModified" datetime="2023-12-24T03:12:25+08:00">2023-12-24</time>
+                <time title="修改時間：2023-12-24 15:00:42" itemprop="dateModified" datetime="2023-12-24T15:00:42+08:00">2023-12-24</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -260,22 +260,21 @@
         <h2 id="定義"><a href="#定義" class="headerlink" title="定義"></a>定義</h2><p>HTTP Status Code 是用來 <code>表示 Server 處理請求的狀態</code>，從 1xx、2xx、3xx、4xx、5xx 開頭分別有其不一樣的意思。</p>
 <a id="more"></a> 
 
-<h2 id="1xx-參考資訊（Informational）"><a href="#1xx-參考資訊（Informational）" class="headerlink" title="1xx 參考資訊（Informational）"></a>1xx 參考資訊（Informational）</h2><p>代表請求已經被接收了，正在處理中，用來提醒 Client 等待 Server 的回應，再採取下個步驟。</p>
-<h2 id="2xx-成功（Successful）"><a href="#2xx-成功（Successful）" class="headerlink" title="2xx 成功（Successful）"></a>2xx 成功（Successful）</h2><p>請求不但被接收了，也被執行成功。</p>
+<h2 id="1xx-參考資訊（Informational）"><a href="#1xx-參考資訊（Informational）" class="headerlink" title="1xx 參考資訊（Informational）"></a>1xx 參考資訊（Informational）</h2><h3 id="解釋"><a href="#解釋" class="headerlink" title="解釋"></a>解釋</h3><p>代表請求已經被接收了，正在處理中，用來提醒 Client 等待 Server 的回應，再採取下個步驟。</p>
+<h2 id="2xx-成功（Successful）"><a href="#2xx-成功（Successful）" class="headerlink" title="2xx 成功（Successful）"></a>2xx 成功（Successful）</h2><h3 id="解釋-1"><a href="#解釋-1" class="headerlink" title="解釋"></a>解釋</h3><p>請求不但被接收了，也被執行成功。</p>
 <h3 id="常用狀態碼"><a href="#常用狀態碼" class="headerlink" title="常用狀態碼"></a><strong>常用狀態碼</strong></h3><p><code>200</code>：<code>OK</code>，代表 API 正常運作的狀態，並返回資料。</p>
 <p><code>201</code>：<code>Created</code>，代表請求的資源已經被 <code>建立成功</code>，通常用作於 <code>POST</code> 請求，並且 <code>可以返回資料</code>。</p>
 <p><code>204</code>：<code>No Content</code>，代表請求執行成功，但是 <code>不用返回資料</code>，通常用作於 <code>DELETE</code> 請求所使用。</p>
-<h2 id="3xx-重新導向（Redirection）"><a href="#3xx-重新導向（Redirection）" class="headerlink" title="3xx 重新導向（Redirection）"></a>3xx <strong>重新導向</strong>（<strong>Redirection</strong>）</h2><p>請求被接收後，發現需要 <code>重新導向指定位置</code>，要 Client 採取下個步驟，才能夠獲取請求。</p>
-<p><strong>常用狀態碼</strong></p>
+<h2 id="3xx-重新導向（Redirection）"><a href="#3xx-重新導向（Redirection）" class="headerlink" title="3xx 重新導向（Redirection）"></a>3xx <strong>重新導向</strong>（<strong>Redirection</strong>）</h2><h3 id="解釋-2"><a href="#解釋-2" class="headerlink" title="解釋"></a>解釋</h3><p>請求被接收後，發現需要 <code>重新導向指定位置</code>，要 Client 採取下個步驟，才能夠獲取請求。</p>
 <h3 id="常用狀態碼-1"><a href="#常用狀態碼-1" class="headerlink" title="常用狀態碼"></a><strong>常用狀態碼</strong></h3><p><code>301</code>：<code>Moved Permanently</code>，代表請求的資源已經被 <code>永久性的轉址</code>，其中不只是網址轉換這麼簡單，還包刮了 <code>網站排名</code>、<code>頁面權重</code>、<code>流量</code> 都會一併轉移，如果網站遷移了，沒有作永久性轉址的動作，搜尋引擎就會把新舊網站當作是兩個獨立不同的資源，舊網站所累積的權重也要重新來過。</p>
 <p><code>302</code>：<code>Found</code>，代表請求的資源被 <code>暫時性轉址</code>，這才是單純只有地址的轉換，通常會用作於 <code>簡易功能型的短網址</code> 功能所使用 (有的功能很全的短網址還是有做到 SEO)。</p>
-<h2 id="4xx-客戶端錯誤（Client-Error）"><a href="#4xx-客戶端錯誤（Client-Error）" class="headerlink" title="4xx 客戶端錯誤（Client Error）"></a>4xx 客戶端錯誤（<strong>Client Error</strong>）</h2><p>代表 Client 端執行時出現錯誤，使得 Server 無法如期的處理請求。</p>
+<h2 id="4xx-客戶端錯誤（Client-Error）"><a href="#4xx-客戶端錯誤（Client-Error）" class="headerlink" title="4xx 客戶端錯誤（Client Error）"></a>4xx 客戶端錯誤（<strong>Client Error</strong>）</h2><h3 id="解釋-3"><a href="#解釋-3" class="headerlink" title="解釋"></a>解釋</h3><p>代表 Client 端執行時出現錯誤，使得 Server 無法如期的處理請求。</p>
 <h3 id="常用狀態碼-2"><a href="#常用狀態碼-2" class="headerlink" title="常用狀態碼"></a><strong>常用狀態碼</strong></h3><p><code>400</code>，<code>Bad Request</code>，代表 Client 發出的請求是有問題的，像是 <code>格式有誤</code>、<code>表單驗證沒過</code>、<code>無效的請求</code> 等，Server 不會對其進行處理。</p>
 <p><code>401</code>，<code>Unauthorized</code>，通常發生於需要 <code>認證身分</code> 的請求而無法判斷其身分，因為 HTTP 是一個 Stateless 的協定，無法記錄每一個人的身分，需要透過類似 <code>Cookie</code>、<code>JWT</code> 相關的驗證憑據來判斷使用者的身分。</p>
 <p><code>403</code>，<code>Forbidden</code>，主要發生於 <code>權限可能不足的情況</code>，拒絕其訪問，與 <code>401</code> 不同的是要先有身分憑證，才可以進一步去判斷該使用者是否符合權限範圍內的操作。</p>
 <p><code>404</code>，<code>Not Found</code>，通常就是 <code>找不到請求的資源</code>，只要是一個可用的網域隨便輸入 <code>URI</code> 都有可能發生，例如：<span class="exturl" data-url="aHR0cHM6Ly93d3cuZ29vZ2xlLmNvbS93YXRjaA==">https://www.google.com/watch<i class="fa fa-external-link-alt"></i></span>。</p>
-<p><code>405</code>，<code>Method Not Allowed</code>，</p>
-<h2 id="5xx-客戶端錯誤（Server-Error）"><a href="#5xx-客戶端錯誤（Server-Error）" class="headerlink" title="5xx 客戶端錯誤（Server Error）"></a>5xx 客戶端錯誤（Server <strong>Error</strong>）</h2><p>代表 Server 端執行時出現錯誤或是 Bug，無法完成請求。</p>
+<p><code>405</code>，<code>Method Not Allowed</code>，這種錯誤發生於請求的 <code>URI</code> 正確但 <code>方法</code> 錯誤，通常遇到這種問題，需要先確認 Restful API 定義的 <code>方法</code> 以及 <code>Content-Type</code> 傳遞的格式。</p>
+<h2 id="5xx-客戶端錯誤（Server-Error）"><a href="#5xx-客戶端錯誤（Server-Error）" class="headerlink" title="5xx 客戶端錯誤（Server Error）"></a>5xx 客戶端錯誤（Server <strong>Error</strong>）</h2><h3 id="解釋-4"><a href="#解釋-4" class="headerlink" title="解釋"></a>解釋</h3><p>代表 Server 端執行時出現錯誤或是 Bug，無法完成請求。</p>
 <h3 id="常用狀態碼-3"><a href="#常用狀態碼-3" class="headerlink" title="常用狀態碼"></a><strong>常用狀態碼</strong></h3><p><code>500</code>，<code>Internal Server Error</code>，如果當 Server 遇到無法預料的錯誤時，就會發出此狀態碼。</p>
 <p><code>502</code>，<code>Bad Gateway</code>，發生於 <code>Gateway 在請求 upstream 的服務時</code> 無法得到回應，通常 Server 端有自己做 <code>反向代理</code>的話可能就會發生此種情況。</p>
 <p><code>503</code>，<code>Service Unavailable</code>，發生於 Server 處於 <code>維護</code>、<code>過載</code> 暫時無法處理請求的狀態，通常會在 HTTP Header 中夾帶 <code>Retry-After</code> 的資訊，讓 Client 等待 Server 恢復後重新請求。</p>
@@ -392,7 +391,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#定義"><span class="nav-number">1.</span> <span class="nav-text">定義</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1xx-參考資訊（Informational）"><span class="nav-number">2.</span> <span class="nav-text">1xx 參考資訊（Informational）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2xx-成功（Successful）"><span class="nav-number">3.</span> <span class="nav-text">2xx 成功（Successful）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#常用狀態碼"><span class="nav-number">3.1.</span> <span class="nav-text">常用狀態碼</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3xx-重新導向（Redirection）"><span class="nav-number">4.</span> <span class="nav-text">3xx 重新導向（Redirection）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#常用狀態碼-1"><span class="nav-number">4.1.</span> <span class="nav-text">常用狀態碼</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4xx-客戶端錯誤（Client-Error）"><span class="nav-number">5.</span> <span class="nav-text">4xx 客戶端錯誤（Client Error）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#常用狀態碼-2"><span class="nav-number">5.1.</span> <span class="nav-text">常用狀態碼</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5xx-客戶端錯誤（Server-Error）"><span class="nav-number">6.</span> <span class="nav-text">5xx 客戶端錯誤（Server Error）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#常用狀態碼-3"><span class="nav-number">6.1.</span> <span class="nav-text">常用狀態碼</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#參考資料"><span class="nav-number">7.</span> <span class="nav-text">參考資料</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#定義"><span class="nav-number">1.</span> <span class="nav-text">定義</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1xx-參考資訊（Informational）"><span class="nav-number">2.</span> <span class="nav-text">1xx 參考資訊（Informational）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#解釋"><span class="nav-number">2.1.</span> <span class="nav-text">解釋</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2xx-成功（Successful）"><span class="nav-number">3.</span> <span class="nav-text">2xx 成功（Successful）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#解釋-1"><span class="nav-number">3.1.</span> <span class="nav-text">解釋</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#常用狀態碼"><span class="nav-number">3.2.</span> <span class="nav-text">常用狀態碼</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3xx-重新導向（Redirection）"><span class="nav-number">4.</span> <span class="nav-text">3xx 重新導向（Redirection）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#解釋-2"><span class="nav-number">4.1.</span> <span class="nav-text">解釋</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#常用狀態碼-1"><span class="nav-number">4.2.</span> <span class="nav-text">常用狀態碼</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4xx-客戶端錯誤（Client-Error）"><span class="nav-number">5.</span> <span class="nav-text">4xx 客戶端錯誤（Client Error）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#解釋-3"><span class="nav-number">5.1.</span> <span class="nav-text">解釋</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#常用狀態碼-2"><span class="nav-number">5.2.</span> <span class="nav-text">常用狀態碼</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5xx-客戶端錯誤（Server-Error）"><span class="nav-number">6.</span> <span class="nav-text">5xx 客戶端錯誤（Server Error）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#解釋-4"><span class="nav-number">6.1.</span> <span class="nav-text">解釋</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#常用狀態碼-3"><span class="nav-number">6.2.</span> <span class="nav-text">常用狀態碼</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#參考資料"><span class="nav-number">7.</span> <span class="nav-text">參考資料</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
