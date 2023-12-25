@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+  <meta name="google-site-verification" content="gMiqErWj487BTNydQ4JwPWMijWfHq7w5bqkaC5JPH9c">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"poabob.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":true,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="Program定義放在二級儲存裝置 (硬碟) 中，沒有被加載到記憶體的一堆 Code ，中文又稱「程式」，可以想像成它是死的。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Program、Process、Thread 介紹">
+<meta property="og:url" content="https://poabob.github.io/2023-12-25/Introduction-to-Program-Process-Thread/index.html">
+<meta property="og:site_name" content="POABOB">
+<meta property="og:description" content="Program定義放在二級儲存裝置 (硬碟) 中，沒有被加載到記憶體的一堆 Code ，中文又稱「程式」，可以想像成它是死的。">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://poabob.github.io/images/Introduction-to-Program-Process-Thread/a.png">
+<meta property="og:image" content="https://poabob.github.io/images/Introduction-to-Program-Process-Thread/b.png">
+<meta property="og:image" content="https://poabob.github.io/images/Introduction-to-Program-Process-Thread/c.png">
+<meta property="article:published_time" content="2023-12-24T20:01:13.000Z">
+<meta property="article:modified_time" content="2023-12-25T09:40:28.790Z">
+<meta property="article:author" content="POABOB">
+<meta property="article:tag" content="interview">
+<meta property="article:tag" content="Thread">
+<meta property="article:tag" content="Process">
+<meta property="article:tag" content="Program">
+<meta property="article:tag" content="Kernel">
+<meta property="article:tag" content="OS">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://poabob.github.io/images/Introduction-to-Program-Process-Thread/a.png">
+
+<link rel="canonical" href="https://poabob.github.io/2023-12-25/Introduction-to-Program-Process-Thread/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-TW'
+  };
+</script>
+
+  <title>Program、Process、Thread 介紹 | POABOB</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-162792341-1"></script>
+    <script data-pjax>
+      if (CONFIG.hostname === location.hostname) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-162792341-1');
+      }
+    </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">POABOB</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">小小工程師的筆記分享</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜尋..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://poabob.github.io/2023-12-25/Introduction-to-Program-Process-Thread/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="POABOB">
+      <meta itemprop="description" content="Life is but a span!">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="POABOB">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Program、Process、Thread 介紹
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+              
+
+              <time title="創建時間：2023-12-25 04:01:13 / 修改時間：17:40:28" itemprop="dateCreated datePublished" datetime="2023-12-25T04:01:13+08:00">2023-12-25</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分類於</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BD%9C%E6%A5%AD%E7%B3%BB%E7%B5%B1/" itemprop="url" rel="index"><span itemprop="name">作業系統</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="Program"><a href="#Program" class="headerlink" title="Program"></a>Program</h2><h3 id="定義"><a href="#定義" class="headerlink" title="定義"></a>定義</h3><p>放在<strong>二級儲存裝置 (硬碟)</strong> 中，<strong>沒有被加載到記憶體</strong>的一堆 Code ，中文又稱「程式」，可以想像成它是<strong>死的</strong>。 </p>
+<a id="more"></a> 
+
+<h2 id="Process"><a href="#Process" class="headerlink" title="Process"></a>Process</h2><h3 id="定義-1"><a href="#定義-1" class="headerlink" title="定義"></a>定義</h3><p><strong>已經被加載到記憶體</strong>，並且<strong>程式碼隨時都會被 CPU 所執行</strong>，且其宣告的在記憶體的變數的值會隨著需求而不斷變動，包含<strong>程式計數器(process counter)</strong>、<strong>堆疊(stack)</strong>、<strong>資料區段(data section)</strong>、<strong>堆積(heap)</strong>。中文稱之為<strong>「行程」</strong>，可以想像成它是<strong>活的</strong>。 </p>
+<blockquote>
+<p>現代執行緒設計導向的系統中，行程本身不是基本執行單位，而是<strong>執行緒的容器</strong></p>
+</blockquote>
+<h3 id="五大狀態"><a href="#五大狀態" class="headerlink" title="五大狀態"></a>五大狀態</h3><ul>
+<li><code>new</code>：行程新產生中，已分得 PCB 空間，尚未被載入記憶體。</li>
+<li><code>running</code>：獲取 CPU，正在執行。</li>
+<li><code>waiting</code>：在 Waiting Queue 等待 I/O Completed 或 Event Occurs，例如等待使用者輸入完成，亦稱「阻塞」（blocked）。</li>
+<li><code>ready</code>：已在記憶體內，且在 Ready Queue 排班中，等待 CPU。</li>
+<li><code>terminated</code>：完成執行，其 PCB 可能尚未回收，要等其 Parent Process 收集該子 Process 成果才會。</li>
+</ul>
+<p><img src="/images/Introduction-to-Program-Process-Thread/a.png" alt="a"></p>
+<h3 id="記憶體配置"><a href="#記憶體配置" class="headerlink" title="記憶體配置"></a>記憶體配置</h3><ul>
+<li><code>Stack</code>：存放 <code>函數的參數</code>、<code>區域</code> 變數等。(會稱作 stack 是由於其配置 <code>遵守 LIFO</code>)</li>
+<li><code>Heap</code>：一般由程式設計師分配釋放，執行時才會知道配置大小，如 <code>malloc/new</code> 和 <code>free/delete</code>。(注意其資料結構不是 DS 中的 heap 而是 <code>link-list</code>)</li>
+<li><code>BSS</code>：<code>未初始化</code>的靜態變數</li>
+<li><code>Data</code>：<code>全域</code>變數、<code>靜態</code>變數</li>
+<li><code>text/code</code>：<code>常量字元串</code></li>
+</ul>
+<p><img src="/images/Introduction-to-Program-Process-Thread/b.png" alt="b"></p>
+<h3 id="配置練習"><a href="#配置練習" class="headerlink" title="配置練習"></a>配置練習</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> a=<span class="number">0</span>;   <span class="comment">//global 初始化區</span></span><br><span class="line"><span class="keyword">char</span> *p1;  <span class="comment">//global 未初始化區</span></span><br><span class="line">main()&#123;</span><br><span class="line">    <span class="keyword">int</span> b;             <span class="comment">// stack</span></span><br><span class="line">    <span class="keyword">char</span> s[]=<span class="string">"abc"</span>;    <span class="comment">// stack</span></span><br><span class="line">    <span class="keyword">char</span> *p2;          <span class="comment">// stack</span></span><br><span class="line">    <span class="keyword">char</span> *p3=<span class="string">"123456"</span>; <span class="comment">// 123456\0 在常量區，p3在stack。</span></span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">int</span> c=<span class="number">0</span>;   <span class="comment">// global (static) 初始化區</span></span><br><span class="line">    p1 = (<span class="keyword">char</span>*)<span class="built_in">malloc</span>(<span class="number">10</span>);</span><br><span class="line">    p2 = (<span class="keyword">char</span>*)<span class="built_in">malloc</span>(<span class="number">20</span>);  <span class="comment">//分配得來得10和20位元組的區域在heap</span></span><br><span class="line">    <span class="built_in">strcpy</span>(p1,<span class="string">"123456"</span>);  </span><br><span class="line">    <span class="comment">//123456\0 在常量區，編譯器可能會將它與 p3 中的 123456\0 優化成一個地方。</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="Thread"><a href="#Thread" class="headerlink" title="Thread"></a>Thread</h2><h3 id="定義-2"><a href="#定義-2" class="headerlink" title="定義"></a>定義</h3><p>是 OS 能夠<strong>進行運算排程的最小單位</strong>，它被包含在 process 之中，<strong>是 process 中的實際運作單位</strong>。一個Process的<strong>全域變數</strong>可以讓它的所有 Threads <strong>共享，</strong>而每個 Thread 也有自己的專屬的變數。</p>
+<h3 id="記憶體配置-1"><a href="#記憶體配置-1" class="headerlink" title="記憶體配置"></a>記憶體配置</h3><ul>
+<li><code>Thread ID</code>：執行緒 ID。</li>
+<li><code>Thread State</code>：執行緒狀態。</li>
+<li><code>Process Counter</code>：程式計數器，負責記錄下一個要執行程式的地址。</li>
+<li><code>CPU Register value</code>：指的是 cpu 的暫存器的內容，專門暫存指令、資料和位址的記憶體空間。</li>
+<li><code>Stack</code>：負責存放 process 活動過程需要調用的指令及區域變數。</li>
+</ul>
+<h3 id="Threads-內會共享"><a href="#Threads-內會共享" class="headerlink" title="Threads 內會共享"></a>Threads 內會共享</h3><ul>
+<li><code>Code Section</code>：<code>程式碼區域</code>，每一個行程都是因為 <code>執行某段程式碼</code> 而開啟的。</li>
+<li><code>Data Section</code>：<code>資料區域</code>，代表行程會 <code>用到哪些資源</code>。</li>
+<li><code>OS Resources</code></li>
+</ul>
+<blockquote>
+<p>Code section + Data section = memory space, Address space, Heap memory</p>
+</blockquote>
+<h3 id="MultiThread-的好處"><a href="#MultiThread-的好處" class="headerlink" title="MultiThread 的好處"></a>MultiThread 的好處</h3><ul>
+<li>允許程式中的某部份 <code>被中斷</code> 或是 <code>執行得非常久</code> 時，該程式仍然可以 <code>繼續執行</code>。</li>
+<li>分享 <code>Code/Data Section</code> 和 <code>OS 資源</code>。</li>
+<li><code>輕量化</code> 的 process。(context switch 一個 thread 比 process <strong><code>快約 5 倍</code></strong>，建立一個 thread 比 process <strong><code>快約 13 倍</code></strong>。)</li>
+<li>可使用 <strong><code>多處理器架構</code></strong> : 使用 <strong><code>多核心</code></strong>。</li>
+</ul>
+<p><img src="/images/Introduction-to-Program-Process-Thread/c.png" alt="c"></p>
+<h2 id="總結"><a href="#總結" class="headerlink" title="總結"></a>總結</h2><ul>
+<li>Thread 是<strong>系統處理工作的基本單元</strong>。</li>
+<li>Thread 是 OS 分配 <strong>CPU 時間</strong>的對象；Process 是 <strong>OS 分配資源的</strong>對象。</li>
+<li>一個 Process 會同時<strong>存在多個 Thread</strong>。</li>
+<li>一個 Process 底下的 Thread 共享資源，如<strong>記憶體</strong>、<strong>全域變數 (Global Variable)</strong> 等，不同的 Process 則否。</li>
+<li>OS 會根據 Thread 的<strong>優先權</strong>以及<strong>使用過的 CPU 時間</strong>，在不同的 Thread 作切換，讓各個 Thread 都有執行的機會。</li>
+</ul>
+<h2 id="參考資料"><a href="#參考資料" class="headerlink" title="參考資料"></a>參考資料</h2><ul>
+<li><span class="exturl" data-url="aHR0cHM6Ly93d3cubXJvcGVuZ2F0ZS5jb20vMjAxNS8wMS9vcGVyYXRpbmctc3lzdGVtLWNoNC1tdWx0aXRocmVhZC5odG1s">https://www.mropengate.com/2015/01/operating-system-ch4-multithread.html<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly9ibG9nLmtlbm55Y29kZXIuaW8vMjAyMC8wNS8xNi8lRTklODAlQjIlRTclQTglOEItUHJvY2Vzcy0lRTMlODAlODElRTclQjclOUElRTclQTglOEItVGhyZWFkLSVFMyU4MCU4MSVFNSU4RCU5NCVFNyVBOCU4Qi1Db3JvdXRpbmUtJUU3JTlBJTg0JUU2JUE2JTgyJUU1JUJGJUI1JUU4JUFDJTlCJUU4JUE3JUEzLw==">https://blog.kennycoder.io/2020/05/16/進程-Process-、線程-Thread-、協程-Coroutine-的概念講解/<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly9tZWRpdW0uY29tL2VyZW5zLXRlY2gtYm9vay8lRTclOTAlODYlRTglQTclQTMtcHJvY2Vzcy10aHJlYWQtOTRhNDA3MjFiNDky">https://medium.com/erens-tech-book/理解-process-thread-94a40721b492<i class="fa fa-external-link-alt"></i></span></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        <div>
+        
+            <div style="text-align:center;color: #ccc;font-size:14px;">------ 本文結束 ------</div>
+        
+        </div>
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>作者： </strong>POABOB
+  </li>
+  <li class="post-copyright-link">
+    <strong>文章連結：</strong>
+    <a href="https://poabob.github.io/2023-12-25/Introduction-to-Program-Process-Thread/" title="Program、Process、Thread 介紹">https://poabob.github.io/2023-12-25/Introduction-to-Program-Process-Thread/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版權聲明： </strong>本網誌所有文章除特別聲明外，均採用 <span class="exturl" data-url="aHR0cHM6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LW5jLXNhLzQuMC96aC1UVw=="><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</span> 許可協議。轉載請註明出處！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/interview/" rel="tag"># interview</a>
+              <a href="/tags/Thread/" rel="tag"># Thread</a>
+              <a href="/tags/Process/" rel="tag"># Process</a>
+              <a href="/tags/Program/" rel="tag"># Program</a>
+              <a href="/tags/Kernel/" rel="tag"># Kernel</a>
+              <a href="/tags/OS/" rel="tag"># OS</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023-12-24/Introduction-to-RDBMS-ACID/" rel="prev" title="關聯式資料庫中的 ACID">
+      <i class="fa fa-chevron-left"></i> 關聯式資料庫中的 ACID
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+  <div id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Program"><span class="nav-number">1.</span> <span class="nav-text">Program</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#定義"><span class="nav-number">1.1.</span> <span class="nav-text">定義</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Process"><span class="nav-number">2.</span> <span class="nav-text">Process</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#定義-1"><span class="nav-number">2.1.</span> <span class="nav-text">定義</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#五大狀態"><span class="nav-number">2.2.</span> <span class="nav-text">五大狀態</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#記憶體配置"><span class="nav-number">2.3.</span> <span class="nav-text">記憶體配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置練習"><span class="nav-number">2.4.</span> <span class="nav-text">配置練習</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Thread"><span class="nav-number">3.</span> <span class="nav-text">Thread</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#定義-2"><span class="nav-number">3.1.</span> <span class="nav-text">定義</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#記憶體配置-1"><span class="nav-number">3.2.</span> <span class="nav-text">記憶體配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Threads-內會共享"><span class="nav-number">3.3.</span> <span class="nav-text">Threads 內會共享</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#MultiThread-的好處"><span class="nav-number">3.4.</span> <span class="nav-text">MultiThread 的好處</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#總結"><span class="nav-number">4.</span> <span class="nav-text">總結</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#參考資料"><span class="nav-number">5.</span> <span class="nav-text">參考資料</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="POABOB"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">POABOB</p>
+  <div class="site-description" itemprop="description">Life is but a span!</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">15</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">50</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL1BPQUJPQg==" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;POABOB"><i class="fab fa-github fa-fw"></i>GitHub</span>
+      </span>
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="bWFpbHRvOnp4Yzc1MjE2NkBnbWFpbC5jb20=" title="E-Mail → mailto:zxc752166@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</span>
+      </span>
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="aHR0cHM6Ly93d3cuZmFjZWJvb2suY29tL3Byb2ZpbGUucGhwP2lkPTEwMDAwMDMyMTQwMDU5MA==" title="FB Page → https:&#x2F;&#x2F;www.facebook.com&#x2F;profile.php?id&#x3D;100000321400590"><i class="fab fa-facebook fa-fw"></i>FB Page</span>
+      </span>
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="aHR0cHM6Ly9pbnN0YWdyYW0uY29tLzB4N2YyZWI=" title="Instagram → https:&#x2F;&#x2F;instagram.com&#x2F;0x7f2eb"><i class="fab fa-instagram fa-fw"></i>Instagram</span>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">POABOB</span>
+</div>
+  <div class="powered-by">由 <span class="exturl theme-link" data-url="aHR0cHM6Ly9oZXhvLmlv">Hexo</span> & <span class="exturl theme-link" data-url="aHR0cHM6Ly9waXNjZXMudGhlbWUtbmV4dC5vcmc=">NexT.Pisces</span> 強力驅動
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/pjax/pjax.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+  <script>
+var pjax = new Pjax({
+  selectors: [
+    'head title',
+    '#page-configurations',
+    '.content-wrap',
+    '.post-toc-wrap',
+    '.languages',
+    '#pjax'
+  ],
+  switches: {
+    '.post-toc-wrap': Pjax.switches.innerHTML
+  },
+  analytics: false,
+  cacheBust: false,
+  scrollTo : !CONFIG.bookmark.enable
+});
+
+window.addEventListener('pjax:success', () => {
+  document.querySelectorAll('script[data-pjax], script#page-configurations, #pjax script').forEach(element => {
+    var code = element.text || element.textContent || element.innerHTML || '';
+    var parent = element.parentNode;
+    parent.removeChild(element);
+    var script = document.createElement('script');
+    if (element.id) {
+      script.id = element.id;
+    }
+    if (element.className) {
+      script.className = element.className;
+    }
+    if (element.type) {
+      script.type = element.type;
+    }
+    if (element.src) {
+      script.src = element.src;
+      // Force synchronous loading of peripheral JS.
+      script.async = false;
+    }
+    if (element.dataset.pjax !== undefined) {
+      script.dataset.pjax = '';
+    }
+    if (code !== '') {
+      script.appendChild(document.createTextNode(code));
+    }
+    parent.appendChild(script);
+  });
+  NexT.boot.refresh();
+  // Define Motion Sequence & Bootstrap Motion.
+  if (CONFIG.motion.enable) {
+    NexT.motion.integrator
+      .init()
+      .add(NexT.motion.middleWares.subMenu)
+      .add(NexT.motion.middleWares.postList)
+      .bootstrap();
+  }
+  NexT.utils.updateSidebarPosition();
+});
+</script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div id="pjax">
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="https://gist.githubusercontent.com/POABOB/65b37ccc358df67efffeedf571219b2a/raw/b26f8f05e0951aa1c22d11122f3232b986012141/md5.min.js"></script>
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : '5aa580a2136b90e75fd6',
+      clientSecret: '128f00ea948ebd5cb1c0c2c7c3a2b81f067257ea',
+      repo        : 'poabob.github.io',
+      owner       : 'POABOB',
+      admin       : ['POABOB'],
+      id          : 'dab8d921b50ed6a5dc58bbc4a245b117',
+        language: 'en | es-ES | fr | ru | zh-CN | zh-TW',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+    </div>
+</body>
+</html>
