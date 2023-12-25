@@ -33,7 +33,7 @@
 <meta property="og:image" content="https://poabob.github.io/images/Golang-Introduction-to-Slice/a.png">
 <meta property="og:image" content="https://poabob.github.io/images/Golang-Introduction-to-Slice/b.png">
 <meta property="article:published_time" content="2023-12-19T18:07:54.000Z">
-<meta property="article:modified_time" content="2023-12-25T07:34:31.623Z">
+<meta property="article:modified_time" content="2023-12-25T07:42:23.897Z">
 <meta property="article:author" content="POABOB">
 <meta property="article:tag" content="array">
 <meta property="article:tag" content="slice">
@@ -240,7 +240,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新於</span>
-                <time title="修改時間：2023-12-25 15:34:31" itemprop="dateModified" datetime="2023-12-25T15:34:31+08:00">2023-12-25</time>
+                <time title="修改時間：2023-12-25 15:42:23" itemprop="dateModified" datetime="2023-12-25T15:42:23+08:00">2023-12-25</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -287,7 +287,7 @@
 <blockquote>
 <p>一旦 Slice 被修改，底層的 Array 元素也會一同被修改。</p>
 </blockquote>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">arr := [<span class="number">4</span>]<span class="keyword">string</span>&#123;<span class="string">"a"</span>,<span class="string">"b"</span>,<span class="string">"c"</span>,<span class="string">"d"</span>&#125; <span class="comment">// len=4, cap=4, value=[a b f d]</span></span><br><span class="line">s := arr[<span class="number">2</span>:<span class="number">3</span>] <span class="comment">// len=1, cap=2, value=[c]</span></span><br><span class="line">s[<span class="number">0</span>] = <span class="string">"f"</span> <span class="comment">// len=1, cap=2, value=[f]</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 忽略 start 或 end，代表從頭取 或是 取至尾端</span></span><br><span class="line">s2 := arr[:<span class="number">2</span>] <span class="comment">// len=2, cap=4, value=[a b]</span></span><br><span class="line">s3 := arr[<span class="number">2</span>:] <span class="comment">// len=2, cap=2, value=[f d]</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 如果再使用 Slice 長度調整時，想要去調整容量，才會使用到 max</span></span><br><span class="line">s4 := arr[:<span class="number">2</span>:<span class="number">3</span>] <span class="comment">// len=2, cap=3, value=[a b]</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">arr := [<span class="number">4</span>]<span class="keyword">string</span>&#123;<span class="string">"a"</span>,<span class="string">"b"</span>,<span class="string">"c"</span>,<span class="string">"d"</span>&#125; <span class="comment">// len=4, cap=4, value=[a b f d]</span></span><br><span class="line">s := arr[<span class="number">2</span>:<span class="number">3</span>] <span class="comment">// len=1, cap=2, value=[c]</span></span><br><span class="line">s[<span class="number">0</span>] = <span class="string">"f"</span> <span class="comment">// len=1, cap=2, value=[f]，此時底層 array 已經變成 [a b f d]</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 忽略 start 或 end，代表從頭取 或是 取至尾端</span></span><br><span class="line">s2 := arr[:<span class="number">2</span>] <span class="comment">// len=2, cap=4, value=[a b]</span></span><br><span class="line">s3 := arr[<span class="number">2</span>:] <span class="comment">// len=2, cap=2, value=[f d]</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 如果再使用 Slice 長度調整時，想要去調整容量，才會使用到 max</span></span><br><span class="line">s4 := arr[:<span class="number">2</span>:<span class="number">3</span>] <span class="comment">// len=2, cap=3, value=[a b]</span></span><br></pre></td></tr></table></figure>
 
 <p>上述的 <code>s2</code>、<code>s3</code> 變數可以看到為什麼明明都是取一樣的長度，可是<strong>容量卻不一樣</strong>呢?</p>
 <p>因為 Slice 是以 <code>start</code> 開始到 <code>原陣列長度</code> 作為其容量大小的預留記憶體，也就是說如果今天有一個 <code>[8]int</code> 要取 <code>array[4:6]</code> 那麼到最後，<code>len</code> 會是 <code>2</code>，則 <code>cap</code> 會是 <code>4</code>。</p>
