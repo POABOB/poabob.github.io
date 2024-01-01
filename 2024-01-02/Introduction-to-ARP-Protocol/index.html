@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+  <meta name="google-site-verification" content="gMiqErWj487BTNydQ4JwPWMijWfHq7w5bqkaC5JPH9c">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"poabob.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":true,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="ARP 協議定義位址解析協定，全名 Address Resolution Protocol，位於 鏈結層 (Link Layer，TCP&#x2F;IP 模型) 中，負責將 32bit IP Address 轉換成 48bit 乙太網地址(MAC Address) 的協議，用來 確定請求的目的網路接口 (Network Interface) 。反之，若是要將 MAC Address 轉換成 IP Addre">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ARP 協議與排查">
+<meta property="og:url" content="https://poabob.github.io/2024-01-02/Introduction-to-ARP-Protocol/index.html">
+<meta property="og:site_name" content="POABOB">
+<meta property="og:description" content="ARP 協議定義位址解析協定，全名 Address Resolution Protocol，位於 鏈結層 (Link Layer，TCP&#x2F;IP 模型) 中，負責將 32bit IP Address 轉換成 48bit 乙太網地址(MAC Address) 的協議，用來 確定請求的目的網路接口 (Network Interface) 。反之，若是要將 MAC Address 轉換成 IP Addre">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://poabob.github.io/images/Introduction-to-ARP-Protocol/a.png">
+<meta property="og:image" content="https://poabob.github.io/images/Introduction-to-ARP-Protocol/b.png">
+<meta property="og:image" content="https://poabob.github.io/images/Introduction-to-ARP-Protocol/c.png">
+<meta property="og:image" content="https://poabob.github.io/images/Introduction-to-ARP-Protocol/d.png">
+<meta property="og:image" content="https://poabob.github.io/images/Introduction-to-ARP-Protocol/e.png">
+<meta property="og:image" content="https://poabob.github.io/images/Introduction-to-ARP-Protocol/f.png">
+<meta property="og:image" content="https://poabob.github.io/images/Introduction-to-ARP-Protocol/g.png">
+<meta property="article:published_time" content="2024-01-01T22:07:13.000Z">
+<meta property="article:modified_time" content="2024-01-01T22:35:11.297Z">
+<meta property="article:author" content="POABOB">
+<meta property="article:tag" content="Backend">
+<meta property="article:tag" content="interview">
+<meta property="article:tag" content="internet">
+<meta property="article:tag" content="SDN">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://poabob.github.io/images/Introduction-to-ARP-Protocol/a.png">
+
+<link rel="canonical" href="https://poabob.github.io/2024-01-02/Introduction-to-ARP-Protocol/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-TW'
+  };
+</script>
+
+  <title>ARP 協議與排查 | POABOB</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-162792341-1"></script>
+    <script data-pjax>
+      if (CONFIG.hostname === location.hostname) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-162792341-1');
+      }
+    </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">POABOB</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">小小工程師的筆記分享</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜尋..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://poabob.github.io/2024-01-02/Introduction-to-ARP-Protocol/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="POABOB">
+      <meta itemprop="description" content="Life is but a span!">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="POABOB">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          ARP 協議與排查
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+              
+
+              <time title="創建時間：2024-01-02 06:07:13 / 修改時間：06:35:11" itemprop="dateCreated datePublished" datetime="2024-01-02T06:07:13+08:00">2024-01-02</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分類於</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%9B%BB%E8%85%A6%E7%B6%B2%E8%B7%AF/" itemprop="url" rel="index"><span itemprop="name">電腦網路</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="ARP-協議"><a href="#ARP-協議" class="headerlink" title="ARP 協議"></a>ARP 協議</h2><h3 id="定義"><a href="#定義" class="headerlink" title="定義"></a>定義</h3><p><strong>位址解析協定</strong>，全名 Address Resolution Protocol，位於 <code>鏈結層</code> (<code>Link Layer</code>，<code>TCP/IP</code> 模型) 中，負責將 <code>32bit</code> <code>IP</code> Address 轉換成 <code>48bit</code> 乙太網地址(<code>MAC</code> Address) 的協議，用來 <code>確定請求的目的網路接口 (Network Interface)</code> 。反之，若是要將 MAC Address 轉換成 IP Address，則是使用 <code>RARP</code> 協議。</p>
+<a id="more"></a>
+
+<h3 id="運作原理"><a href="#運作原理" class="headerlink" title="運作原理"></a>運作原理</h3><p>假如當前的 Node A (120.107.152.137) 想要向 IP Address 為 120.107.152.4 的 Node 發送請求，這時候 Node A 其實不知道對應的會是 <code>哪一個 Node</code> 以及 <code>哪一個網路介面</code>，所以就會發 <code>ARP Request</code> (查詢 120.107.152.4) <code>廣播</code> 該網路區段內 的 Nodes。</p>
+<p>每個 Node 一旦收到請求就會判斷 <code>目標是否為自己</code>，若不是則直接 <code>丟包</code>，反之，則將自己的 <code>MAC Address</code> 返回。最後，Node D (120.107.152.4) 就會根據 <code>ARP Reply</code> (返回 10-bf-48-1a-2a-c1) 將結果儲存於 <code>ARP Cache</code>，做為後續直接的使用。</p>
+<p><img src="/images/Introduction-to-ARP-Protocol/a.png" alt="a"></p>
+<h3 id="ARP-Cache"><a href="#ARP-Cache" class="headerlink" title="ARP Cache"></a>ARP Cache</h3><p>APR 為了 <code>避免</code> 每次都要廣播查找 MAC Address，都會將廣播獲取的結果 <code>進行 Cached</code>，一般過期時間為 <code>20 分鐘</code>，如果遇到像是 <code>&lt;incomplete&gt;</code> 這種不完整的資料，則是 <code>3 分鐘</code>。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">$ arp -a</span><br><span class="line"><span class="comment"># ...</span></span><br><span class="line">? (10.244.0.19) at 1e:da:43:8f:b7:4c [ether] on kube-bridge</span><br><span class="line">? (10.244.0.15) at 56:82:d1:0e:9e:04 [ether] on kube-bridge</span><br><span class="line">? (10.244.0.18) at a2:40:ff:bf:b0:43 [ether] on kube-bridge</span><br><span class="line">? (10.244.0.4) at &lt;incomplete&gt; on kube-bridge</span><br></pre></td></tr></table></figure>
+
+<p>通常可以使用 arp 指令查找相關資訊：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 顯示所有 Cache 的資料</span></span><br><span class="line">$ arp -a</span><br><span class="line"></span><br><span class="line"><span class="comment"># 新增靜態的 ARP 紀錄，若需要 `永久保存`，則要修改 `/etc/ethers` 檔案</span></span><br><span class="line">$ arp -s ip \&lt;ip-address\&gt; mac \&lt;mac-address\&gt;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 讓 `/etc/ethers` 中的靜態 ARP 紀錄 `生效`</span></span><br><span class="line">$ arp -f</span><br></pre></td></tr></table></figure>
+
+<h3 id="ARP-格式"><a href="#ARP-格式" class="headerlink" title="ARP 格式"></a>ARP 格式</h3><ul>
+<li>Hardware Type：表示 <code>發送主機使用之網路實體介面種類</code>，例如：<code>1</code> 表示 <code>Ethernet 網路介面</code>。</li>
+<li>Protocol Type：表示 <code>所使用的通訊協定</code>， <code>0x0800</code> 表示 <code>IP</code> 協定。</li>
+<li>Operation Type：表示此 <code>封包的工作模式</code>：<blockquote>
+<p>1：ARP Request</p>
+<p>2：ARP Reply</p>
+<p>3：RARP Request</p>
+<p>4：RARP Reply</p>
+</blockquote>
+</li>
+<li>HLEN：<code>網路介面卡硬體位址長度</code>。例如： Ethernet 位址的長度為 6。</li>
+<li>PLEN：<code>網路協定位址長度</code>。因為 IP 位址長 4 個位元組，此值為 4。</li>
+<li>Sender HW：<code>發送端的硬體位址</code>。如果是 Ethernet 網路的話，此為 6 個位元組長的地址，例如： 04:d9:f5:bc:93:8e。</li>
+<li>Target HW：<code>目的地的硬體位址</code>。</li>
+<li>Sender IP：<code>發送端的 IP 位址</code>，例如：120.107.152.137。</li>
+<li>Target IP：<code>目的地的 IP 位址</code>，例如：120.107.152.4。</li>
+</ul>
+<p><img src="/images/Introduction-to-ARP-Protocol/b.png" alt="b"></p>
+<h3 id="RARP-協議"><a href="#RARP-協議" class="headerlink" title="RARP 協議"></a>RARP 協議</h3><p>RARP 早期是用來替 <code>diskless</code> 或 <code>無法儲存自己 IP</code> 的設備提供 IP Address，透過 RARP 可以 <code>廣播</code> 自身 Node 的 <code>MAC Address</code>，向 <code>RARP Server</code> 請求分配一個 IP Address。雖然早期很常使用 RARP 協議，但它已經被 <code>DHCP</code> (Dynamic Host Configuration Protocol) 給取代，因為 DHCP 提供 <code>更彈性</code> 與 <code>更多功能</code> 來 動態分配 IP Addresses，目前主要出現於 <code>嵌入式系統</code> 和 <code>需要預先分配 IP Address 的網路設備</code> 之中。</p>
+<h2 id="ARP-排查"><a href="#ARP-排查" class="headerlink" title="ARP 排查"></a>ARP 排查</h2><h3 id="排查方式"><a href="#排查方式" class="headerlink" title="排查方式"></a>排查方式</h3><p>本篇文章將會使用本機的環境 (120.107.152.137) 向 lab server (120.107.152.4) 使用 ping 指令發送請求，讓其自動產生 ARP 紀錄，並且透過 <span class="exturl" data-url="aHR0cHM6Ly93d3cud2lyZXNoYXJrLm9yZy8=">Wireshark<i class="fa fa-external-link-alt"></i></span> 對其封包進行解析。</p>
+<ol>
+<li>清除電腦內的 ARP Cache。</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">$ arp -d</span><br><span class="line"></span><br><span class="line">$ arp -a</span><br><span class="line">介面: 120.107.152.137 --- 0x5</span><br><span class="line">  網際網路網址           實體位址               類型</span><br><span class="line">  224.0.0.2             01-00-5e-00-00-02     靜態</span><br><span class="line">  224.0.0.22            01-00-5e-00-00-16     靜態</span><br><span class="line"></span><br><span class="line">介面: 172.19.192.1 --- 0x12</span><br><span class="line">  網際網路網址           實體位址               類型</span><br><span class="line">  224.0.0.22            01-00-5e-00-00-16     靜態</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>開啟 Wireshark，分別輸入 <code>eth.type == 0x0806</code> 和 <code>host 120.107.152.137</code>，用作於攔截與 host 120.107.152.137 相關的 ARP Request，並點擊 <code>乙太網路 2</code>。</li>
+</ol>
+<p><img src="/images/Introduction-to-ARP-Protocol/c.png" alt="c"></p>
+<ol start="3">
+<li>開啟 cmd，ping 目的地址 120.107.152.4。</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">$ ping 120.107.152.4</span><br><span class="line"></span><br><span class="line">Ping 120.107.152.4 (使用 32 位元組的資料):</span><br><span class="line">回覆自 120.107.152.4: 位元組=32 時間&lt;1ms TTL=64</span><br><span class="line">回覆自 120.107.152.4: 位元組=32 時間&lt;1ms TTL=64</span><br><span class="line">回覆自 120.107.152.4: 位元組=32 時間&lt;1ms TTL=64</span><br><span class="line">回覆自 120.107.152.4: 位元組=32 時間&lt;1ms TTL=64</span><br><span class="line"></span><br><span class="line">120.107.152.4 的 Ping 統計資料:</span><br><span class="line">    封包: 已傳送 = 4，已收到 = 4, 已遺失 = 0 (0% 遺失)，大約的來回時間 (毫秒):</span><br><span class="line">    最小值 = 0ms，最大值 = 0ms，平均 = 0ms</span><br></pre></td></tr></table></figure>
+
+<ol start="4">
+<li>在 Wireshark 點擊排查這兩條紀錄，其封包的組成會由 <code>Ethernet header</code> (18 bytes) 和 <code>ARP packet</code> (24 bytes) 組成。</li>
+</ol>
+<p><img src="/images/Introduction-to-ARP-Protocol/d.png" alt="d"></p>
+<p><img src="/images/Introduction-to-ARP-Protocol/e.png" alt="e"></p>
+<ol start="5">
+<li>ARP Request 排查。</li>
+</ol>
+<p><strong>Ethernet header</strong>：</p>
+<ul>
+<li>Destination：<code>目的</code> 位址。Broadcast ff:ff:ff:ff:ff:ff</li>
+<li>Source：<code>來源</code> 位址。04:d9:f5:bc:93:8e</li>
+<li>Type：封包 <code>類型</code>。ARP (0x0806)</li>
+</ul>
+<p><strong>ARP packet</strong>：</p>
+<ul>
+<li>Hardware type：Ethernet (1)</li>
+<li>Protocol type：IPv4 (0x0800)</li>
+<li>Hardware size：6</li>
+<li>Protocol type：4</li>
+<li>Opcode：request (1)</li>
+<li>Sender MAC address：04:d9:f5:bc:93:8e</li>
+<li>Sender IP address：120.107.152.137</li>
+<li>Target MAC address：00:00:00:00:00:00</li>
+<li>Target IP address：120.107.152.4</li>
+</ul>
+<p><img src="/images/Introduction-to-ARP-Protocol/f.png" alt="f"></p>
+<ol start="6">
+<li>ARP Reply 排查。</li>
+</ol>
+<p><strong>Ethernet header</strong>：</p>
+<ul>
+<li>Destination：04:d9:f5:bc:93:8e</li>
+<li>Source：10:bf:48:1a:2a:c1</li>
+<li>Type：ARP (0x0806)</li>
+<li>Padding：確保 Header 格式 <code>以 32 bits 長度</code> 呈現的補0</li>
+</ul>
+<p><strong>ARP packet</strong>：</p>
+<ul>
+<li>Hardware type：Ethernet (1)</li>
+<li>Protocol type：IPv4 (0x0800)</li>
+<li>Hardware size：6</li>
+<li>Protocol type：4</li>
+<li>Opcode：reply(2)</li>
+<li>Sender MAC address：10:bf:48:1a:2a:c1</li>
+<li>Sender IP address：120.107.152.4</li>
+<li>Target MAC address：04:d9:f5:bc:93:8e</li>
+<li>Target IP address：120.107.152.137</li>
+</ul>
+<p><img src="/images/Introduction-to-ARP-Protocol/g.png" alt="g"></p>
+<ol start="7">
+<li>查看 ARP Cache，這邊就會記錄剛剛所獲取到的 MAC Address。</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">$ arp -a</span><br><span class="line"></span><br><span class="line">介面: 120.107.152.137 --- 0x5</span><br><span class="line">  網際網路網址           實體位址               類型</span><br><span class="line">  120.107.152.4         10-bf-48-1a-2a-c1     動態</span><br><span class="line">  224.0.0.2             01-00-5e-00-00-02     靜態</span><br><span class="line">  224.0.0.22            01-00-5e-00-00-16     靜態</span><br><span class="line"></span><br><span class="line">介面: 172.19.192.1 --- 0x12</span><br><span class="line">  網際網路網址           實體位址               類型</span><br><span class="line">  224.0.0.2             01-00-5e-00-00-02     靜態</span><br><span class="line">  224.0.0.22            01-00-5e-00-00-16     靜態</span><br></pre></td></tr></table></figure>
+
+<h2 id="參考資料"><a href="#參考資料" class="headerlink" title="參考資料"></a>參考資料</h2><ul>
+<li><span class="exturl" data-url="aHR0cHM6Ly93d3cuZ2Vla3Nmb3JnZWVrcy5vcmcvd2hhdC1pcy1yYXJwLw==">https://www.geeksforgeeks.org/what-is-rarp/<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly93d3cudHNuaWVuLmlkdi50dy9NYW5hZ2VyX1dlYkJvb2svY2hhcDQvNC0yJTIwQVJQJTIwJUU1JThEJTk0JUU1JUFFJTlBJUU4JTg4JTg3JUU1JTg4JTg2JUU2JTlFJTkwLmh0bWw=">https://www.tsnien.idv.tw/Manager_WebBook/chap4/4-2 ARP 協定與分析.html<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly9zZG4uZmVpc2t5Lnh5ei93YW5nLWx1by1qaS1jaHUvaW5kZXgvYXJw">https://sdn.feisky.xyz/wang-luo-ji-chu/index/arp<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly9pbmZvLnN1cHBvcnQuaHVhd2VpLmNvbS9pbmZvLWZpbmRlci9lbmN5Y2xvcGVkaWEvZW4vQVJQLmh0bWw=">https://info.support.huawei.com/info-finder/encyclopedia/en/ARP.html<i class="fa fa-external-link-alt"></i></span></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        <div>
+        
+            <div style="text-align:center;color: #ccc;font-size:14px;">------ 本文結束 ------</div>
+        
+        </div>
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>作者： </strong>POABOB
+  </li>
+  <li class="post-copyright-link">
+    <strong>文章連結：</strong>
+    <a href="https://poabob.github.io/2024-01-02/Introduction-to-ARP-Protocol/" title="ARP 協議與排查">https://poabob.github.io/2024-01-02/Introduction-to-ARP-Protocol/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版權聲明： </strong>本網誌所有文章除特別聲明外，均採用 <span class="exturl" data-url="aHR0cHM6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LW5jLXNhLzQuMC96aC1UVw=="><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</span> 許可協議。轉載請註明出處！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Backend/" rel="tag"># Backend</a>
+              <a href="/tags/interview/" rel="tag"># interview</a>
+              <a href="/tags/internet/" rel="tag"># internet</a>
+              <a href="/tags/SDN/" rel="tag"># SDN</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023-12-25/Introduction-to-Program-Process-Thread/" rel="prev" title="Program、Process、Thread 介紹">
+      <i class="fa fa-chevron-left"></i> Program、Process、Thread 介紹
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+  <div id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#ARP-協議"><span class="nav-number">1.</span> <span class="nav-text">ARP 協議</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#定義"><span class="nav-number">1.1.</span> <span class="nav-text">定義</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#運作原理"><span class="nav-number">1.2.</span> <span class="nav-text">運作原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ARP-Cache"><span class="nav-number">1.3.</span> <span class="nav-text">ARP Cache</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ARP-格式"><span class="nav-number">1.4.</span> <span class="nav-text">ARP 格式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RARP-協議"><span class="nav-number">1.5.</span> <span class="nav-text">RARP 協議</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ARP-排查"><span class="nav-number">2.</span> <span class="nav-text">ARP 排查</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#排查方式"><span class="nav-number">2.1.</span> <span class="nav-text">排查方式</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#參考資料"><span class="nav-number">3.</span> <span class="nav-text">參考資料</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="POABOB"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">POABOB</p>
+  <div class="site-description" itemprop="description">Life is but a span!</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">16</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">51</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL1BPQUJPQg==" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;POABOB"><i class="fab fa-github fa-fw"></i>GitHub</span>
+      </span>
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="bWFpbHRvOnp4Yzc1MjE2NkBnbWFpbC5jb20=" title="E-Mail → mailto:zxc752166@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</span>
+      </span>
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="aHR0cHM6Ly93d3cuZmFjZWJvb2suY29tL3Byb2ZpbGUucGhwP2lkPTEwMDAwMDMyMTQwMDU5MA==" title="FB Page → https:&#x2F;&#x2F;www.facebook.com&#x2F;profile.php?id&#x3D;100000321400590"><i class="fab fa-facebook fa-fw"></i>FB Page</span>
+      </span>
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="aHR0cHM6Ly9pbnN0YWdyYW0uY29tLzB4N2YyZWI=" title="Instagram → https:&#x2F;&#x2F;instagram.com&#x2F;0x7f2eb"><i class="fab fa-instagram fa-fw"></i>Instagram</span>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">POABOB</span>
+</div>
+  <div class="powered-by">由 <span class="exturl theme-link" data-url="aHR0cHM6Ly9oZXhvLmlv">Hexo</span> & <span class="exturl theme-link" data-url="aHR0cHM6Ly9waXNjZXMudGhlbWUtbmV4dC5vcmc=">NexT.Pisces</span> 強力驅動
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/pjax/pjax.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+  <script>
+var pjax = new Pjax({
+  selectors: [
+    'head title',
+    '#page-configurations',
+    '.content-wrap',
+    '.post-toc-wrap',
+    '.languages',
+    '#pjax'
+  ],
+  switches: {
+    '.post-toc-wrap': Pjax.switches.innerHTML
+  },
+  analytics: false,
+  cacheBust: false,
+  scrollTo : !CONFIG.bookmark.enable
+});
+
+window.addEventListener('pjax:success', () => {
+  document.querySelectorAll('script[data-pjax], script#page-configurations, #pjax script').forEach(element => {
+    var code = element.text || element.textContent || element.innerHTML || '';
+    var parent = element.parentNode;
+    parent.removeChild(element);
+    var script = document.createElement('script');
+    if (element.id) {
+      script.id = element.id;
+    }
+    if (element.className) {
+      script.className = element.className;
+    }
+    if (element.type) {
+      script.type = element.type;
+    }
+    if (element.src) {
+      script.src = element.src;
+      // Force synchronous loading of peripheral JS.
+      script.async = false;
+    }
+    if (element.dataset.pjax !== undefined) {
+      script.dataset.pjax = '';
+    }
+    if (code !== '') {
+      script.appendChild(document.createTextNode(code));
+    }
+    parent.appendChild(script);
+  });
+  NexT.boot.refresh();
+  // Define Motion Sequence & Bootstrap Motion.
+  if (CONFIG.motion.enable) {
+    NexT.motion.integrator
+      .init()
+      .add(NexT.motion.middleWares.subMenu)
+      .add(NexT.motion.middleWares.postList)
+      .bootstrap();
+  }
+  NexT.utils.updateSidebarPosition();
+});
+</script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div id="pjax">
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="https://gist.githubusercontent.com/POABOB/65b37ccc358df67efffeedf571219b2a/raw/b26f8f05e0951aa1c22d11122f3232b986012141/md5.min.js"></script>
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : '5aa580a2136b90e75fd6',
+      clientSecret: '128f00ea948ebd5cb1c0c2c7c3a2b81f067257ea',
+      repo        : 'poabob.github.io',
+      owner       : 'POABOB',
+      admin       : ['POABOB'],
+      id          : 'f4aff565454502d8fe431a292a433c6c',
+        language: 'en | es-ES | fr | ru | zh-CN | zh-TW',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+    </div>
+</body>
+</html>
