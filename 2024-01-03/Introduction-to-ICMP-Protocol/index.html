@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+  <meta name="google-site-verification" content="gMiqErWj487BTNydQ4JwPWMijWfHq7w5bqkaC5JPH9c">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"poabob.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":true,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="ICMP 協議定義網際控制訊息協定，全稱 Internet Control Message Protocol。主要功能是用來 偵測網路當前的狀況，因為透過 IP 在網路傳遞資料不怎麼可靠，傳遞過程必須經過 多個路由器 轉發才能夠送達目的地，那麼為了確保轉發前能夠安全送達，所以就有了 ICMP 協議。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ICMP 協議與排查">
+<meta property="og:url" content="https://poabob.github.io/2024-01-03/Introduction-to-ICMP-Protocol/index.html">
+<meta property="og:site_name" content="POABOB">
+<meta property="og:description" content="ICMP 協議定義網際控制訊息協定，全稱 Internet Control Message Protocol。主要功能是用來 偵測網路當前的狀況，因為透過 IP 在網路傳遞資料不怎麼可靠，傳遞過程必須經過 多個路由器 轉發才能夠送達目的地，那麼為了確保轉發前能夠安全送達，所以就有了 ICMP 協議。">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://poabob.github.io/images/Introduction-to-ICMP-Protocol/a.png">
+<meta property="og:image" content="https://poabob.github.io/images/Introduction-to-ICMP-Protocol/b.png">
+<meta property="og:image" content="https://poabob.github.io/images/Introduction-to-ICMP-Protocol/c.png">
+<meta property="og:image" content="https://poabob.github.io/images/Introduction-to-ICMP-Protocol/d.png">
+<meta property="og:image" content="https://poabob.github.io/images/Introduction-to-ICMP-Protocol/e.png">
+<meta property="og:image" content="https://poabob.github.io/images/Introduction-to-ICMP-Protocol/f.png">
+<meta property="og:image" content="https://poabob.github.io/images/Introduction-to-ICMP-Protocol/g.png">
+<meta property="og:image" content="https://poabob.github.io/images/Introduction-to-ICMP-Protocol/h.png">
+<meta property="og:image" content="https://poabob.github.io/images/Introduction-to-ICMP-Protocol/i.png">
+<meta property="og:image" content="https://poabob.github.io/images/Introduction-to-ICMP-Protocol/j.png">
+<meta property="og:image" content="https://poabob.github.io/images/Introduction-to-ICMP-Protocol/k.png">
+<meta property="og:image" content="https://poabob.github.io/images/Introduction-to-ICMP-Protocol/l.png">
+<meta property="og:image" content="https://poabob.github.io/images/Introduction-to-ICMP-Protocol/m.png">
+<meta property="og:image" content="https://poabob.github.io/images/Introduction-to-ICMP-Protocol/n.png">
+<meta property="og:image" content="https://poabob.github.io/images/Introduction-to-ICMP-Protocol/o.png">
+<meta property="article:published_time" content="2024-01-02T18:07:13.000Z">
+<meta property="article:modified_time" content="2024-01-02T18:40:29.774Z">
+<meta property="article:author" content="POABOB">
+<meta property="article:tag" content="Backend">
+<meta property="article:tag" content="interview">
+<meta property="article:tag" content="internet">
+<meta property="article:tag" content="SDN">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://poabob.github.io/images/Introduction-to-ICMP-Protocol/a.png">
+
+<link rel="canonical" href="https://poabob.github.io/2024-01-03/Introduction-to-ICMP-Protocol/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-TW'
+  };
+</script>
+
+  <title>ICMP 協議與排查 | POABOB</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-162792341-1"></script>
+    <script data-pjax>
+      if (CONFIG.hostname === location.hostname) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-162792341-1');
+      }
+    </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">POABOB</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">小小工程師的筆記分享</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜尋..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://poabob.github.io/2024-01-03/Introduction-to-ICMP-Protocol/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="POABOB">
+      <meta itemprop="description" content="Life is but a span!">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="POABOB">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          ICMP 協議與排查
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+              
+
+              <time title="創建時間：2024-01-03 02:07:13 / 修改時間：02:40:29" itemprop="dateCreated datePublished" datetime="2024-01-03T02:07:13+08:00">2024-01-03</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分類於</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%9B%BB%E8%85%A6%E7%B6%B2%E8%B7%AF/" itemprop="url" rel="index"><span itemprop="name">電腦網路</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="ICMP-協議"><a href="#ICMP-協議" class="headerlink" title="ICMP 協議"></a>ICMP 協議</h2><h3 id="定義"><a href="#定義" class="headerlink" title="定義"></a>定義</h3><p><strong>網際控制訊息協定</strong>，全稱 Internet Control Message Protocol。主要功能是用來 <code>偵測網路當前的狀況</code>，因為透過 IP 在網路傳遞資料不怎麼可靠，傳遞過程必須經過 <code>多個路由器</code> 轉發才能夠送達目的地，那麼為了確保轉發前能夠安全送達，所以就有了 ICMP 協議。</p>
+<a id="more"></a>
+
+<p>在網路上，<code>每一個 Node</code> 或是 <code>路由器</code> 都會支援 ICMP 協議，在 <code>彼此的傳遞過程</code> 就可以來互相交換目前網路的狀況資訊，一旦在傳遞的過程中發生錯誤 (例如：主機不可達、路由不可達、網路中斷等)，ICMP 協議就會將這些 <code>錯誤資訊的封包傳回主機</code> 進行 <code>錯誤處理</code>。</p>
+<p>其中，ICMP 所產生的報文有兩種，分別是 <code>障礙通知</code> 和 <code>狀況查詢</code>：</p>
+<ol>
+<li><code>障礙通知</code>：當主機封包傳送至一半發生問題而無發繼續傳遞，ICMP 就會 <code>將原因回傳原主機</code>。</li>
+</ol>
+<p><img src="/images/Introduction-to-ICMP-Protocol/a.png" alt="a"></p>
+<ol start="2">
+<li><code>狀況查詢</code>：透過發送 ICMP 來 <code>查詢目前網路狀況</code>。</li>
+</ol>
+<p><img src="/images/Introduction-to-ICMP-Protocol/b.png" alt="b"></p>
+<blockquote>
+<p>圖片中的不論是 <code>路由器 (1、2)</code> 還是 <code>Host B (3)</code>，<code>都有可能</code> 回傳 ICMP，畢竟我們不知道經過的這些路徑中，是否每個能夠正常運作。</p>
+</blockquote>
+<h3 id="ICMP-格式"><a href="#ICMP-格式" class="headerlink" title="ICMP 格式"></a>ICMP 格式</h3><p>ICMP 的報文則是 <code>被嵌入在 IP 報文</code> 內，但是 ICMP 的長度不是固定的，會根據 <code>訊息的類型</code> 而異。</p>
+<p><img src="/images/Introduction-to-ICMP-Protocol/c.png" alt="c"></p>
+<p>內部 ICMP 格式：</p>
+<ul>
+<li>Message Type：表示 <code>ICMP 的訊息類型</code>，總共有 <code>13 種</code> 的類型，請參考下表。</li>
+<li>Code：<code>編碼</code>，對各種訊息類型 <code>進一步說明</code> 工作內容，通常都會是 <code>0</code>，類似於 <code>HTTP Status Code</code>。</li>
+<li>Checksum：<code>錯誤檢查</code>，用於封包進行錯誤檢查，該校驗和是從 <code>ICMP Header 和 Data</code> 替換為 0 的數據計算得出的，Checksum 的演算法則是明確被定義於 <span class="exturl" data-url="aHR0cHM6Ly9kYXRhdHJhY2tlci5pZXRmLm9yZy9kb2MvaHRtbC9yZmMxMDcx">RFC 1071<i class="fa fa-external-link-alt"></i></span> 。</li>
+<li>Message Description：<code>訊息說明</code>。</li>
+<li>Message Data：<code>訊息資料</code>。</li>
+</ul>
+<p><img src="/images/Introduction-to-ICMP-Protocol/d.png" alt="d"></p>
+<table>
+<thead>
+<tr>
+<th>Message Type</th>
+<th>ICMP 訊息功能</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0</td>
+<td>Echo Reply（回應答覆）</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Destination Unreachable（目的地無法到達）</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Source Quench（來源抑制）</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Redirect（改變傳輸路徑）</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Echo Request（回應要求）</td>
+</tr>
+<tr>
+<td>9</td>
+<td>Router Advertisement（路由器宣傳）</td>
+</tr>
+<tr>
+<td>10</td>
+<td>Router Solicitation（路由器懇請）</td>
+</tr>
+<tr>
+<td>11</td>
+<td>Time Exceeded for a Datagram（溢時傳輸）</td>
+</tr>
+<tr>
+<td>12</td>
+<td>Parameter Problem on a Datagram（參數問題）</td>
+</tr>
+<tr>
+<td>13</td>
+<td>Timestamp Request（時間標籤要求）</td>
+</tr>
+<tr>
+<td>14</td>
+<td>Timestamp Reply（時間標籤回覆）</td>
+</tr>
+<tr>
+<td>15</td>
+<td>Information Request（資訊要求）（停用）</td>
+</tr>
+<tr>
+<td>16</td>
+<td>Information Reply（資訊回覆）（停用）</td>
+</tr>
+<tr>
+<td>17</td>
+<td>Address Mask Request（位址遮罩要求）</td>
+</tr>
+<tr>
+<td>18</td>
+<td>Address Mask Reply（位址遮罩回覆）</td>
+</tr>
+</tbody></table>
+<h3 id="Ping"><a href="#Ping" class="headerlink" title="Ping"></a>Ping</h3><p>Ping 是一個簡單的網路工具，用於測試與驗證 <code>目標的 IP Address 是否可用</code>，或是評估彼此之間的<code>往返的時間 (RTT，Round Trip Time)</code>，而 Ping 就是使用 ICMP 協議的 <code>Echo Request</code> 向需要評估的網路介面傳遞封包並等待 <code>Echo Reply</code>。</p>
+<h4 id="使用範例"><a href="#使用範例" class="headerlink" title="使用範例"></a>使用範例</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 設定 ping 的間隔秒數</span></span><br><span class="line">ping -i 2 &lt;IP Address&gt;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 確認本地的網路介面是否正常運作</span></span><br><span class="line">ping 0</span><br><span class="line"></span><br><span class="line"><span class="comment"># 設定傳遞封包數量</span></span><br><span class="line">ping -c 1 google.com</span><br><span class="line"></span><br><span class="line"><span class="comment"># 設定傳遞封包的大小</span></span><br><span class="line">ping -s 70 localhost</span><br></pre></td></tr></table></figure>
+
+<h3 id="Traceroute"><a href="#Traceroute" class="headerlink" title="Traceroute"></a>Traceroute</h3><p>在 <code>IP Header</code> 中的 <code>Options</code> 欄位佔用了 <code>0-40 bytes</code> (Padding 則是為了讓 IP Header 能夠 <code>以 32位元為倍數</code>，補足 <code>Options</code> 的長度)，其中這個位置就是 ping 用來 <code>存放經過的路由 IP</code>。</p>
+<p>不過在 Options 內又會有 <code>3 bytes</code> 用來儲存欄位資訊，所以最後只會剩下 <code>37 bytes</code> 能夠儲存 IP Address，以 IPv4 的格式計算的話，每個 IP Address <code>佔用 4 bytes</code>，最多只能存放 <code>9 個路由</code> 的 IP 位址。</p>
+<p><img src="/images/Introduction-to-ICMP-Protocol/e.png" alt="e"></p>
+<p>由於這樣的限制，而 traceroute 有了迫切的需求，traceroute 的運作原理則是透過 <code>UDP</code> 協議和 <code>TTL (Time to Live)</code> 去作為 <code>每個路由器的計數器</code>，每次到達一個路由時，就會讓其 <code>TTL 減 1</code> ，若是 <code>TTL 歸 0</code> 則就會用 <code>ICMP 的超時報文 (Time to live exceed in-transit)</code> 返回原本的主機。</p>
+<p>然後再次使用 UDP 協議，但 TTL 會隨著每次經過的路由器而疊加，直到抵達目的 IP Address 後返回 ICMP <code>端口不可達報文 (Port unreachable)</code>。</p>
+<p>透過每次 TTL 的疊加計算，就可以突破 IP Header 中的 9 個 IP 位址的上限。</p>
+<p><img src="/images/Introduction-to-ICMP-Protocol/f.png" alt="f"></p>
+<blockquote>
+<p>每個 TTL 都會 <code>發送 3 個封包</code>，並且會 <code>計算來回的時間</code>。若是 <code>5 秒內</code> 沒有收到任一份回應，就會打印 <code>星號 (*)</code>。</p>
+</blockquote>
+<h4 id="使用場景"><a href="#使用場景" class="headerlink" title="使用場景"></a>使用場景</h4><p>通常 Ping 是用來去判斷 <code>兩者之間的網路運作是否正常</code> 和 <code>整體的回應時間</code>，而使用 traceroute 則是針對了解 <code>所經過路由器的延遲時間</code> 進而分析更細部的問題。</p>
+<h4 id="使用範例-1"><a href="#使用範例-1" class="headerlink" title="使用範例"></a>使用範例</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">$ traceroute google.com</span><br><span class="line">traceroute to google.com (142.251.43.14), 64 hops max, 52 byte packets</span><br><span class="line"> 1  192.168.1.1 (192.168.1.1)  6.504 ms  3.320 ms  3.425 ms</span><br><span class="line"> 2  h254.s98.ts.hinet.net (168.95.98.254)  4.404 ms  4.264 ms  5.237 ms</span><br><span class="line"> 3  chch-3332.hinet.net (168.95.157.30)  5.552 ms  4.572 ms  5.177 ms</span><br><span class="line"> 4  chch-3032.hinet.net (220.128.20.22)  7.249 ms  32.056 ms  6.029 ms</span><br><span class="line"> 5  * * tylc-3032.hinet.net (220.128.19.10)  13.853 ms</span><br><span class="line"> 6  pcpd-3332.hinet.net (220.128.13.233)  7.790 ms</span><br><span class="line">    tyfo-3335.hinet.net (220.128.9.17)  7.972 ms</span><br><span class="line">    tyfo-3335.hinet.net (220.128.8.17)  7.622 ms</span><br><span class="line"> 7  72.14.196.80 (72.14.196.80)  8.522 ms</span><br><span class="line">    142.250.169.120 (142.250.169.120)  7.608 ms</span><br><span class="line">    72.14.202.34 (72.14.202.34)  9.744 ms</span><br><span class="line"> 8  * * *</span><br><span class="line"> 9  108.170.244.65 (108.170.244.65)  17.301 ms</span><br><span class="line">    tsa03s08-in-f14.1e100.net (142.251.43.14)  7.572 ms</span><br><span class="line">    108.170.244.65 (108.170.244.65)  9.112 ms</span><br></pre></td></tr></table></figure>
+
+<h2 id="ICMP-排查"><a href="#ICMP-排查" class="headerlink" title="ICMP 排查"></a>ICMP 排查</h2><p>本篇文章將會使用本機的環境 (Macbook) 向 <code>8.8.8.8</code> Google 的 DNS Server 使用 <code>ping</code> 與 <code>traceroute</code> 工具發送請求，並且透過 Wireshark 對其封包進行解析。</p>
+<h3 id="Ping-1"><a href="#Ping-1" class="headerlink" title="Ping"></a>Ping</h3><ol>
+<li>開啟 Wireshark，並在篩選輸入 <code>ip.addr == 8.8.8.8</code> 來查找與該位址一樣的封包，選擇 <code>WiFi en0 的網路介面</code> (網路介面依電腦環境而異，如果是使用乙太網路，可以選擇 <code>乙太網路</code> 的選項)，並且網路介面上的 filter 輸入 <code>host 8.8.8.8</code>。</li>
+</ol>
+<p><img src="/images/Introduction-to-ICMP-Protocol/g.png" alt="g"></p>
+<ol start="2">
+<li>開啟 command line，輸入 ping 指令，執行 4 次，並可以從 Wireshark 看到封包的動向。</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">$ ping -c 4 8.8.8.8</span><br><span class="line">PING 8.8.8.8 (8.8.8.8): 56 data bytes</span><br><span class="line">64 bytes from 8.8.8.8: icmp_seq=0 ttl=116 time=7.829 ms</span><br><span class="line">64 bytes from 8.8.8.8: icmp_seq=1 ttl=116 time=9.805 ms</span><br><span class="line">64 bytes from 8.8.8.8: icmp_seq=2 ttl=116 time=16.072 ms</span><br><span class="line">64 bytes from 8.8.8.8: icmp_seq=3 ttl=116 time=13.649 ms</span><br><span class="line"></span><br><span class="line">--- 8.8.8.8 ping statistics ---</span><br><span class="line">4 packets transmitted, 4 packets received, 0.0% packet loss</span><br><span class="line">round-trip min/avg/max/stddev = 7.829/11.839/16.072/3.218 ms</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Introduction-to-ICMP-Protocol/h.png" alt="h"></p>
+<ol start="3">
+<li>ICMP Echo Request 排查。</li>
+</ol>
+<p><img src="/images/Introduction-to-ICMP-Protocol/i.png" alt="i"></p>
+<ul>
+<li>Type：<code>8 (Echo request)</code></li>
+<li>Code：0</li>
+<li>Checksum：0x97d6</li>
+<li>Identifier：(0xbcf1)(0xf1bc)</li>
+<li>Sequence number：(0x0000)(0x0000)</li>
+</ul>
+<p><img src="/images/Introduction-to-ICMP-Protocol/j.png" alt="j"></p>
+<ol start="4">
+<li>ICMP Echo Reply 排查。</li>
+</ol>
+<p><img src="/images/Introduction-to-ICMP-Protocol/k.png" alt="k"></p>
+<ul>
+<li>Type：<code>0 (Echo reply)</code></li>
+<li>Code：0</li>
+<li>Checksum：0x9fd6</li>
+</ul>
+<h3 id="Traceroute-1"><a href="#Traceroute-1" class="headerlink" title="Traceroute"></a>Traceroute</h3><ol>
+<li>操作如 Ping 的 <code>步驟一</code>。</li>
+<li>使用 command line，執行 traceroute。</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">$ traceroute 8.8.8.8</span><br><span class="line">traceroute to 8.8.8.8 (8.8.8.8), 64 hops max, 52 byte packets</span><br><span class="line"> 1  192.168.1.1 (192.168.1.1)  12.289 ms  4.513 ms  3.154 ms</span><br><span class="line"> 2  h254.s98.ts.hinet.net (168.95.98.254)  3.609 ms  4.799 ms  3.971 ms</span><br><span class="line"> 3  chch-3332.hinet.net (168.95.157.26)  4.961 ms  5.156 ms  5.000 ms</span><br><span class="line"> 4  chch-3032.hinet.net (220.128.20.22)  7.773 ms  7.852 ms  7.222 ms</span><br><span class="line"> 5  tylc-3032.hinet.net (220.128.19.10)  7.439 ms  7.429 ms *</span><br><span class="line"> 6  tylc-3336.hinet.net (220.128.9.21)  15.753 ms</span><br><span class="line">    pcpd-3331.hinet.net (220.128.14.81)  7.435 ms</span><br><span class="line">    pcpd-3331.hinet.net (220.128.12.109)  8.335 ms</span><br><span class="line"> 7  142.250.169.120 (142.250.169.120)  7.107 ms</span><br><span class="line">    72.14.218.128 (72.14.218.128)  8.185 ms</span><br><span class="line">    72.14.215.0 (72.14.215.0)  7.691 ms</span><br><span class="line"> 8  * * *</span><br><span class="line"> 9  8.8.8.8 (8.8.8.8)  52.815 ms  29.545 ms  6.719 ms</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Introduction-to-ICMP-Protocol/l.png" alt="l"></p>
+<p>可以觀察到，從我的 Macbook 到 8.8.8.8，會經過 <code>9 個 hops (包含 8.8.8.8)</code>，總共有 <code>30 個封包</code>，對應每筆請求都會 <code>傳遞 3 個封包的規則</code>，並且 <code>第 3、6 筆</code> 封包也確實有根據 TTL 經過的 <code>路由器數量</code> 來遞增最後目的位址則是返回 <code>Destintantion unreachable (Port unreachable)</code> 的 ICMP 報文收尾。</p>
+<p><img src="/images/Introduction-to-ICMP-Protocol/m.png" alt="m"></p>
+<p><img src="/images/Introduction-to-ICMP-Protocol/n.png" alt="n"></p>
+<blockquote>
+<p>這邊其實使用 <code>host 8.8.8.8</code> 將 IP 地址進行過濾，所以可能有人會發現沒有 <code>Time to live exceed in-transit</code> 報文，只要不過濾 8.8.8.8 就可以看到相對應資訊，如下圖所示。</p>
+</blockquote>
+<p><img src="/images/Introduction-to-ICMP-Protocol/o.png" alt="o"></p>
+<h2 id="參考資料"><a href="#參考資料" class="headerlink" title="參考資料"></a>參考資料</h2><ul>
+<li><span class="exturl" data-url="aHR0cHM6Ly93d3cudHNuaWVuLmlkdi50dy9NYW5hZ2VyX1dlYkJvb2svY2hhcDQvNC01JTIwSUNNUCUyMCVFNSU4RCU5NCVFNSVBRSU5QSVFOCU4OCU4NyVFNSU4OCU4NiVFNiU5RSU5MC5odG1s">https://www.tsnien.idv.tw/Manager_WebBook/chap4/4-5 ICMP 協定與分析.html<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly9zZG4uZmVpc2t5Lnh5ei93YW5nLWx1by1qaS1jaHUvaW5kZXgvaWNtcA==">https://sdn.feisky.xyz/wang-luo-ji-chu/index/icmp<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly93d3cuc2NhbGVyLmNvbS90b3BpY3MvZGlmZmVyZW5jZS1iZXR3ZWVuLXBpbmctYW5kLXRyYWNlcm91dGUv">https://www.scaler.com/topics/difference-between-ping-and-traceroute/<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly95b3V0dS5iZS95aWh3SFhvbV9law==">https://youtu.be/yihwHXom_ek<i class="fa fa-external-link-alt"></i></span></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        <div>
+        
+            <div style="text-align:center;color: #ccc;font-size:14px;">------ 本文結束 ------</div>
+        
+        </div>
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>作者： </strong>POABOB
+  </li>
+  <li class="post-copyright-link">
+    <strong>文章連結：</strong>
+    <a href="https://poabob.github.io/2024-01-03/Introduction-to-ICMP-Protocol/" title="ICMP 協議與排查">https://poabob.github.io/2024-01-03/Introduction-to-ICMP-Protocol/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版權聲明： </strong>本網誌所有文章除特別聲明外，均採用 <span class="exturl" data-url="aHR0cHM6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LW5jLXNhLzQuMC96aC1UVw=="><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</span> 許可協議。轉載請註明出處！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Backend/" rel="tag"># Backend</a>
+              <a href="/tags/interview/" rel="tag"># interview</a>
+              <a href="/tags/internet/" rel="tag"># internet</a>
+              <a href="/tags/SDN/" rel="tag"># SDN</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024-01-02/Introduction-to-ARP-Protocol/" rel="prev" title="ARP 協議與排查">
+      <i class="fa fa-chevron-left"></i> ARP 協議與排查
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+  <div id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#ICMP-協議"><span class="nav-number">1.</span> <span class="nav-text">ICMP 協議</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#定義"><span class="nav-number">1.1.</span> <span class="nav-text">定義</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ICMP-格式"><span class="nav-number">1.2.</span> <span class="nav-text">ICMP 格式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Ping"><span class="nav-number">1.3.</span> <span class="nav-text">Ping</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#使用範例"><span class="nav-number">1.3.1.</span> <span class="nav-text">使用範例</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Traceroute"><span class="nav-number">1.4.</span> <span class="nav-text">Traceroute</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#使用場景"><span class="nav-number">1.4.1.</span> <span class="nav-text">使用場景</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#使用範例-1"><span class="nav-number">1.4.2.</span> <span class="nav-text">使用範例</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ICMP-排查"><span class="nav-number">2.</span> <span class="nav-text">ICMP 排查</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Ping-1"><span class="nav-number">2.1.</span> <span class="nav-text">Ping</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Traceroute-1"><span class="nav-number">2.2.</span> <span class="nav-text">Traceroute</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#參考資料"><span class="nav-number">3.</span> <span class="nav-text">參考資料</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="POABOB"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">POABOB</p>
+  <div class="site-description" itemprop="description">Life is but a span!</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">17</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">51</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL1BPQUJPQg==" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;POABOB"><i class="fab fa-github fa-fw"></i>GitHub</span>
+      </span>
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="bWFpbHRvOnp4Yzc1MjE2NkBnbWFpbC5jb20=" title="E-Mail → mailto:zxc752166@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</span>
+      </span>
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="aHR0cHM6Ly93d3cuZmFjZWJvb2suY29tL3Byb2ZpbGUucGhwP2lkPTEwMDAwMDMyMTQwMDU5MA==" title="FB Page → https:&#x2F;&#x2F;www.facebook.com&#x2F;profile.php?id&#x3D;100000321400590"><i class="fab fa-facebook fa-fw"></i>FB Page</span>
+      </span>
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="aHR0cHM6Ly9pbnN0YWdyYW0uY29tLzB4N2YyZWI=" title="Instagram → https:&#x2F;&#x2F;instagram.com&#x2F;0x7f2eb"><i class="fab fa-instagram fa-fw"></i>Instagram</span>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">POABOB</span>
+</div>
+  <div class="powered-by">由 <span class="exturl theme-link" data-url="aHR0cHM6Ly9oZXhvLmlv">Hexo</span> & <span class="exturl theme-link" data-url="aHR0cHM6Ly9waXNjZXMudGhlbWUtbmV4dC5vcmc=">NexT.Pisces</span> 強力驅動
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/pjax/pjax.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+  <script>
+var pjax = new Pjax({
+  selectors: [
+    'head title',
+    '#page-configurations',
+    '.content-wrap',
+    '.post-toc-wrap',
+    '.languages',
+    '#pjax'
+  ],
+  switches: {
+    '.post-toc-wrap': Pjax.switches.innerHTML
+  },
+  analytics: false,
+  cacheBust: false,
+  scrollTo : !CONFIG.bookmark.enable
+});
+
+window.addEventListener('pjax:success', () => {
+  document.querySelectorAll('script[data-pjax], script#page-configurations, #pjax script').forEach(element => {
+    var code = element.text || element.textContent || element.innerHTML || '';
+    var parent = element.parentNode;
+    parent.removeChild(element);
+    var script = document.createElement('script');
+    if (element.id) {
+      script.id = element.id;
+    }
+    if (element.className) {
+      script.className = element.className;
+    }
+    if (element.type) {
+      script.type = element.type;
+    }
+    if (element.src) {
+      script.src = element.src;
+      // Force synchronous loading of peripheral JS.
+      script.async = false;
+    }
+    if (element.dataset.pjax !== undefined) {
+      script.dataset.pjax = '';
+    }
+    if (code !== '') {
+      script.appendChild(document.createTextNode(code));
+    }
+    parent.appendChild(script);
+  });
+  NexT.boot.refresh();
+  // Define Motion Sequence & Bootstrap Motion.
+  if (CONFIG.motion.enable) {
+    NexT.motion.integrator
+      .init()
+      .add(NexT.motion.middleWares.subMenu)
+      .add(NexT.motion.middleWares.postList)
+      .bootstrap();
+  }
+  NexT.utils.updateSidebarPosition();
+});
+</script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div id="pjax">
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="https://gist.githubusercontent.com/POABOB/65b37ccc358df67efffeedf571219b2a/raw/b26f8f05e0951aa1c22d11122f3232b986012141/md5.min.js"></script>
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : '5aa580a2136b90e75fd6',
+      clientSecret: '128f00ea948ebd5cb1c0c2c7c3a2b81f067257ea',
+      repo        : 'poabob.github.io',
+      owner       : 'POABOB',
+      admin       : ['POABOB'],
+      id          : '50b5aba2242861ea2e7716873aa80cc7',
+        language: 'en | es-ES | fr | ru | zh-CN | zh-TW',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+    </div>
+</body>
+</html>
