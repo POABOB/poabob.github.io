@@ -237,10 +237,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">發表於</span>
-              
 
-              <time title="創建時間：2024-01-03 02:07:13 / 修改時間：02:40:29" itemprop="dateCreated datePublished" datetime="2024-01-03T02:07:13+08:00">2024-01-03</time>
+              <time title="創建時間：2024-01-03 02:07:13" itemprop="dateCreated datePublished" datetime="2024-01-03T02:07:13+08:00">2024-01-03</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新於</span>
+                <time title="修改時間：2024-01-06 13:18:03" itemprop="dateModified" datetime="2024-01-06T13:18:03+08:00">2024-01-06</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -312,10 +318,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">發表於</span>
-              
 
-              <time title="創建時間：2024-01-02 06:07:13 / 修改時間：06:35:11" itemprop="dateCreated datePublished" datetime="2024-01-02T06:07:13+08:00">2024-01-02</time>
+              <time title="創建時間：2024-01-02 06:07:13" itemprop="dateCreated datePublished" datetime="2024-01-02T06:07:13+08:00">2024-01-02</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新於</span>
+                <time title="修改時間：2024-01-06 14:08:34" itemprop="dateModified" datetime="2024-01-06T14:08:34+08:00">2024-01-06</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -337,7 +349,10 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="ARP-協議"><a href="#ARP-協議" class="headerlink" title="ARP 協議"></a>ARP 協議</h2><h3 id="定義"><a href="#定義" class="headerlink" title="定義"></a>定義</h3><p><strong>位址解析協定</strong>，全名 Address Resolution Protocol，位於 <code>鏈結層</code> (<code>Link Layer</code>，<code>TCP/IP</code> 模型) 中，負責將 <code>32bit</code> <code>IP</code> Address 轉換成 <code>48bit</code> 乙太網地址(<code>MAC</code> Address) 的協議，用來 <code>確定請求的目的網路接口 (Network Interface)</code> 。反之，若是要將 MAC Address 轉換成 IP Address，則是使用 <code>RARP</code> 協議。</p>
+          <h2 id="ARP-協議"><a href="#ARP-協議" class="headerlink" title="ARP 協議"></a>ARP 協議</h2><h3 id="定義"><a href="#定義" class="headerlink" title="定義"></a>定義</h3><p><strong>位址解析協定</strong>，全名 Address Resolution Protocol，位於 <code>網路存取層</code> 與 <code>網路層</code> (<code>TCP/IP</code> 模型) 中，負責將 <code>32bit</code> <code>IP</code> Address 轉換成 <code>48bit</code> 乙太網地址(<code>MAC</code> Address) 的協議，用來 <code>獲取目的 IP Address 的實體位址</code>，並且藉由添加 Ethernet Header 使用實體網路來傳遞。反之，若是要將 MAC Address 轉換成 IP Address，則是使用 <code>RARP</code> 協議。</p>
+<blockquote>
+<p>ARP 協議只會作用於相同的網路區段下，若是兩台主機處於不同網域，則 ARP 就會直接請求所屬網域內Default Gateway 的實體位址，而不是目標主機的實體位址。</p>
+</blockquote>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2024-01-02/Introduction-to-ARP-Protocol/#more" rel="contents">

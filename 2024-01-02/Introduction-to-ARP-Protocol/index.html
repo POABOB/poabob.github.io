@@ -23,12 +23,12 @@
     var CONFIG = {"hostname":"poabob.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":true,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="ARP 協議定義位址解析協定，全名 Address Resolution Protocol，位於 鏈結層 (Link Layer，TCP&#x2F;IP 模型) 中，負責將 32bit IP Address 轉換成 48bit 乙太網地址(MAC Address) 的協議，用來 確定請求的目的網路接口 (Network Interface) 。反之，若是要將 MAC Address 轉換成 IP Addre">
+  <meta name="description" content="ARP 協議定義位址解析協定，全名 Address Resolution Protocol，位於 網路存取層 與 網路層 (TCP&#x2F;IP 模型) 中，負責將 32bit IP Address 轉換成 48bit 乙太網地址(MAC Address) 的協議，用來 獲取目的 IP Address 的實體位址，並且藉由添加 Ethernet Header 使用實體網路來傳遞。反之，若是要將 MAC A">
 <meta property="og:type" content="article">
 <meta property="og:title" content="ARP 協議與排查">
 <meta property="og:url" content="https://poabob.github.io/2024-01-02/Introduction-to-ARP-Protocol/index.html">
 <meta property="og:site_name" content="POABOB">
-<meta property="og:description" content="ARP 協議定義位址解析協定，全名 Address Resolution Protocol，位於 鏈結層 (Link Layer，TCP&#x2F;IP 模型) 中，負責將 32bit IP Address 轉換成 48bit 乙太網地址(MAC Address) 的協議，用來 確定請求的目的網路接口 (Network Interface) 。反之，若是要將 MAC Address 轉換成 IP Addre">
+<meta property="og:description" content="ARP 協議定義位址解析協定，全名 Address Resolution Protocol，位於 網路存取層 與 網路層 (TCP&#x2F;IP 模型) 中，負責將 32bit IP Address 轉換成 48bit 乙太網地址(MAC Address) 的協議，用來 獲取目的 IP Address 的實體位址，並且藉由添加 Ethernet Header 使用實體網路來傳遞。反之，若是要將 MAC A">
 <meta property="og:locale" content="zh_TW">
 <meta property="og:image" content="https://poabob.github.io/images/Introduction-to-ARP-Protocol/a.png">
 <meta property="og:image" content="https://poabob.github.io/images/Introduction-to-ARP-Protocol/b.png">
@@ -38,7 +38,7 @@
 <meta property="og:image" content="https://poabob.github.io/images/Introduction-to-ARP-Protocol/f.png">
 <meta property="og:image" content="https://poabob.github.io/images/Introduction-to-ARP-Protocol/g.png">
 <meta property="article:published_time" content="2024-01-01T22:07:13.000Z">
-<meta property="article:modified_time" content="2024-01-01T22:35:11.297Z">
+<meta property="article:modified_time" content="2024-01-06T06:08:34.673Z">
 <meta property="article:author" content="POABOB">
 <meta property="article:tag" content="Backend">
 <meta property="article:tag" content="interview">
@@ -235,10 +235,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">發表於</span>
-              
 
-              <time title="創建時間：2024-01-02 06:07:13 / 修改時間：06:35:11" itemprop="dateCreated datePublished" datetime="2024-01-02T06:07:13+08:00">2024-01-02</time>
+              <time title="創建時間：2024-01-02 06:07:13" itemprop="dateCreated datePublished" datetime="2024-01-02T06:07:13+08:00">2024-01-02</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新於</span>
+                <time title="修改時間：2024-01-06 14:08:34" itemprop="dateModified" datetime="2024-01-06T14:08:34+08:00">2024-01-06</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -260,10 +266,13 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h2 id="ARP-協議"><a href="#ARP-協議" class="headerlink" title="ARP 協議"></a>ARP 協議</h2><h3 id="定義"><a href="#定義" class="headerlink" title="定義"></a>定義</h3><p><strong>位址解析協定</strong>，全名 Address Resolution Protocol，位於 <code>鏈結層</code> (<code>Link Layer</code>，<code>TCP/IP</code> 模型) 中，負責將 <code>32bit</code> <code>IP</code> Address 轉換成 <code>48bit</code> 乙太網地址(<code>MAC</code> Address) 的協議，用來 <code>確定請求的目的網路接口 (Network Interface)</code> 。反之，若是要將 MAC Address 轉換成 IP Address，則是使用 <code>RARP</code> 協議。</p>
+        <h2 id="ARP-協議"><a href="#ARP-協議" class="headerlink" title="ARP 協議"></a>ARP 協議</h2><h3 id="定義"><a href="#定義" class="headerlink" title="定義"></a>定義</h3><p><strong>位址解析協定</strong>，全名 Address Resolution Protocol，位於 <code>網路存取層</code> 與 <code>網路層</code> (<code>TCP/IP</code> 模型) 中，負責將 <code>32bit</code> <code>IP</code> Address 轉換成 <code>48bit</code> 乙太網地址(<code>MAC</code> Address) 的協議，用來 <code>獲取目的 IP Address 的實體位址</code>，並且藉由添加 Ethernet Header 使用實體網路來傳遞。反之，若是要將 MAC Address 轉換成 IP Address，則是使用 <code>RARP</code> 協議。</p>
+<blockquote>
+<p>ARP 協議只會作用於相同的網路區段下，若是兩台主機處於不同網域，則 ARP 就會直接請求所屬網域內Default Gateway 的實體位址，而不是目標主機的實體位址。</p>
+</blockquote>
 <a id="more"></a>
 
-<h3 id="運作原理"><a href="#運作原理" class="headerlink" title="運作原理"></a>運作原理</h3><p>假如當前的 Node A (120.107.152.137) 想要向 IP Address 為 120.107.152.4 的 Node 發送請求，這時候 Node A 其實不知道對應的會是 <code>哪一個 Node</code> 以及 <code>哪一個網路介面</code>，所以就會發 <code>ARP Request</code> (查詢 120.107.152.4) <code>廣播</code> 該網路區段內 的 Nodes。</p>
+<h3 id="運作原理"><a href="#運作原理" class="headerlink" title="運作原理"></a>運作原理</h3><p>假如當前的 Node A (120.107.152.137) 想要向 IP Address 為 120.107.152.4 的 Node 發送請求，這時候 Node A 其實不知道對應的會是 <code>哪一個 Node</code> 的實體位址，所以就會發 <code>ARP Request</code> (查詢 120.107.152.4) <code>廣播</code> 該網路區段內 的 Nodes。</p>
 <p>每個 Node 一旦收到請求就會判斷 <code>目標是否為自己</code>，若不是則直接 <code>丟包</code>，反之，則將自己的 <code>MAC Address</code> 返回。最後，Node D (120.107.152.4) 就會根據 <code>ARP Reply</code> (返回 10-bf-48-1a-2a-c1) 將結果儲存於 <code>ARP Cache</code>，做為後續直接的使用。</p>
 <p><img src="/images/Introduction-to-ARP-Protocol/a.png" alt="a"></p>
 <h3 id="ARP-Cache"><a href="#ARP-Cache" class="headerlink" title="ARP Cache"></a>ARP Cache</h3><p>APR 為了 <code>避免</code> 每次都要廣播查找 MAC Address，都會將廣播獲取的結果 <code>進行 Cached</code>，一般過期時間為 <code>20 分鐘</code>，如果遇到像是 <code>&lt;incomplete&gt;</code> 這種不完整的資料，則是 <code>3 分鐘</code>。</p>

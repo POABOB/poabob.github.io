@@ -46,7 +46,7 @@
 <meta property="og:image" content="https://poabob.github.io/images/Introduction-to-ICMP-Protocol/n.png">
 <meta property="og:image" content="https://poabob.github.io/images/Introduction-to-ICMP-Protocol/o.png">
 <meta property="article:published_time" content="2024-01-02T18:07:13.000Z">
-<meta property="article:modified_time" content="2024-01-02T18:40:29.774Z">
+<meta property="article:modified_time" content="2024-01-06T05:18:03.926Z">
 <meta property="article:author" content="POABOB">
 <meta property="article:tag" content="Backend">
 <meta property="article:tag" content="interview">
@@ -243,10 +243,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">發表於</span>
-              
 
-              <time title="創建時間：2024-01-03 02:07:13 / 修改時間：02:40:29" itemprop="dateCreated datePublished" datetime="2024-01-03T02:07:13+08:00">2024-01-03</time>
+              <time title="創建時間：2024-01-03 02:07:13" itemprop="dateCreated datePublished" datetime="2024-01-03T02:07:13+08:00">2024-01-03</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新於</span>
+                <time title="修改時間：2024-01-06 13:18:03" itemprop="dateModified" datetime="2024-01-06T13:18:03+08:00">2024-01-06</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -274,7 +280,7 @@
 <p>在網路上，<code>每一個 Node</code> 或是 <code>路由器</code> 都會支援 ICMP 協議，在 <code>彼此的傳遞過程</code> 就可以來互相交換目前網路的狀況資訊，一旦在傳遞的過程中發生錯誤 (例如：主機不可達、路由不可達、網路中斷等)，ICMP 協議就會將這些 <code>錯誤資訊的封包傳回主機</code> 進行 <code>錯誤處理</code>。</p>
 <p>其中，ICMP 所產生的報文有兩種，分別是 <code>障礙通知</code> 和 <code>狀況查詢</code>：</p>
 <ol>
-<li><code>障礙通知</code>：當主機封包傳送至一半發生問題而無發繼續傳遞，ICMP 就會 <code>將原因回傳原主機</code>。</li>
+<li><code>障礙通知</code>：當主機封包傳送至一半發生問題而無法繼續傳遞，ICMP 就會 <code>將原因回傳原主機</code>。</li>
 </ol>
 <p><img src="/images/Introduction-to-ICMP-Protocol/a.png" alt="a"></p>
 <ol start="2">
@@ -418,8 +424,9 @@
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">$ traceroute 8.8.8.8</span><br><span class="line">traceroute to 8.8.8.8 (8.8.8.8), 64 hops max, 52 byte packets</span><br><span class="line"> 1  192.168.1.1 (192.168.1.1)  12.289 ms  4.513 ms  3.154 ms</span><br><span class="line"> 2  h254.s98.ts.hinet.net (168.95.98.254)  3.609 ms  4.799 ms  3.971 ms</span><br><span class="line"> 3  chch-3332.hinet.net (168.95.157.26)  4.961 ms  5.156 ms  5.000 ms</span><br><span class="line"> 4  chch-3032.hinet.net (220.128.20.22)  7.773 ms  7.852 ms  7.222 ms</span><br><span class="line"> 5  tylc-3032.hinet.net (220.128.19.10)  7.439 ms  7.429 ms *</span><br><span class="line"> 6  tylc-3336.hinet.net (220.128.9.21)  15.753 ms</span><br><span class="line">    pcpd-3331.hinet.net (220.128.14.81)  7.435 ms</span><br><span class="line">    pcpd-3331.hinet.net (220.128.12.109)  8.335 ms</span><br><span class="line"> 7  142.250.169.120 (142.250.169.120)  7.107 ms</span><br><span class="line">    72.14.218.128 (72.14.218.128)  8.185 ms</span><br><span class="line">    72.14.215.0 (72.14.215.0)  7.691 ms</span><br><span class="line"> 8  * * *</span><br><span class="line"> 9  8.8.8.8 (8.8.8.8)  52.815 ms  29.545 ms  6.719 ms</span><br></pre></td></tr></table></figure>
 
 <p><img src="/images/Introduction-to-ICMP-Protocol/l.png" alt="l"></p>
-<p>可以觀察到，從我的 Macbook 到 8.8.8.8，會經過 <code>9 個 hops (包含 8.8.8.8)</code>，總共有 <code>30 個封包</code>，對應每筆請求都會 <code>傳遞 3 個封包的規則</code>，並且 <code>第 3、6 筆</code> 封包也確實有根據 TTL 經過的 <code>路由器數量</code> 來遞增最後目的位址則是返回 <code>Destintantion unreachable (Port unreachable)</code> 的 ICMP 報文收尾。</p>
+<p>可以觀察到，從我的 Macbook 到 8.8.8.8，會經過 <code>9 個 hops (包含 8.8.8.8)</code>，總共有 <code>30 個封包</code>，對應每筆請求都會 <code>傳遞 3 個封包的規則</code>，最後目的位址則是返回 <code>Destintantion unreachable (Port unreachable)</code> 的 ICMP 報文收尾。</p>
 <p><img src="/images/Introduction-to-ICMP-Protocol/m.png" alt="m"></p>
+<p>如果從 <code>第 3、6 筆</code> 封包也確實有根據 TTL 經過的 <code>路由器數量</code> 來遞增。</p>
 <p><img src="/images/Introduction-to-ICMP-Protocol/n.png" alt="n"></p>
 <blockquote>
 <p>這邊其實使用 <code>host 8.8.8.8</code> 將 IP 地址進行過濾，所以可能有人會發現沒有 <code>Time to live exceed in-transit</code> 報文，只要不過濾 8.8.8.8 就可以看到相對應資訊，如下圖所示。</p>
